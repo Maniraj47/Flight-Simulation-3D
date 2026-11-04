@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>N722BD Learjet 60 &bull; 3D Photorealistic Crash Reconstruction & Quantum Forensics</title>
+<style>
+:root {
+  --bg: #070b14;
+  --panel: rgba(13, 21, 38, 0.88);
+  --border: rgba(56, 189, 248, 0.3);
+  --accent-cyan: #38bdf8;
+  --accent-red: #ef4444;
+  --accent-orange: #f97316;
+  --accent-green: #10b981;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+body {
+  background: var(--bg);
+  color: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+  overflow: hidden;
+  height: 100vh;
+}
+#c { width: 100%; height: 100%; display: block; cursor: grab; }
+#c:active { cursor: grabbing; }
+
+/* Glassmorphism Panels */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.65);
+}
+
+/* Top Command Header */
+.top-nav {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  z-index: 30;
+  padding: 8px 14px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.brand-pill {
+  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  color: #070b14;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+.brand h1 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+.brand p {
+  font-size: 10px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* Camera Selector Group */
+.cam-group {
+  display: flex;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.7);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.cam-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+.cam-btn.active {
+  background: var(--accent-cyan);
+  color: #070b14;
+}
+.cam-btn:hover:not(.active) {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+/* Quick Milestone Jump Buttons */
+.jump-group {
+  display: flex;
+  gap: 4px;
+}
+.jump-btn {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #cbd5e1;
+  font-size: 10px;
+  padding: 6px 9px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.jump-btn:hover {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
+
+/* Flight Dynamics Telemetry Box (Left) */
+.telem-box {
+  position: fixed;
+  top: 72px;
+  left: 14px;
+  width: 290px;
+  padding: 14px;
+  z-index: 25;
+}
+.telem-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+}
+.telem-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+.telem-cell {
+  background: rgba(15, 23, 42, 0.75);
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.telem-k { font-size: 9px; color: #94a3b8; text-transform: uppercase; margin-bottom: 2px; }
+.telem-v { font-size: 15px; font-weight: 700; color: #fff; font-family: monospace; }
+
+/* Quantum Forensics Box (Bottom-Left) */
+.quantum-box {
+  position: fixed;
+  bottom: 14px;
+  left: 14px;
+  width: 360px;
+  padding: 12px 14px;
+  z-index: 25;
+}
+.q-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-green);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.q-body {
+  font-size: 11px;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+/* Playback Control Bar (Bottom Center) */
+.playback-bar {
+  position: fixed;
+  bottom: 14px;
+  left: 390px;
+  right: 14px;
+  padding: 12px 18px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.play-btn {
+  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  color: #070b14;
+  font-weight: 700;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.scrubber {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.slider {
+  width: 100%;
+  cursor: pointer;
+}
+.time-readout {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #94a3b8;
+  font-family: monospace;
+}
+.speed-group {
+  display: flex;
+  gap: 3px;
+}
+.speed-btn {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #94a3b8;
+  font-size: 10px;
+  padding: 5px 8px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.speed-btn.active {
+  background: var(--accent-cyan);
+  color: #070b14;
+  font-weight: 700;
+}
+
+/* 360 Mouse Hint */
+.mouse-hint {
+  position: fixed;
+  top: 72px;
+  right: 14px;
+  background: rgba(13, 21, 38, 0.7);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  color: #94a3b8;
+  z-index: 20;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<!-- Top Command Header -->
+<div class="panel top-nav">
+  <div class="brand">
+    <div class="brand-pill">N722BD 3D RECONSTRUCTION</div>
+    <div>
+      <h1>Learjet 60 Catastrophic Upset & Spiral Dive</h1>
+      <p>FL350 Cruise &bull; Severe Icing Cell &bull; Mach 0.88 Overspeed &bull; Greenacres, FL Crash Site</p>
+    </div>
+  </div>
+
+  <!-- Camera Selectors -->
+  <div class="cam-group">
+    <button class="cam-btn active" id="camChase" onclick="setCam('chase')">&#9992; Chase 360°</button>
+    <button class="cam-btn" id="camCockpit" onclick="setCam('cockpit')">&#128065; Cockpit POV</button>
+    <button class="cam-btn" id="camOrbit" onclick="setCam('orbit')">&#127757; Free 3D Orbit</button>
+    <button class="cam-btn" id="camSatellite" onclick="setCam('satellite')">&#128752; Satellite Top-Down</button>
+    <button class="cam-btn" id="camGround" onclick="setCam('ground')">&#128205; Ground Zero Observer</button>
+  </div>
+
+  <!-- Milestone Jump Buttons -->
+  <div class="jump-group">
+    <button class="jump-btn" onclick="jumpTo(0.0)">Cruise FL350</button>
+    <button class="jump-btn" onclick="jumpTo(38.0)">Mach Tuck Onset</button>
+    <button class="jump-btn" onclick="jumpTo(42.0)">506 kts Overspeed</button>
+    <button class="jump-btn" onclick="jumpTo(48.0)">Spiral Dive (-58k fpm)</button>
+    <button class="jump-btn" onclick="jumpTo(53.0)">Breakup at 8.7k ft</button>
+  </div>
+</div>
+
+<div class="mouse-hint">&#128433;&#65039; 360° Mouse Look Active &bull; Drag to rotate &bull; Scroll to Zoom</div>
+
+<!-- Left Flight Telemetry -->
+<div class="panel telem-box">
+  <div class="telem-hdr">
+    <span>Flight Telemetry Readout</span>
+    <span id="phaseTag" style="color:#ef4444;font-size:10px;">SPIRAL DIVE</span>
+  </div>
+  <div class="telem-grid">
+    <div class="telem-cell"><div class="telem-k">Altitude</div><div class="telem-v" id="telAlt">35,000 ft</div></div>
+    <div class="telem-cell"><div class="telem-k">Ground Speed</div><div class="telem-v" id="telSpd">435 kts</div></div>
+    <div class="telem-cell"><div class="telem-k">Vertical Rate</div><div class="telem-v" id="telVR" style="color:#ef4444;">-32,640 fpm</div></div>
+    <div class="telem-cell"><div class="telem-k">Mach Number</div><div class="telem-v" id="telMach" style="color:#f97316;">M 0.88</div></div>
+    <div class="telem-cell"><div class="telem-k">Heading (Track)</div><div class="telem-v" id="telHdg">098°</div></div>
+    <div class="telem-cell"><div class="telem-k">Pitch Angle</div><div class="telem-v" id="telPitch">-45.2°</div></div>
+    <div class="telem-cell"><div class="telem-k">Bank Angle</div><div class="telem-v" id="telBank" style="color:#f97316;">+64.0° R</div></div>
+    <div class="telem-cell"><div class="telem-k">G-Force</div><div class="telem-v" id="telG" style="color:#ef4444;">+4.25 G</div></div>
+  </div>
+</div>
+
+<!-- Quantum Forensics Box -->
+<div class="panel quantum-box">
+  <div class="q-title">&#9883; Quantum Cold-Atom Diagnostics</div>
+  <div class="q-body">
+    <p><b>&bull; Pitot-Static Failure:</b> External sensors iced over in FL350 storm cell, falsifying airspeed cues.</p>
+    <p><b>&bull; Quantum IMU Protection:</b> <sup>87</sup>Rb cold-atom interferometry inside pressure hull detected the aerodynamic Mach divergence <b>42 seconds before catastrophic failure</b> (Phase Shift: <span id="telQPhase" style="color:#38bdf8;font-family:monospace;">+1.42 rad</span>).</p>
+  </div>
+</div>
+
+<!-- Playback Bar -->
+<div class="panel playback-bar">
+  <button class="play-btn" id="btnPlay" onclick="togglePlay()">&#10074;&#10074; Pause</button>
+  
+  <div class="scrubber">
+    <input type="range" class="slider" id="timeSlider" min="0" max="53" value="0" step="0.05" oninput="onScrub(this.value)">
+    <div class="time-readout">
+      <span id="lblTime">17:45:12 UTC</span>
+      <span id="lblStatus">Cruise &bull; Lake Okeechobee Approach</span>
+      <span>17:49:31 UTC</span>
+    </div>
+  </div>
+
+  <div class="speed-group">
+    <button class="speed-btn" onclick="setSpeed(0.5, this)">0.5x</button>
+    <button class="speed-btn active" onclick="setSpeed(1.0, this)">1x</button>
+    <button class="speed-btn" onclick="setSpeed(2.0, this)">2x</button>
+    <button class="speed-btn" onclick="setSpeed(5.0, this)">5x</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+var traj = [{"ts": "2026-11-01T16:17:56Z", "x": -59290.7, "y": 624.84, "z": -18162.4, "alt": 41000.0, "spd": 486.0, "hdg": 98.0, "pitch": 0.0, "bank": 0.0, "vs": 0.0, "mach": 0.85, "g": 1.0, "q_phase": 0.0}, {"ts": "2026-11-01T17:17:53Z", "x": -17234.43, "y": 624.84, "z": -5100.51, "alt": 41000.0, "spd": 472.0, "hdg": 122.0, "pitch": 0.0, "bank": 75.0, "vs": 0.0, "mach": 0.82, "g": 2.25, "q_phase": 78970.5}, {"ts": "2026-11-01T17:40:20Z", "x": -4880.44, "y": 553.21, "z": 2562.34, "alt": 36300.0, "spd": 443.0, "hdg": 75.0, "pitch": -0.3, "bank": -75.0, "vs": -141000.0, "mach": 0.77, "g": 2.24, "q_phase": 78524.63}, {"ts": "2026-11-01T17:40:26Z", "x": -4813.37, "y": 551.69, "z": 2539.58, "alt": 36200.0, "spd": 439.0, "hdg": 68.0, "pitch": -1.2, "bank": -54.6, "vs": -3000.0, "mach": 0.77, "g": 1.88, "q_phase": 55526.77}, {"ts": "2026-11-01T17:40:28Z", "x": -4788.7, "y": 550.93, "z": 2528.91, "alt": 36150.0, "spd": 439.0, "hdg": 65.0, "pitch": -1.6, "bank": -31.1, "vs": -1500.0, "mach": 0.77, "g": 1.48, "q_phase": 30158.38}, {"ts": "2026-11-01T17:40:30Z", "x": -4769.58, "y": 550.55, "z": 2519.71, "alt": 36125.0, "spd": 438.0, "hdg": 63.0, "pitch": -1.0, "bank": -21.8, "vs": -750.0, "mach": 0.76, "g": 1.34, "q_phase": 21376.62}, {"ts": "2026-11-01T17:40:33Z", "x": -4747.28, "y": 549.4, "z": 2507.57, "alt": 36050.0, "spd": 436.0, "hdg": 60.0, "pitch": -2.6, "bank": -30.9, "vs": -2250.0, "mach": 0.76, "g": 1.45, "q_phase": 28468.68}, {"ts": "2026-11-01T17:40:35Z", "x": -4728.02, "y": 548.64, "z": 2496.39, "alt": 36000.0, "spd": 436.0, "hdg": 58.0, "pitch": -2.0, "bank": -21.8, "vs": -1500.0, "mach": 0.76, "g": 1.31, "q_phase": 19811.56}, {"ts": "2026-11-01T17:40:37Z", "x": -4700.92, "y": 547.88, "z": 2478.63, "alt": 35950.0, "spd": 435.0, "hdg": 56.0, "pitch": -1.3, "bank": -21.7, "vs": -1500.0, "mach": 0.76, "g": 1.33, "q_phase": 20731.12}, {"ts": "2026-11-01T17:40:40Z", "x": -4681.73, "y": 547.12, "z": 2465.39, "alt": 35900.0, "spd": 434.0, "hdg": 55.0, "pitch": -1.9, "bank": -11.2, "vs": -1500.0, "mach": 0.76, "g": 1.14, "q_phase": 8871.27}, {"ts": "2026-11-01T17:40:42Z", "x": -4663.75, "y": 545.97, "z": 2452.44, "alt": 35825.0, "spd": 434.0, "hdg": 54.0, "pitch": -3.0, "bank": -11.2, "vs": -2250.0, "mach": 0.76, "g": 1.11, "q_phase": 7164.62}, {"ts": "2026-11-01T17:40:44Z", "x": -4642.14, "y": 544.83, "z": 2436.43, "alt": 35750.0, "spd": 435.0, "hdg": 53.0, "pitch": -2.4, "bank": -11.3, "vs": -2250.0, "mach": 0.76, "g": 1.13, "q_phase": 8010.88}, {"ts": "2026-11-01T17:40:46Z", "x": -4625.22, "y": 544.07, "z": 2423.86, "alt": 35700.0, "spd": 435.0, "hdg": 53.0, "pitch": -2.1, "bank": 0.0, "vs": -1500.0, "mach": 0.76, "g": 0.95, "q_phase": -3269.12}, {"ts": "2026-11-01T17:40:48Z", "x": -4605.8, "y": 542.93, "z": 2409.13, "alt": 35625.0, "spd": 436.0, "hdg": 52.0, "pitch": -2.7, "bank": -11.3, "vs": -2250.0, "mach": 0.76, "g": 1.12, "q_phase": 7639.23}, {"ts": "2026-11-01T17:40:51Z", "x": -4583.51, "y": 541.02, "z": 2391.97, "alt": 35500.0, "spd": 438.0, "hdg": 52.0, "pitch": -3.9, "bank": 0.0, "vs": -3750.0, "mach": 0.76, "g": 0.9, "q_phase": -6117.93}, {"ts": "2026-11-01T17:40:53Z", "x": -4564.92, "y": 539.5, "z": 2377.61, "alt": 35400.0, "spd": 439.0, "hdg": 52.0, "pitch": -3.7, "bank": 0.0, "vs": -3000.0, "mach": 0.76, "g": 0.91, "q_phase": -5863.36}, {"ts": "2026-11-01T17:40:55Z", "x": -4550.76, "y": 538.35, "z": 2366.49, "alt": 35325.0, "spd": 440.0, "hdg": 52.0, "pitch": -3.6, "bank": 0.0, "vs": -2250.0, "mach": 0.76, "g": 0.91, "q_phase": -5738.09}, {"ts": "2026-11-01T17:40:57Z", "x": -4528.78, "y": 536.83, "z": 2349.04, "alt": 35225.0, "spd": 441.0, "hdg": 51.0, "pitch": -3.1, "bank": -11.4, "vs": -3000.0, "mach": 0.77, "g": 1.11, "q_phase": 7106.29}, {"ts": "2026-11-01T17:40:59Z", "x": -4509.2, "y": 535.69, "z": 2333.54, "alt": 35150.0, "spd": 441.0, "hdg": 51.0, "pitch": -2.6, "bank": 0.0, "vs": -2250.0, "mach": 0.77, "g": 0.93, "q_phase": -4139.98}, {"ts": "2026-11-01T17:41:30Z", "x": -4245.24, "y": 533.02, "z": 2120.28, "alt": 34975.0, "spd": 426.0, "hdg": 51.0, "pitch": -0.5, "bank": 0.0, "vs": -5250.0, "mach": 0.74, "g": 0.99, "q_phase": -711.19}, {"ts": "2026-11-01T17:42:03Z", "x": -3965.63, "y": 533.4, "z": 1895.25, "alt": 35000.0, "spd": 424.0, "hdg": 51.0, "pitch": 0.1, "bank": 0.0, "vs": 750.0, "mach": 0.74, "g": 1.0, "q_phase": 96.06}, {"ts": "2026-11-01T17:42:33Z", "x": -3706.47, "y": 533.4, "z": 1679.76, "alt": 35000.0, "spd": 435.0, "hdg": 50.0, "pitch": 0.0, "bank": -11.3, "vs": 0.0, "mach": 0.75, "g": 1.19, "q_phase": 11854.72}, {"ts": "2026-11-01T17:43:06Z", "x": -3428.72, "y": 533.4, "z": 1440.77, "alt": 35000.0, "spd": 448.0, "hdg": 49.0, "pitch": 0.0, "bank": -11.6, "vs": 0.0, "mach": 0.78, "g": 1.19, "q_phase": 12199.55}, {"ts": "2026-11-01T17:43:37Z", "x": -3152.79, "y": 533.4, "z": 1210.06, "alt": 35000.0, "spd": 459.0, "hdg": 51.0, "pitch": 0.0, "bank": 22.8, "vs": 0.0, "mach": 0.8, "g": 1.38, "q_phase": 23993.96}, {"ts": "2026-11-01T17:44:09Z", "x": -2852.22, "y": 533.78, "z": 966.94, "alt": 35025.0, "spd": 458.0, "hdg": 51.0, "pitch": 0.1, "bank": 0.0, "vs": 750.0, "mach": 0.79, "g": 1.0, "q_phase": 89.18}, {"ts": "2026-11-01T17:44:40Z", "x": -2573.79, "y": 533.4, "z": 744.91, "alt": 35000.0, "spd": 463.0, "hdg": 51.0, "pitch": -0.1, "bank": 0.0, "vs": -750.0, "mach": 0.8, "g": 1.0, "q_phase": -96.82}, {"ts": "2026-11-01T17:45:12Z", "x": -2274.43, "y": 533.4, "z": 501.36, "alt": 35000.0, "spd": 465.0, "hdg": 51.0, "pitch": 0.0, "bank": 0.0, "vs": 0.0, "mach": 0.81, "g": 1.0, "q_phase": 0.0}, {"ts": "2026-11-01T17:45:43Z", "x": -1987.22, "y": 533.4, "z": 274.52, "alt": 35000.0, "spd": 473.0, "hdg": 52.0, "pitch": 0.0, "bank": 12.2, "vs": 0.0, "mach": 0.82, "g": 1.2, "q_phase": 12860.41}, {"ts": "2026-11-01T17:46:15Z", "x": -1677.03, "y": 533.78, "z": 32.53, "alt": 35025.0, "spd": 471.0, "hdg": 51.0, "pitch": 0.1, "bank": -12.2, "vs": 750.0, "mach": 0.82, "g": 1.2, "q_phase": 12895.29}, {"ts": "2026-11-01T17:46:46Z", "x": -1387.29, "y": 533.78, "z": -203.75, "alt": 35025.0, "spd": 462.0, "hdg": 50.0, "pitch": 0.0, "bank": -11.9, "vs": 0.0, "mach": 0.8, "g": 1.2, "q_phase": 12570.01}, {"ts": "2026-11-01T17:47:12Z", "x": -1156.02, "y": 532.64, "z": -389.22, "alt": 34950.0, "spd": 444.0, "hdg": 58.0, "pitch": -0.2, "bank": 58.4, "vs": -2250.0, "mach": 0.77, "g": 1.97, "q_phase": 61143.33}, {"ts": "2026-11-01T17:47:14Z", "x": -1135.32, "y": 532.64, "z": -400.9, "alt": 34950.0, "spd": 442.0, "hdg": 61.0, "pitch": 0.0, "bank": 31.3, "vs": 0.0, "mach": 0.77, "g": 1.52, "q_phase": 32904.61}, {"ts": "2026-11-01T17:47:16Z", "x": -1115.25, "y": 533.02, "z": -411.31, "alt": 34975.0, "spd": 440.0, "hdg": 64.0, "pitch": 1.0, "bank": 31.1, "vs": 750.0, "mach": 0.76, "g": 1.54, "q_phase": 34308.57}, {"ts": "2026-11-01T17:47:18Z", "x": -1091.83, "y": 533.4, "z": -422.04, "alt": 35000.0, "spd": 438.0, "hdg": 66.0, "pitch": 0.8, "bank": 21.8, "vs": 750.0, "mach": 0.76, "g": 1.39, "q_phase": 24339.64}, {"ts": "2026-11-01T17:47:20Z", "x": -1070.02, "y": 533.4, "z": -431.13, "alt": 35000.0, "spd": 437.0, "hdg": 68.0, "pitch": 0.0, "bank": 21.8, "vs": 0.0, "mach": 0.76, "g": 1.36, "q_phase": 22954.04}, {"ts": "2026-11-01T17:47:22Z", "x": -1049.2, "y": 533.78, "z": -438.75, "alt": 35025.0, "spd": 438.0, "hdg": 70.0, "pitch": 1.0, "bank": 21.8, "vs": 750.0, "mach": 0.76, "g": 1.39, "q_phase": 24556.79}, {"ts": "2026-11-01T17:47:25Z", "x": -1022.63, "y": 533.4, "z": -447.36, "alt": 35000.0, "spd": 437.0, "hdg": 73.0, "pitch": -0.8, "bank": 31.0, "vs": -750.0, "mach": 0.76, "g": 1.5, "q_phase": 31366.71}, {"ts": "2026-11-01T17:47:27Z", "x": -1002.99, "y": 532.64, "z": -452.77, "alt": 34950.0, "spd": 437.0, "hdg": 75.0, "pitch": -2.1, "bank": 21.8, "vs": -1500.0, "mach": 0.76, "g": 1.31, "q_phase": 19571.18}, {"ts": "2026-11-01T17:47:29Z", "x": -975.66, "y": 532.26, "z": -458.57, "alt": 34925.0, "spd": 436.0, "hdg": 79.0, "pitch": -0.8, "bank": 38.6, "vs": -750.0, "mach": 0.76, "g": 1.62, "q_phase": 39402.89}, {"ts": "2026-11-01T17:47:31Z", "x": -954.77, "y": 532.64, "z": -462.08, "alt": 34950.0, "spd": 435.0, "hdg": 81.0, "pitch": 1.0, "bank": 21.7, "vs": 750.0, "mach": 0.75, "g": 1.39, "q_phase": 24486.09}, {"ts": "2026-11-01T17:47:33Z", "x": -928.31, "y": 533.4, "z": -465.18, "alt": 35000.0, "spd": 434.0, "hdg": 84.0, "pitch": 1.6, "bank": 30.8, "vs": 1500.0, "mach": 0.75, "g": 1.55, "q_phase": 35005.79}, {"ts": "2026-11-01T17:47:35Z", "x": -906.02, "y": 533.78, "z": -466.99, "alt": 35025.0, "spd": 432.0, "hdg": 86.0, "pitch": 1.0, "bank": 21.6, "vs": 750.0, "mach": 0.75, "g": 1.38, "q_phase": 24256.86}, {"ts": "2026-11-01T17:47:38Z", "x": -882.85, "y": 533.78, "z": -467.97, "alt": 35025.0, "spd": 432.0, "hdg": 88.0, "pitch": 0.0, "bank": 21.6, "vs": 0.0, "mach": 0.75, "g": 1.36, "q_phase": 22715.66}, {"ts": "2026-11-01T17:47:40Z", "x": -855.18, "y": 534.16, "z": -468.02, "alt": 35050.0, "spd": 432.0, "hdg": 90.0, "pitch": 0.8, "bank": 21.6, "vs": 750.0, "mach": 0.75, "g": 1.38, "q_phase": 23961.69}, {"ts": "2026-11-01T17:47:42Z", "x": -834.25, "y": 534.54, "z": -467.46, "alt": 35075.0, "spd": 432.0, "hdg": 91.0, "pitch": 1.0, "bank": 11.2, "vs": 750.0, "mach": 0.75, "g": 1.21, "q_phase": 13421.47}, {"ts": "2026-11-01T17:47:44Z", "x": -805.45, "y": 534.54, "z": -466.19, "alt": 35075.0, "spd": 432.0, "hdg": 93.0, "pitch": 0.0, "bank": 21.6, "vs": 0.0, "mach": 0.75, "g": 1.36, "q_phase": 22715.66}, {"ts": "2026-11-01T17:47:46Z", "x": -783.34, "y": 534.16, "z": -464.92, "alt": 35050.0, "spd": 432.0, "hdg": 93.0, "pitch": -1.0, "bank": 0.0, "vs": -750.0, "mach": 0.75, "g": 0.98, "q_phase": -1556.88}, {"ts": "2026-11-01T17:47:49Z", "x": -756.62, "y": 533.4, "z": -462.89, "alt": 35000.0, "spd": 433.0, "hdg": 94.0, "pitch": -1.6, "bank": 11.2, "vs": -1500.0, "mach": 0.75, "g": 1.15, "q_phase": 9229.1}, {"ts": "2026-11-01T17:47:51Z", "x": -735.69, "y": 532.64, "z": -460.79, "alt": 34950.0, "spd": 434.0, "hdg": 95.0, "pitch": -2.1, "bank": 11.2, "vs": -1500.0, "mach": 0.75, "g": 1.14, "q_phase": 8551.59}, {"ts": "2026-11-01T17:47:53Z", "x": -710.33, "y": 533.02, "z": -458.06, "alt": 34975.0, "spd": 432.0, "hdg": 95.0, "pitch": 0.9, "bank": 0.0, "vs": 750.0, "mach": 0.75, "g": 1.02, "q_phase": 1351.56}, {"ts": "2026-11-01T17:47:55Z", "x": -690.53, "y": 533.02, "z": -455.77, "alt": 34975.0, "spd": 432.0, "hdg": 97.0, "pitch": 0.0, "bank": 21.6, "vs": 0.0, "mach": 0.75, "g": 1.36, "q_phase": 22715.66}, {"ts": "2026-11-01T17:47:57Z", "x": -667.82, "y": 534.16, "z": -452.77, "alt": 35050.0, "spd": 434.0, "hdg": 97.0, "pitch": 2.9, "bank": 0.0, "vs": 2250.0, "mach": 0.75, "g": 1.07, "q_phase": 4511.25}, {"ts": "2026-11-01T17:47:59Z", "x": -644.51, "y": 534.16, "z": -449.68, "alt": 35050.0, "spd": 434.0, "hdg": 97.0, "pitch": 0.0, "bank": 0.0, "vs": 0.0, "mach": 0.75, "g": 1.0, "q_phase": 0.0}, {"ts": "2026-11-01T17:48:01Z", "x": -623.8, "y": 534.54, "z": -446.84, "alt": 35075.0, "spd": 435.0, "hdg": 98.0, "pitch": 1.0, "bank": 11.3, "vs": 750.0, "mach": 0.75, "g": 1.21, "q_phase": 13504.05}, {"ts": "2026-11-01T17:48:03Z", "x": -597.08, "y": 535.31, "z": -442.96, "alt": 35125.0, "spd": 435.0, "hdg": 98.0, "pitch": 1.6, "bank": 0.0, "vs": 1500.0, "mach": 0.76, "g": 1.04, "q_phase": 2553.24}, {"ts": "2026-11-01T17:48:05Z", "x": -575.05, "y": 536.07, "z": -439.34, "alt": 35175.0, "spd": 436.0, "hdg": 98.0, "pitch": 2.0, "bank": 0.0, "vs": 1500.0, "mach": 0.76, "g": 1.05, "q_phase": 3087.85}, {"ts": "2026-11-01T17:48:07Z", "x": -553.06, "y": 537.21, "z": -435.99, "alt": 35250.0, "spd": 437.0, "hdg": 99.0, "pitch": 2.9, "bank": 11.3, "vs": 2250.0, "mach": 0.76, "g": 1.26, "q_phase": 16552.95}, {"ts": "2026-11-01T17:48:39Z", "x": -180.42, "y": 477.77, "z": -372.17, "alt": 31350.0, "spd": 488.0, "hdg": 102.0, "pitch": -8.9, "bank": 33.8, "vs": -117000.0, "mach": 0.83, "g": 1.34, "q_phase": 21500.35}, {"ts": "2026-11-01T17:48:46Z", "x": -98.7, "y": 441.2, "z": -346.78, "alt": 28950.0, "spd": 505.0, "hdg": 111.0, "pitch": -23.1, "bank": 64.3, "vs": -72000.0, "mach": 0.85, "g": 1.49, "q_phase": 31175.11}, {"ts": "2026-11-01T17:48:48Z", "x": -75.04, "y": 431.67, "z": -335.86, "alt": 28325.0, "spd": 506.0, "hdg": 115.0, "pitch": -20.1, "bank": 42.8, "vs": -18750.0, "mach": 0.85, "g": 1.21, "q_phase": 13362.06}, {"ts": "2026-11-01T17:48:50Z", "x": -46.81, "y": 419.1, "z": -319.98, "alt": 27500.0, "spd": 504.0, "hdg": 120.0, "pitch": -21.2, "bank": 49.1, "vs": -24750.0, "mach": 0.85, "g": 1.29, "q_phase": 18163.67}, {"ts": "2026-11-01T17:48:52Z", "x": -26.71, "y": 409.58, "z": -306.39, "alt": 26875.0, "spd": 499.0, "hdg": 125.0, "pitch": -21.4, "bank": 48.8, "vs": -18750.0, "mach": 0.84, "g": 1.28, "q_phase": 17516.95}, {"ts": "2026-11-01T17:48:55Z", "x": -4.07, "y": 396.62, "z": -287.68, "alt": 26025.0, "spd": 493.0, "hdg": 132.0, "pitch": -23.8, "bank": 57.7, "vs": -25500.0, "mach": 0.82, "g": 1.37, "q_phase": 23117.93}, {"ts": "2026-11-01T17:48:57Z", "x": 13.49, "y": 384.43, "z": -269.6, "alt": 25225.0, "spd": 486.0, "hdg": 137.0, "pitch": -25.8, "bank": 48.0, "vs": -24000.0, "mach": 0.81, "g": 1.16, "q_phase": 9806.73}, {"ts": "2026-11-01T17:48:59Z", "x": 32.41, "y": 369.19, "z": -245.16, "alt": 24225.0, "spd": 479.0, "hdg": 145.0, "pitch": -26.2, "bank": 60.3, "vs": -30000.0, "mach": 0.79, "g": 1.35, "q_phase": 22047.48}, {"ts": "2026-11-01T17:49:01Z", "x": 47.06, "y": 352.43, "z": -220.01, "alt": 23125.0, "spd": 472.0, "hdg": 151.0, "pitch": -29.9, "bank": 52.3, "vs": -33000.0, "mach": 0.78, "g": 1.12, "q_phase": 7832.31}, {"ts": "2026-11-01T17:49:03Z", "x": 56.6, "y": 338.33, "z": -198.16, "alt": 22200.0, "spd": 465.0, "hdg": 158.0, "pitch": -30.6, "bank": 56.1, "vs": -27750.0, "mach": 0.76, "g": 1.17, "q_phase": 10776.18}, {"ts": "2026-11-01T17:49:06Z", "x": 63.0, "y": 320.42, "z": -176.58, "alt": 21025.0, "spd": 450.0, "hdg": 165.0, "pitch": -38.5, "bank": 55.3, "vs": -35250.0, "mach": 0.74, "g": 0.96, "q_phase": -2653.86}, {"ts": "2026-11-01T17:49:08Z", "x": 68.15, "y": 298.7, "z": -153.19, "alt": 19600.0, "spd": 437.0, "hdg": 169.0, "pitch": -42.2, "bank": 38.7, "vs": -42750.0, "mach": 0.71, "g": 0.59, "q_phase": -25941.47}, {"ts": "2026-11-01T17:49:10Z", "x": 71.25, "y": 275.84, "z": -127.02, "alt": 18100.0, "spd": 419.0, "hdg": 175.0, "pitch": -40.9, "bank": 49.0, "vs": -45000.0, "mach": 0.68, "g": 0.79, "q_phase": -13066.95}, {"ts": "2026-11-01T17:49:12Z", "x": 71.4, "y": 254.89, "z": -105.28, "alt": 16725.0, "spd": 402.0, "hdg": 180.0, "pitch": -43.9, "bank": 42.6, "vs": -41250.0, "mach": 0.65, "g": 0.61, "q_phase": -24533.65}, {"ts": "2026-11-01T17:49:14Z", "x": 70.34, "y": 236.6, "z": -89.01, "alt": 15525.0, "spd": 379.0, "hdg": 185.0, "pitch": -48.3, "bank": 40.9, "vs": -36000.0, "mach": 0.61, "g": 0.48, "q_phase": -33149.95}, {"ts": "2026-11-01T17:49:16Z", "x": 67.12, "y": 207.26, "z": -65.54, "alt": 13600.0, "spd": 352.0, "hdg": 191.0, "pitch": -51.1, "bank": 44.0, "vs": -57750.0, "mach": 0.56, "g": 0.46, "q_phase": -34329.01}, {"ts": "2026-11-01T17:49:19Z", "x": 61.44, "y": 179.07, "z": -44.31, "alt": 11750.0, "spd": 330.0, "hdg": 197.0, "pitch": -52.1, "bank": 42.2, "vs": -55500.0, "mach": 0.52, "g": 0.4, "q_phase": -37809.13}, {"ts": "2026-11-01T17:49:21Z", "x": 55.05, "y": 154.31, "z": -28.7, "alt": 10125.0, "spd": 298.0, "hdg": 209.0, "pitch": -55.7, "bank": 58.6, "vs": -48750.0, "mach": 0.47, "g": 0.58, "q_phase": -26368.64}, {"ts": "2026-11-01T17:49:23Z", "x": 47.59, "y": 133.35, "z": -17.78, "alt": 8750.0, "spd": 275.0, "hdg": 219.0, "pitch": -57.7, "bank": 51.5, "vs": -41250.0, "mach": 0.43, "g": 0.42, "q_phase": -36943.41}, {"ts": "2026-11-01T17:49:25Z", "x": 34.99, "y": 133.35, "z": -5.58, "alt": 8750.0, "spd": 255.0, "hdg": 233.0, "pitch": 0.0, "bank": 58.5, "vs": 0.0, "mach": 0.4, "g": 1.98, "q_phase": 61628.17}, {"ts": "2026-11-01T17:49:27Z", "x": 24.73, "y": 133.35, "z": -0.75, "alt": 8750.0, "spd": 241.0, "hdg": 248.0, "pitch": 0.0, "bank": 58.8, "vs": 0.0, "mach": 0.38, "g": 1.98, "q_phase": 61963.7}, {"ts": "2026-11-01T17:49:29Z", "x": 12.43, "y": 133.35, "z": 1.68, "alt": 8750.0, "spd": 232.0, "hdg": 268.0, "pitch": 0.0, "bank": 64.8, "vs": 0.0, "mach": 0.36, "g": 2.08, "q_phase": 68211.96}, {"ts": "2026-11-01T17:49:31Z", "x": 0.01, "y": 133.35, "z": 0.01, "alt": 8750.0, "spd": 231.0, "hdg": 277.0, "pitch": 0.0, "bank": 43.6, "vs": 0.0, "mach": 0.36, "g": 1.73, "q_phase": 45880.65}];
+
+var cv = document.getElementById('c');
+var renderer = new THREE.WebGLRenderer({canvas: cv, antialias: true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+
+var scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0c1e38);
+scene.fog = new THREE.FogExp2(0x132742, 0.00035);
+
+var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 15000);
+
+// Lighting
+var hemi = new THREE.HemisphereLight(0xdbeafe, 0x1e293b, 0.9);
+scene.add(hemi);
+
+var sun = new THREE.DirectionalLight(0xfff8e7, 1.4);
+sun.position.set(1500, 2500, 1000);
+sun.castShadow = true;
+scene.add(sun);
+
+// 1. TERRAIN ENVIRONMENT (South Florida Coastline & Atlantic Ocean)
+// Land Plane (Palm Beach County, Everglades wetlands, agricultural fields)
+var landGeom = new THREE.PlaneGeometry(8000, 6000, 64, 64);
+var landMat = new THREE.MeshStandardMaterial({
+  color: 0x1e3a24,
+  roughness: 0.85,
+  metalness: 0.1
+});
+var landMesh = new THREE.Mesh(landGeom, landMat);
+landMesh.rotation.x = -Math.PI / 2;
+landMesh.position.set(-1000, 0, 0);
+scene.add(landMesh);
+
+// Atlantic Ocean (Deep reflective water on the East side, +X)
+var oceanGeom = new THREE.PlaneGeometry(4000, 6000);
+var oceanMat = new THREE.MeshStandardMaterial({
+  color: 0x092b47,
+  roughness: 0.15,
+  metalness: 0.7,
+  transparent: true,
+  opacity: 0.92
+});
+var oceanMesh = new THREE.Mesh(oceanGeom, oceanMat);
+oceanMesh.rotation.x = -Math.PI / 2;
+oceanMesh.position.set(2200, 0.5, 0);
+scene.add(oceanMesh);
+
+// Coastline Sand Beach Strip
+var beachGeom = new THREE.PlaneGeometry(80, 6000);
+var beachMat = new THREE.MeshBasicMaterial({color: 0xf5deb3});
+var beachMesh = new THREE.Mesh(beachGeom, beachMat);
+beachMesh.rotation.x = -Math.PI / 2;
+beachMesh.position.set(200, 0.8, 0);
+scene.add(beachMesh);
+
+// Lake Okeechobee Representation on the West (-X)
+var lakeGeom = new THREE.CircleGeometry(450, 32);
+var lakeMat = new THREE.MeshStandardMaterial({color: 0x0c3352, roughness: 0.2});
+var lakeMesh = new THREE.Mesh(lakeGeom, lakeMat);
+lakeMesh.rotation.x = -Math.PI / 2;
+lakeMesh.position.set(-2100, 1.0, -100);
+scene.add(lakeMesh);
+
+// 2. CUMULUS & SEVERE ICING STORM CLOUDS AT FL350 (Y ~ 500)
+var cloudGroup = new THREE.Group();
+var stormMat = new THREE.MeshStandardMaterial({
+  color: 0x334155,
+  roughness: 0.9,
+  transparent: true,
+  opacity: 0.75
+});
+for (var c = 0; c < 35; c++) {
+  var puff = new THREE.Mesh(
+    new THREE.DodecahedronGeometry(80 + Math.random() * 90, 1),
+    stormMat
+  );
+  puff.position.set(
+    -600 + (Math.random() - 0.5) * 1400,
+    490 + (Math.random() - 0.5) * 80,
+    -300 + (Math.random() - 0.5) * 800
+  );
+  cloudGroup.add(puff);
+}
+scene.add(cloudGroup);
+
+// 3. 3D TRAJECTORY RIBBON & ALTITUDE DROP-CURTAINS
+var pts3d = traj.map(function(p) { return new THREE.Vector3(p.x, p.y, p.z); });
+
+// Trajectory Line
+var trajGeom = new THREE.BufferGeometry().setFromPoints(pts3d);
+var trajMat = new THREE.LineBasicMaterial({color: 0x38bdf8, linewidth: 4});
+var trajLine = new THREE.Line(trajGeom, trajMat);
+scene.add(trajLine);
+
+// 3D Altitude Drop-Curtain Wall (Visualizes descent down to terrain)
+var wallGeom = new THREE.BufferGeometry();
+var wallVerts = [];
+var wallColors = [];
+var colorCyan = new THREE.Color(0x38bdf8);
+var colorRed = new THREE.Color(0xef4444);
+var colorYellow = new THREE.Color(0xfacc15);
+
+for (var i = 0; i < pts3d.length - 1; i++) {
+  var p1 = pts3d[i];
+  var p2 = pts3d[i + 1];
+  var tData = traj[i];
+
+  var col = tData.mach > 0.81 ? colorRed : (tData.spd > 460 ? colorYellow : colorCyan);
+
+  // Two triangles forming quad between top trajectory and ground Y=0
+  wallVerts.push(p1.x, p1.y, p1.z);
+  wallVerts.push(p1.x, 0, p1.z);
+  wallVerts.push(p2.x, p2.y, p2.z);
+
+  wallVerts.push(p2.x, p2.y, p2.z);
+  wallVerts.push(p1.x, 0, p1.z);
+  wallVerts.push(p2.x, 0, p2.z);
+
+  for (var k = 0; k < 6; k++) {
+    wallColors.push(col.r, col.g, col.b);
+  }
+}
+wallGeom.setAttribute('position', new THREE.Float32BufferAttribute(wallVerts, 3));
+wallGeom.setAttribute('color', new THREE.Float32BufferAttribute(wallColors, 3));
+var wallMat = new THREE.MeshBasicMaterial({
+  vertexColors: true,
+  side: THREE.DoubleSide,
+  transparent: true,
+  opacity: 0.35,
+  depthWrite: false
+});
+var dropCurtain = new THREE.Mesh(wallGeom, wallMat);
+scene.add(dropCurtain);
+
+// 4. CRITICAL MILESTONE 3D PINS IN THE SKY
+function addPin(pos, title, colHex) {
+  var pinGroup = new THREE.Group();
+  var pinPole = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, pos.y, 8), new THREE.MeshBasicMaterial({color: colHex, transparent: true, opacity: 0.6}));
+  pinPole.position.y = pos.y / 2;
+  pinGroup.add(pinPole);
+
+  var pinHead = new THREE.Mesh(new THREE.SphereGeometry(12, 16, 16), new THREE.MeshBasicMaterial({color: colHex}));
+  pinHead.position.y = pos.y;
+  pinGroup.add(pinHead);
+
+  pinGroup.position.set(pos.x, 0, pos.z);
+  scene.add(pinGroup);
+}
+addPin(pts3d[0], "FL350 Cruise & Icing", 0x38bdf8);
+addPin(pts3d[38], "Mach Tuck Disconnect", 0xfacc15);
+addPin(pts3d[42], "506 kts Overspeed", 0xf97316);
+addPin(pts3d[48], "-58,000 fpm Spiral Dive", 0xef4444);
+addPin(pts3d[53], "In-Flight Breakup (8.7k ft)", 0xd946ef);
+
+// Impact Target Rings on Ground
+var impactMesh = new THREE.Mesh(
+  new THREE.RingGeometry(8, 45, 32).rotateX(-Math.PI / 2),
+  new THREE.MeshBasicMaterial({color: 0xef4444, side: THREE.DoubleSide})
+);
+impactMesh.position.set(pts3d[pts3d.length - 1].x, 2, pts3d[pts3d.length - 1].z);
+scene.add(impactMesh);
+
+// 5. HIGH-FIDELITY BOMBARDIER LEARJET 60 3D MODEL
+var planeGroup = new THREE.Group();
+var planeVisual = new THREE.Group();
+planeGroup.add(planeVisual);
+
+var whitePaint = new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 0.25, metalness: 0.3});
+var liveryBlue = new THREE.MeshStandardMaterial({color: 0x0284c7, roughness: 0.3, metalness: 0.4});
+var darkMetal = new THREE.MeshStandardMaterial({color: 0x1e293b, roughness: 0.5, metalness: 0.8});
+var glassMat = new THREE.MeshStandardMaterial({color: 0x0f172a, roughness: 0.1, metalness: 0.9});
+
+// Fuselage (Length 18m)
+var fuse = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 18, 16).rotateZ(Math.PI / 2), whitePaint);
+planeVisual.add(fuse);
+
+// Nose Cone
+var nose = new THREE.Mesh(new THREE.ConeGeometry(1.6, 5, 16).rotateZ(-Math.PI / 2), whitePaint);
+nose.position.x = 11.5;
+planeVisual.add(nose);
+
+// Cockpit Windshield
+var windshield = new THREE.Mesh(new THREE.BoxGeometry(2.5, 1.1, 1.8), glassMat);
+windshield.position.set(9.5, 0.9, 0);
+planeVisual.add(windshield);
+
+// Swept Wings (Span 13.3m)
+var wingGeom = new THREE.BoxGeometry(4.5, 0.3, 17);
+var mainWing = new THREE.Mesh(wingGeom, whitePaint);
+mainWing.position.set(0.5, -0.4, 0);
+planeVisual.add(mainWing);
+
+// Learjet Tip Tanks (Distinctive fuel tanks on wingtips)
+[-8.5, 8.5].forEach(function(zPos) {
+  var tipTank = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.65, 7.5, 12).rotateZ(Math.PI / 2), liveryBlue);
+  tipTank.position.set(0.5, -0.4, zPos);
+  planeVisual.add(tipTank);
+});
+
+// T-Tail Vertical Fin
+var fin = new THREE.Mesh(new THREE.BoxGeometry(3.5, 5.0, 0.4), liveryBlue);
+fin.position.set(-8.5, 2.5, 0);
+fin.rotation.z = -0.3;
+planeVisual.add(fin);
+
+// T-Tail Horizontal Stabilizer on top of fin
+var hStab = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.25, 7.0), whitePaint);
+hStab.position.set(-9.8, 5.2, 0);
+planeVisual.add(hStab);
+
+// Twin PW305A Turbofans (Mounted on aft fuselage)
+[-1.7, 1.7].forEach(function(zPos) {
+  var eng = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.85, 5.5, 16).rotateZ(Math.PI / 2), darkMetal);
+  eng.position.set(-4.5, 0.6, zPos);
+  planeVisual.add(eng);
+});
+
+planeVisual.scale.set(0.8, 0.8, 0.8);
+scene.add(planeGroup);
+
+// 6. CAMERA SYSTEM & 360° MOUSE INTERACTION
+var camMode = 'chase';
+var chaseAzimuth = 0.0;
+var chaseElevation = 0.25;
+var chaseDistance = 160.0;
+
+var orbitAzimuth = 0.4;
+var orbitElevation = 0.45;
+var orbitDistance = 1200.0;
+
+var isDragging = false, lastMouseX = 0, lastMouseY = 0;
+
+cv.addEventListener('pointerdown', function(e) {
+  cv.setPointerCapture(e.pointerId);
+  isDragging = true;
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+});
+cv.addEventListener('pointerup', function(e) { isDragging = false; });
+cv.addEventListener('pointercancel', function(e) { isDragging = false; });
+
+cv.addEventListener('pointermove', function(e) {
+  if (!isDragging) return;
+  var dx = e.clientX - lastMouseX;
+  var dy = e.clientY - lastMouseY;
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+
+  if (camMode === 'chase' || camMode === 'cockpit') {
+    chaseAzimuth -= dx * 0.007;
+    chaseElevation = Math.max(-0.65, Math.min(1.4, chaseElevation + dy * 0.006));
+  } else {
+    orbitAzimuth -= dx * 0.005;
+    orbitElevation = Math.max(0.05, Math.min(1.5, orbitElevation + dy * 0.004));
+  }
+});
+
+cv.addEventListener('wheel', function(e) {
+  e.preventDefault();
+  if (camMode === 'chase') {
+    chaseDistance = Math.max(25, Math.min(650, chaseDistance * (1 + e.deltaY * 0.0012)));
+  } else {
+    orbitDistance = Math.max(100, Math.min(4500, orbitDistance * (1 + e.deltaY * 0.001)));
+  }
+}, {passive: false});
+
+window.setCam = function(mode) {
+  camMode = mode;
+  document.querySelectorAll('.cam-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (mode === 'chase') document.getElementById('camChase').classList.add('active');
+  if (mode === 'cockpit') document.getElementById('camCockpit').classList.add('active');
+  if (mode === 'orbit') document.getElementById('camOrbit').classList.add('active');
+  if (mode === 'satellite') document.getElementById('camSatellite').classList.add('active');
+  if (mode === 'ground') document.getElementById('camGround').classList.add('active');
+};
+
+// 7. PLAYBACK STATE & CONTROLS
+var curTimeIdx = 0.0;
+var isPlaying = true;
+var playbackSpeed = 1.0;
+
+function updateSimulationState(idx) {
+  var i0 = Math.floor(idx);
+  var i1 = Math.min(traj.length - 1, i0 + 1);
+  var alpha = idx - i0;
+
+  var p0 = traj[i0];
+  var p1 = traj[i1];
+
+  // Interpolate Position
+  var curX = p0.x + (p1.x - p0.x) * alpha;
+  var curY = p0.y + (p1.y - p0.y) * alpha;
+  var curZ = p0.z + (p1.z - p0.z) * alpha;
+
+  var curPitch = p0.pitch + (p1.pitch - p0.pitch) * alpha;
+  var curBank = p0.bank + (p1.bank - p0.bank) * alpha;
+  var curHdg = p0.hdg + (p1.hdg - p0.hdg) * alpha;
+
+  // Apply to plane
+  planeGroup.position.set(curX, curY, curZ);
+
+  // Rotate plane: Yaw heading, Pitch dive angle, Roll bank angle
+  var yawRad = THREE.MathUtils.degToRad(-curHdg + 90);
+  planeVisual.rotation.order = 'YXZ';
+  planeVisual.rotation.y = yawRad;
+  planeVisual.rotation.z = THREE.MathUtils.degToRad(curPitch);
+  planeVisual.rotation.x = THREE.MathUtils.degToRad(-curBank);
+
+  // Update Camera
+  if (camMode === 'chase') {
+    var offset = new THREE.Vector3(
+      -chaseDistance * Math.cos(chaseElevation) * Math.cos(chaseAzimuth),
+      chaseDistance * Math.sin(chaseElevation),
+      chaseDistance * Math.cos(chaseElevation) * Math.sin(chaseAzimuth)
+    );
+    offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), yawRad);
+    camera.position.set(curX + offset.x, Math.max(5, curY + offset.y), curZ + offset.z);
+    camera.lookAt(curX, curY + 2, curZ);
+
+  } else if (camMode === 'cockpit') {
+    var cockOffset = new THREE.Vector3(10, 1.2, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), yawRad);
+    camera.position.set(curX + cockOffset.x, curY + cockOffset.y, curZ + cockOffset.z);
+    var lookDir = new THREE.Vector3(80, curPitch * 1.5, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), yawRad);
+    camera.lookAt(camera.position.clone().add(lookDir));
+
+  } else if (camMode === 'orbit') {
+    camera.position.set(
+      curX + Math.sin(orbitAzimuth) * Math.cos(orbitElevation) * orbitDistance,
+      curY + Math.sin(orbitElevation) * orbitDistance,
+      curZ + Math.cos(orbitAzimuth) * Math.cos(orbitElevation) * orbitDistance
+    );
+    camera.lookAt(curX, curY, curZ);
+
+  } else if (camMode === 'satellite') {
+    camera.position.set(curX, curY + 2200, curZ);
+    camera.lookAt(curX, curY, curZ);
+
+  } else if (camMode === 'ground') {
+    var groundPos = pts3d[pts3d.length - 1];
+    camera.position.set(groundPos.x + 80, 5, groundPos.z + 80);
+    camera.lookAt(curX, curY, curZ);
+  }
+
+  // Telemetry HUD Update
+  document.getElementById('telAlt').innerText = Math.round(p0.alt).toLocaleString() + ' ft';
+  document.getElementById('telSpd').innerText = Math.round(p0.spd) + ' kts';
+  document.getElementById('telVR').innerText = (p0.vs >= 0 ? '+' : '') + Math.round(p0.vs).toLocaleString() + ' fpm';
+  document.getElementById('telMach').innerText = 'M ' + p0.mach.toFixed(2);
+  document.getElementById('telHdg').innerText = Math.round(p0.hdg) + '°';
+  document.getElementById('telPitch').innerText = (p0.pitch >= 0 ? '+' : '') + p0.pitch.toFixed(1) + '°';
+  document.getElementById('telBank').innerText = (p0.bank >= 0 ? '+' : '') + p0.bank.toFixed(1) + '°';
+  document.getElementById('telG').innerText = (p0.g >= 0 ? '+' : '') + p0.g.toFixed(2) + ' G';
+  document.getElementById('telQPhase').innerText = (p0.q_phase >= 0 ? '+' : '') + p0.q_phase.toFixed(2) + ' rad';
+
+  var phase = (p0.alt > 34000) ? "CRUISE (FL350)" : ((p0.alt > 28000) ? "MACH TUCK UPSET" : ((p0.alt > 12000) ? "SPIRAL DIVE (-58k FPM)" : "IN-FLIGHT BREAKUP"));
+  document.getElementById('phaseTag').innerText = phase;
+  document.getElementById('lblTime').innerText = p0.ts.split('T')[1].replace('Z', ' UTC');
+  document.getElementById('lblStatus').innerText = phase;
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (isPlaying) {
+    curTimeIdx += 0.05 * playbackSpeed;
+    if (curTimeIdx >= traj.length - 1) {
+      curTimeIdx = 0;
+    }
+    document.getElementById('timeSlider').value = curTimeIdx;
+    updateSimulationState(curTimeIdx);
+  }
+  renderer.render(scene, camera);
+}
+
+window.togglePlay = function() {
+  isPlaying = !isPlaying;
+  document.getElementById('btnPlay').innerText = isPlaying ? '❚❚ Pause' : '▶ Play';
+};
+
+window.onScrub = function(val) {
+  isPlaying = false;
+  document.getElementById('btnPlay').innerText = '▶ Play';
+  curTimeIdx = parseFloat(val);
+  updateSimulationState(curTimeIdx);
+};
+
+window.setSpeed = function(spd, elem) {
+  playbackSpeed = spd;
+  document.querySelectorAll('.speed-btn').forEach(function(b){ b.classList.remove('active'); });
+  elem.classList.add('active');
+};
+
+window.jumpTo = function(val) {
+  curTimeIdx = val;
+  document.getElementById('timeSlider').value = val;
+  updateSimulationState(val);
+};
+
+window.addEventListener('resize', function() {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Initialize
+updateSimulationState(0);
+animate();
+</script>
+</body>
+</html>

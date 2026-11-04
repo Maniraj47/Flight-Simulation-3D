@@ -1,0 +1,2265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hyper-Realistic 3D City, Airport & Flight Simulation</title>
+<style>
+:root {
+  --ink: #f8fafc;
+  --panel: rgba(13, 21, 38, 0.88);
+  --panel-border: rgba(56, 189, 248, 0.28);
+  --accent: #0284c7;
+  --accent-cyan: #38bdf8;
+  --accent-orange: #f97316;
+  --accent-emerald: #10b981;
+  --accent-purple: #c084fc;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+html, body {
+  height: 100%;
+  margin: 0;
+  background: #070b14;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+  overflow: hidden;
+}
+#c { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+#c:active { cursor: grabbing; }
+
+/* HUD Top Command Bar */
+
+.interactive { pointer-events: auto; }
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+}
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+}
+.logo-pill {
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: #fff;
+  font-weight: 800;
+  font-size: 13px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+.brand-text h1 { font-size: 16px; font-weight: 700; color: #fff; }
+.brand-text p { font-size: 11px; color: #94a3b8; }
+
+.control-groups {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.btn-group {
+  display: flex;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  overflow: hidden;
+}
+button {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 12px;
+  border: 0;
+  background: none;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+button:hover { background: rgba(56, 189, 248, 0.15); color: #fff; }
+button.active { background: var(--accent); color: #fff; font-weight: 700; }
+.slider-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+}
+.slider-group label { font-size: 13px; font-weight: 700; color: var(--accent-cyan); font-family: monospace; min-width: 44px; }
+.slider-group input { width: 110px; cursor: pointer; }
+
+/* Flight Telemetry HUD Overlay (Top-Left) */
+
+.telem-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.flight-phase-badge {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid var(--accent-emerald);
+  color: var(--accent-emerald);
+  text-transform: uppercase;
+}
+.telem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.telem-item {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.telem-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+.telem-val { font-size: 16px; font-weight: 700; font-family: monospace; color: #fff; }
+.telem-unit { font-size: 10px; color: #94a3b8; margin-left: 2px; }
+
+/* Cockpit POV Reticle Overlay */
+#cockpit-hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 15;
+  display: none;
+}
+.hud-svg { width: 100%; height: 100%; }
+
+/* Weather & Climate Info Box (Bottom-Left) */
+.info-box {
+  position: fixed;
+  left: 14px;
+  bottom: 14px;
+  max-width: 380px;
+  padding: 14px 18px;
+  z-index: 20;
+}
+.info-box h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: #fff; }
+.info-box p { font-size: 12px; line-height: 1.45; color: #cbd5e1; margin: 2px 0; }
+.note { font-size: 11px; color: #94a3b8; margin-top: 6px; font-style: italic; }
+
+/* Test Flight Mission Button */
+.test-flight-btn {
+  background: linear-gradient(135deg, #f97316, #ea580c) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  padding: 8px 16px !important;
+  border: 1px solid #fdba74 !important;
+  box-shadow: 0 0 16px rgba(249, 115, 22, 0.45) !important;
+  cursor: pointer;
+  border-radius: 8px;
+  animation: pulseBtn 2.2s infinite;
+}
+@keyframes pulseBtn {
+  0%, 100% { box-shadow: 0 0 12px rgba(249, 115, 22, 0.35); }
+  50% { box-shadow: 0 0 24px rgba(249, 115, 22, 0.75); }
+}
+
+/* Extended Component Telemetry HUD */
+.hud-component-telem {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  width: 320px;
+  padding: 12px 14px;
+  z-index: 25;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+}
+.comp-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+}
+.comp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  font-size: 11px;
+}
+.comp-row {
+  background: rgba(15, 23, 42, 0.55);
+  padding: 4px 6px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+}
+.comp-k { color: #94a3b8; }
+.comp-v { color: #38bdf8; font-family: monospace; font-weight: 600; }
+
+/* Test Flight Diagnostics Modal */
+#testModal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(4, 8, 18, 0.82);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.modal-card {
+  width: 580px;
+  max-width: 90vw;
+  background: #0d1526;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.7), 0 0 32px rgba(2, 132, 199, 0.25);
+  padding: 24px;
+  color: #f8fafc;
+}
+.modal-hdr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+}
+.modal-icon {
+  font-size: 28px;
+  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0;
+}
+.chk-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(15, 23, 42, 0.7);
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+}
+.chk-status {
+  color: #10b981;
+  font-weight: 700;
+  font-family: monospace;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #f8fafc;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.btn-primary-action {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border: 1px solid #34d399;
+  color: #fff;
+  font-weight: 700;
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+}
+
+/* Post-Flight Certification Report Card */
+#reportCard {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 520px;
+  max-width: 92vw;
+  background: rgba(13, 21, 38, 0.95);
+  border: 2px solid #10b981;
+  border-radius: 14px;
+  padding: 18px 22px;
+  z-index: 90;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.7), 0 0 32px rgba(16, 185, 129, 0.35);
+  display: none;
+  backdrop-filter: blur(16px);
+}
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 12px 0;
+  font-size: 12px;
+}
+.report-row {
+  background: rgba(15, 23, 42, 0.7);
+  padding: 6px 10px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+.badge-pass {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+
+/* Top Command Bar - Fixed, Single Row, No-Wrap */
+.hud-top {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  top: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  z-index: 30;
+  height: 48px;
+}
+.brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.brand-text h1 {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.brand-text p {
+  font-size: 10px;
+  color: #94a3b8;
+  margin: 0;
+}
+.control-groups {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  max-width: calc(100% - 240px);
+  padding: 2px 0;
+}
+.control-groups::-webkit-scrollbar { display: none; }
+
+.btn-group button {
+  padding: 6px 10px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.slider-group {
+  padding: 4px 10px;
+  gap: 6px;
+}
+.slider-group label {
+  font-size: 11px;
+  min-width: 38px;
+}
+.slider-group input[type=range] {
+  width: 70px;
+}
+.slider-group button {
+  padding: 4px 8px;
+  font-size: 10px;
+}
+
+/* Flight Action Button (Start / Stop in the task) */
+.btn-flight-action {
+  font-weight: 700 !important;
+  padding: 7px 16px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  font-size: 12px !important;
+  letter-spacing: 0.02em !important;
+  white-space: nowrap !important;
+  transition: all 0.2s ease !important;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-flight-action.start {
+  background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+  color: #fff !important;
+  border: 1px solid #38bdf8 !important;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.4) !important;
+}
+.btn-flight-action.stop {
+  background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
+  color: #fff !important;
+  border: 1px solid #fca5a5 !important;
+  box-shadow: 0 0 18px rgba(239, 68, 68, 0.6) !important;
+  animation: pulseStop 1.8s infinite;
+}
+@keyframes pulseStop {
+  0%, 100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.5); transform: scale(1); }
+  50% { box-shadow: 0 0 22px rgba(239, 68, 68, 0.9); transform: scale(1.02); }
+}
+
+/* Telemetry HUD - Positioned Cleanly on Left, Never Overlapping */
+.hud-telemetry {
+  position: fixed;
+  left: 14px;
+  top: 66px;
+  width: 250px;
+  padding: 10px 14px;
+  z-index: 20;
+  pointer-events: auto;
+  transition: all 0.25s ease;
+}
+.hud-telemetry.minimized .telem-grid {
+  display: none;
+}
+.hud-telemetry.minimized {
+  width: auto;
+  padding: 8px 12px;
+}
+.telem-min-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #94a3b8;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 6px;
+}
+.telem-min-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+.telem-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+.telem-item {
+  padding: 5px 8px;
+}
+.telem-label {
+  font-size: 9px;
+  margin-bottom: 2px;
+}
+.telem-val {
+  font-size: 14px;
+}
+
+/* Full Flight Plan Trip Debriefing Modal */
+#debriefModal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(4, 9, 20, 0.88);
+  backdrop-filter: blur(14px);
+  z-index: 150;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.debrief-card {
+  width: 760px;
+  max-width: 95vw;
+  max-height: 90vh;
+  background: #0d1526;
+  border: 2px solid #38bdf8;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 35px rgba(56, 189, 248, 0.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #f8fafc;
+}
+.debrief-header {
+  padding: 16px 22px;
+  background: linear-gradient(90deg, rgba(2, 132, 199, 0.25), rgba(15, 23, 42, 0.8));
+  border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.debrief-body {
+  padding: 18px 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.debrief-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.debrief-stat {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+.debrief-stat-k { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.debrief-stat-v { font-size: 16px; font-weight: 700; color: #38bdf8; font-family: monospace; }
+.debrief-log {
+  background: rgba(9, 14, 28, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  max-height: 240px;
+  overflow-y: auto;
+}
+.log-row {
+  display: flex;
+  gap: 12px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.log-t { color: #f97316; font-weight: 700; min-width: 52px; }
+.log-e { color: #e2e8f0; }
+.log-tag { color: #10b981; font-weight: 700; }
+.debrief-footer {
+  padding: 12px 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+
+/* 360° Camera Viewport Hints & Styling */
+#c {
+  cursor: grab !important;
+}
+#c:active {
+  cursor: grabbing !important;
+}
+.hud-mouse-hint {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(13, 21, 38, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  color: #94a3b8;
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hud-mouse-hint span {
+  color: #38bdf8;
+  font-weight: 600;
+}
+.btn-reset-cam {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #94a3b8;
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 4px;
+}
+.btn-reset-cam:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+
+/* Flight Mode & Crash History Switcher Dock (Right Side) */
+.mode-switcher-dock {
+  position: fixed;
+  top: 72px;
+  right: 14px;
+  width: 270px;
+  padding: 12px 14px;
+  z-index: 28;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mode-dock-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #38bdf8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+}
+.mode-opt-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 23, 42, 0.7);
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+.mode-opt-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.mode-opt-btn.active {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.35), rgba(15, 23, 42, 0.9));
+  border: 1px solid #38bdf8;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+}
+.mode-opt-btn.active.crash {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(15, 23, 42, 0.9));
+  border: 1px solid #ef4444;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+}
+.mode-btn-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.mode-btn-text h3 {
+  font-size: 12px;
+  font-weight: 700;
+  margin: 0;
+}
+.mode-btn-text p {
+  font-size: 10px;
+  color: #94a3b8;
+  margin: 2px 0 0 0;
+  line-height: 1.3;
+}
+.model-badge {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<!-- Top Command HUD -->
+<div class="hud-top">
+  <div class="panel brand-badge interactive">
+    <div class="logo-pill">METROPOLIS 3D</div>
+    <div class="brand-text">
+      <h1>Capital City (KCAP)</h1>
+      <p>JSBSim 6-DOF FDM</p>
+    </div>
+  </div>
+
+  <div class="control-groups interactive">
+    <!-- Climate Selector -->
+    <div class="panel btn-group" role="group">
+      <button id="btnCold" class="active" onclick="setClimate('cold')">&#10052; Cold</button>
+      <button id="btnHot" onclick="setClimate('hot')">&#9728; Hot</button>
+      <button id="btnSpring" onclick="setClimate('spring')">&#127793; Normal</button>
+      <button id="btnRain" onclick="setClimate('rain')">&#127783; Storm</button>
+    </div>
+
+    <!-- Time of Day -->
+    <div class="panel slider-group">
+      <label id="lblTime">10:00</label>
+      <input id="rngTime" type="range" min="0" max="24" step="0.05" value="10">
+      <button id="btnClock" onclick="toggleClock()">&#9654; Auto</button>
+    </div>
+
+    <!-- Camera Selector -->
+    <div class="panel btn-group">
+      <button id="camChase" class="active" onclick="setCamera('chase')">&#9992; Chase</button>
+      <button id="camCockpit" onclick="setCamera('cockpit')">&#128065; Cockpit</button>
+      <button id="camTower" onclick="setCamera('tower')">&#128508; Tower</button>
+      <button id="camSkyline" onclick="setCamera('skyline')">&#127970; City</button>
+      <button id="camOrbit" onclick="setCamera('orbit')">&#127757; Orbit</button>
+      <button class="btn-reset-cam" onclick="resetCurrentCamera()" title="Reset to default angle">&#8634; Center</button>
+    </div>
+
+    <!-- Flight Plan Action Button: "START FLIGHT PLAN" / "Stop in the task" -->
+    <div class="panel" style="padding: 2px;">
+      <button id="btnFlightAction" class="btn-flight-action start" onclick="toggleFlightPlanAction()">&#9992; START FLIGHT PLAN</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Flight Mode & Crash History Switcher Dock -->
+<div class="panel mode-switcher-dock interactive">
+  <div class="mode-dock-title">
+    <span>Simulation Mode</span>
+    <span class="model-badge" id="modelStatusTag">C-27J SPARTAN</span>
+  </div>
+
+  <!-- Mode 1: Normal Flight Simulation -->
+  <button id="btnModeNormal" class="mode-opt-btn active" onclick="switchSimulationMode('normal')">
+    <div class="mode-btn-icon">&#9992;&#65039;</div>
+    <div class="mode-btn-text">
+      <h3>Normal Flight Simulation</h3>
+      <p>KCAP Pattern &bull; Takeoff &bull; City &bull; ILS Landing</p>
+    </div>
+  </button>
+
+  <!-- Mode 2: Crash History: N722BD Investigation -->
+  <button id="btnModeCrash" class="mode-opt-btn" onclick="switchSimulationMode('crash')">
+    <div class="mode-btn-icon">&#128165;</div>
+    <div class="mode-btn-text">
+      <h3 style="color:#f87171;">Crash History: N722BD</h3>
+      <p>FL350 Severe Icing &bull; -58k fpm Spiral Dive Forensics</p>
+    </div>
+  </button>
+</div>
+
+<!-- Flight Telemetry HUD -->
+<div id="telemetryCard" class="panel hud-telemetry interactive">
+  <div class="telem-header">
+    <div style="font-size: 11px; font-weight: 700; color: var(--accent-cyan); display:flex; align-items:center;">
+      AIRLINER CAP-101
+      <button class="telem-min-btn" onclick="toggleTelemMinimize()" title="Minimize/Expand Telemetry">&#9724; Min</button>
+    </div>
+    <div id="telemPhase" class="flight-phase-badge">RUNWAY HOLD</div>
+  </div>
+  <div class="telem-grid">
+    <div class="telem-item">
+      <div class="telem-label">Airspeed</div>
+      <div class="telem-val"><span id="telemSpeed">0</span><span class="telem-unit">kts</span></div>
+    </div>
+    <div class="telem-item">
+      <div class="telem-label">Altitude</div>
+      <div class="telem-val"><span id="telemAlt">0</span><span class="telem-unit">ft AGL</span></div>
+    </div>
+    <div class="telem-item">
+      <div class="telem-label">Pitch</div>
+      <div class="telem-val"><span id="telemPitch">0.0</span><span class="telem-unit">°</span></div>
+    </div>
+    <div class="telem-item">
+      <div class="telem-label">Bank Angle</div>
+      <div class="telem-val"><span id="telemRoll">0.0</span><span class="telem-unit">°</span></div>
+    </div>
+    <div class="telem-item">
+      <div class="telem-label">Landing Gear</div>
+      <div class="telem-val" id="telemGear" style="color: var(--accent-emerald);">DOWN</div>
+    </div>
+    <div class="telem-item">
+      <div class="telem-label">Heading</div>
+      <div class="telem-val"><span id="telemHdg">090</span><span class="telem-unit">°</span></div>
+    </div>
+  </div>
+</div>
+<div class="panel hud-telemetry">
+  <div class="telem-header">
+    <div style="font-size: 11px; font-weight: 700; color: var(--accent-cyan);">AIRLINER CAP-101</div>
+    <div id="telemPhase" class="flight-phase-badge">TAKEOFF ROLL</div>
+  </div>
+  <div class="telem-grid">
+    <div class="telem-item">
+      <div class="telem-label">Airspeed</div>
+      <div class="telem-val"><span id="telemSpeed">0</span><span class="telem-unit">kts</span></div>
+    </div>
+    <div class="telem-item">
+      <div class="telem-label">Altitude</div>
+      <div class="telem-val"><span id="telemAlt">0</span><span class="telem-unit">ft AGL</span></div>
+    </div>
+    <div class="telem-item">
+      <div class="telem-label">Pitch</div>
+      <div class="telem-val"><span id="telemPitch">0.0</span><span class="telem-unit">°</span></div>
+    </div>
+    <div class="telem-item">
+      <div class="telem-label">Bank Angle</div>
+      <div class="telem-val"><span id="telemRoll">0.0</span><span class="telem-unit">°</span></div>
+    </div>
+    <div class="telem-item">
+      <div class="telem-label">Landing Gear</div>
+      <div class="telem-val" id="telemGear" style="color: var(--accent-emerald);">DOWN</div>
+    </div>
+    <div class="telem-item">
+      <div class="telem-label">Heading</div>
+      <div class="telem-val"><span id="telemHdg">090</span><span class="telem-unit">°</span></div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Full Flight Plan Trip Debriefing Modal -->
+<div id="debriefModal">
+  <div class="debrief-card">
+    <div class="debrief-header">
+      <div>
+        <h2 style="font-size:16px;margin:0;color:#fff;display:flex;align-items:center;gap:8px;">
+          <span style="color:#10b981;">&#10004;</span> FLIGHT PLAN TRIP DEBRIEFING & ANALYSIS
+        </h2>
+        <p style="font-size:11px;color:#94a3b8;margin:2px 0 0 0;">Capital City International (KCAP) Runway 09L Pattern Trip Log</p>
+      </div>
+      <span class="badge-pass" id="debriefStatusBadge">TRIP LOG COMPLETE</span>
+    </div>
+
+    <div class="debrief-body">
+      <!-- 4x2 Stats Grid -->
+      <div class="debrief-grid">
+        <div class="debrief-stat">
+          <div class="debrief-stat-k">Trip Duration</div>
+          <div class="debrief-stat-v" id="dbDuration">01:35 min</div>
+        </div>
+        <div class="debrief-stat">
+          <div class="debrief-stat-k">Takeoff Roll (Vr)</div>
+          <div class="debrief-stat-v" id="dbTakeoff">472 m (145 kts)</div>
+        </div>
+        <div class="debrief-stat">
+          <div class="debrief-stat-k">Max Altitude</div>
+          <div class="debrief-stat-v" id="dbMaxAlt">1,326 ft AGL</div>
+        </div>
+        <div class="debrief-stat">
+          <div class="debrief-stat-k">Max Airspeed</div>
+          <div class="debrief-stat-v" id="dbMaxSpd">198 kts (M 0.30)</div>
+        </div>
+        <div class="debrief-stat">
+          <div class="debrief-stat-k">Peak G-Load</div>
+          <div class="debrief-stat-v" id="dbGLoad">+1.28 G</div>
+        </div>
+        <div class="debrief-stat">
+          <div class="debrief-stat-k">Fuel Consumed</div>
+          <div class="debrief-stat-v" id="dbFuel">312 lbs</div>
+        </div>
+        <div class="debrief-stat">
+          <div class="debrief-stat-k">Touchdown Sink</div>
+          <div class="debrief-stat-v" id="dbSink">-136 ft/min</div>
+        </div>
+        <div class="debrief-stat">
+          <div class="debrief-stat-k">Landing Rollout</div>
+          <div class="debrief-stat-v" id="dbRollout">392 m</div>
+        </div>
+      </div>
+
+      <!-- Chronological Event Log of everything that happened -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">
+          Chronological Flight Log & System Events:
+        </div>
+        <div class="debrief-log" id="debriefLogRows">
+          <!-- Dynamically populated or default complete log -->
+        </div>
+      </div>
+    </div>
+
+    <div class="debrief-footer">
+      <button class="btn-secondary" onclick="closeDebriefModal()">Close & Return to Cockpit</button>
+      <button class="btn-primary-action" onclick="restartFlightPlan()">&#9654; Re-Fly Flight Plan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Extended JSBSim Component & Aerodynamic Telemetry HUD -->
+<div class="panel hud-component-telem interactive">
+  <div class="comp-title">
+    <span>JSBSim Component Telemetry</span>
+    <span style="color:#10b981;font-size:10px;">ONLINE</span>
+  </div>
+  <div class="comp-grid">
+    <div class="comp-row"><span class="comp-k">Eng 1 N1</span><span class="comp-v" id="telEng1N1">88.5%</span></div>
+    <div class="comp-row"><span class="comp-k">Eng 2 N1</span><span class="comp-v" id="telEng2N1">88.5%</span></div>
+    <div class="comp-row"><span class="comp-k">Thrust Tot</span><span class="comp-v" id="telThrust">48,200 lbf</span></div>
+    <div class="comp-row"><span class="comp-k">Fuel Flow</span><span class="comp-v" id="telFuelFlow">4,280 pph</span></div>
+    <div class="comp-row"><span class="comp-k">Angle of Attack</span><span class="comp-v" id="telAoA">+4.8°</span></div>
+    <div class="comp-row"><span class="comp-k">Sideslip (Beta)</span><span class="comp-v" id="telBeta">0.1°</span></div>
+    <div class="comp-row"><span class="comp-k">Mach Number</span><span class="comp-v" id="telMach">0.32 M</span></div>
+    <div class="comp-row"><span class="comp-k">Dynamic Q</span><span class="comp-v" id="telQbar">124 psf</span></div>
+    <div class="comp-row"><span class="comp-k">G-Load</span><span class="comp-v" id="telG">1.04 G</span></div>
+    <div class="comp-row"><span class="comp-k">Vert Speed</span><span class="comp-v" id="telVS">+1,240 fpm</span></div>
+  </div>
+</div>
+
+<!-- Pre-Flight Diagnostics Modal -->
+<div id="testModal">
+  <div class="modal-card">
+    <div class="modal-hdr">
+      <div class="modal-icon">&#9889;</div>
+      <div>
+        <h2 style="font-size:18px;margin:0;">JSBSim Flight Test Configuration</h2>
+        <p style="font-size:12px;color:#94a3b8;margin:2px 0 0 0;">Pre-flight default checks across scenarios (Weather, Time, Climate, Aerodynamics)</p>
+      </div>
+    </div>
+    
+    <div style="font-size:13px;line-height:1.5;color:#cbd5e1;">
+      Select desired flight test scenarios, then launch the automated test circuit. The flight dynamics engine will execute a full takeoff, climb, crosswind, downwind, base, final ILS approach, and reverse-thrust rollout to verify all aircraft default specifications.
+    </div>
+
+    <div class="checklist">
+      <div class="chk-item">
+        <span>1. Flight Control Surfaces (Elevator, Aileron, Rudder, Spoilers)</span>
+        <span class="chk-status" id="chkControls">CALIBRATED [PASS]</span>
+      </div>
+      <div class="chk-item">
+        <span>2. Dual CFM56-7B Turbofans (Ignition, Spool, EGT Sensors)</span>
+        <span class="chk-status" id="chkEngines">SPOOLED [PASS]</span>
+      </div>
+      <div class="chk-item">
+        <span>3. Tricycle Bogies & Main Hydraulic Antiskid Brakes</span>
+        <span class="chk-status" id="chkHydraulics">3,000 PSI [PASS]</span>
+      </div>
+      <div class="chk-item">
+        <span>4. Selected Climate & Environment Defaults</span>
+        <span class="chk-status" id="chkEnv">VERIFIED [PASS]</span>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeTestFlightModal()">Cancel</button>
+      <button class="btn-primary-action" onclick="executeTestFlight()">&#9654; EXECUTE TEST FLIGHT</button>
+    </div>
+  </div>
+</div>
+
+<!-- Post-Flight Test Certification Report -->
+<div id="reportCard">
+  <div style="display:flex;justify-content:space-between;align-items:center;">
+    <div style="font-weight:700;color:#10b981;font-size:14px;letter-spacing:0.05em;">&#10004; JSBSim FLIGHT TEST CERTIFICATION REPORT</div>
+    <span class="badge-pass">ALL DEFAULTS VERIFIED</span>
+  </div>
+  <p style="font-size:11px;color:#94a3b8;margin:4px 0 10px 0;">Capital City International (KCAP) &bull; Runway 09L Pattern Complete</p>
+  
+  <div class="report-grid">
+    <div class="report-row"><span>Takeoff Roll</span><span style="color:#38bdf8;font-weight:700;">472 m (PASS)</span></div>
+    <div class="report-row"><span>Rotation (Vr)</span><span style="color:#38bdf8;font-weight:700;">145.0 kts (PASS)</span></div>
+    <div class="report-row"><span>Max Altitude</span><span style="color:#38bdf8;font-weight:700;">1,326 ft AGL (PASS)</span></div>
+    <div class="report-row"><span>Peak G-Load</span><span style="color:#38bdf8;font-weight:700;">+1.28 G (PASS)</span></div>
+    <div class="report-row"><span>Flare Sink Rate</span><span style="color:#38bdf8;font-weight:700;">-136 fpm (GREASE)</span></div>
+    <div class="report-row"><span>Landing Rollout</span><span style="color:#38bdf8;font-weight:700;">392 m (PASS)</span></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;">
+    <button class="btn-secondary" style="font-size:11px;padding:6px 12px;" onclick="document.getElementById('reportCard').style.display='none'">Dismiss</button>
+    <button class="btn-primary-action" style="font-size:11px;padding:6px 12px;" onclick="document.getElementById('reportCard').style.display='none';openTestFlightModal();">Re-Test Scenario</button>
+  </div>
+</div>
+
+
+<div class="hud-mouse-hint">
+  <span>&#128433;&#65039; 360° Mouse Look Active</span> &bull; Drag to rotate 360° &bull; Scroll to Zoom &bull; Double-click to Reset
+</div>
+
+<!-- Cockpit Heads-Up Display Graphic Overlay -->
+<div id="cockpit-hud">
+  <svg class="hud-svg" viewBox="0 0 1000 600">
+    <!-- Pitch ladder and Flight Director -->
+    <circle cx="500" cy="300" r="12" stroke="#10b981" stroke-width="2" fill="none"/>
+    <line x1="470" y1="300" x2="488" y2="300" stroke="#10b981" stroke-width="2"/>
+    <line x1="512" y1="300" x2="530" y2="300" stroke="#10b981" stroke-width="2"/>
+    <line x1="500" y1="288" x2="500" y2="280" stroke="#10b981" stroke-width="2"/>
+    <!-- Pitch lines -->
+    <line x1="440" y1="240" x2="560" y2="240" stroke="#10b981" stroke-width="1.5" stroke-dasharray="10,5"/>
+    <text x="415" y="244" fill="#10b981" font-size="12" font-family="monospace">+10</text>
+    <line x1="440" y1="360" x2="560" y2="360" stroke="#10b981" stroke-width="1.5" stroke-dasharray="10,5"/>
+    <text x="415" y="364" fill="#10b981" font-size="12" font-family="monospace">-10</text>
+    <!-- Speed & Alt tapes -->
+    <rect x="240" y="150" width="70" height="300" fill="rgba(16,24,32,0.4)" stroke="#10b981" stroke-width="1.5"/>
+    <text x="275" y="305" fill="#10b981" font-size="18" font-family="monospace" text-anchor="middle" font-weight="bold" id="hudSpd">140</text>
+    <rect x="690" y="150" width="75" height="300" fill="rgba(16,24,32,0.4)" stroke="#10b981" stroke-width="1.5"/>
+    <text x="727" y="305" fill="#10b981" font-size="18" font-family="monospace" text-anchor="middle" font-weight="bold" id="hudAlt">1500</text>
+  </svg>
+</div>
+
+<!-- Weather & Environment Info Box -->
+<div class="panel info-box">
+  <h2 id="envTitle">Cold City &bull; Winter Environment</h2>
+  <p id="envDesc">-12 °C &bull; Dense snow cover &bull; Overcast atmosphere</p>
+  <p id="envMetrics">Air density: 1.35 kg/m³ &bull; Altimeter: 29.98 inHg &bull; Active Runway: 09L</p>
+  <p class="note">Watch CAP-101 taxi, take off on Runway 09L, climb over the river, bank around the skyscrapers, and land safely on the same runway!</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<script>
+(function(){
+  var cv = document.getElementById('c');
+  var renderer = new THREE.WebGLRenderer({canvas: cv, antialias: true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 12000);
+
+  // Lighting
+  var hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.7);
+  var sunLight = new THREE.DirectionalLight(0xfff8e7, 1.4);
+  sunLight.castShadow = true;
+  sunLight.shadow.mapSize.width = 2048;
+  sunLight.shadow.mapSize.height = 2048;
+  sunLight.shadow.camera.near = 10;
+  sunLight.shadow.camera.far = 4000;
+  var d = 900;
+  sunLight.shadow.camera.left = -d;
+  sunLight.shadow.camera.right = d;
+  sunLight.shadow.camera.top = d;
+  sunLight.shadow.camera.bottom = -d;
+
+  var moonLight = new THREE.DirectionalLight(0xa5c2ff, 0.0);
+  scene.add(hemiLight, sunLight, moonLight);
+
+  // Helper Random
+  var seed = 42;
+  function rnd() {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  }
+
+  // Texture generator helper
+  function makeCanvasTexture(width, height, drawFn) {
+    var c = document.createElement('canvas');
+    c.width = width; c.height = height;
+    var ctx = c.getContext('2d');
+    drawFn(ctx, width, height);
+    var t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    return t;
+  }
+
+  // Procedural Window Texture
+  var windowLitMap = [];
+  for (var i = 0; i < 64; i++) windowLitMap.push(rnd() < 0.55);
+
+  var windowTex = makeCanvasTexture(256, 256, function(g, w, h) {
+    g.fillStyle = '#1e293b';
+    g.fillRect(0, 0, w, h);
+    var cols = 4, rows = 8;
+    var cw = w / cols, ch = h / rows;
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        g.fillStyle = '#64748b';
+        g.fillRect(c * cw + cw * 0.18, r * ch + ch * 0.2, cw * 0.64, ch * 0.6);
+        // glass frame highlight
+        g.fillStyle = '#94a3b8';
+        g.fillRect(c * cw + cw * 0.18, r * ch + ch * 0.2, cw * 0.64, ch * 0.12);
+      }
+    }
+  });
+
+  var windowEmissiveTex = makeCanvasTexture(256, 256, function(g, w, h) {
+    g.fillStyle = '#000000';
+    g.fillRect(0, 0, w, h);
+    var cols = 4, rows = 8;
+    var cw = w / cols, ch = h / rows;
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        if (windowLitMap[r * cols + c]) {
+          g.fillStyle = (c % 2 === 0) ? '#ffea9f' : '#fed7aa'; // warm golden offices
+          g.fillRect(c * cw + cw * 0.18, r * ch + ch * 0.2, cw * 0.64, ch * 0.6);
+        }
+      }
+    }
+  });
+
+  var bldgMaterial = new THREE.MeshLambertMaterial({
+    map: windowTex,
+    emissiveMap: windowEmissiveTex,
+    emissive: 0xffffff,
+    emissiveIntensity: 0,
+    vertexColors: true
+  });
+
+  // 1. DIVERSE CITY BUILDINGS ARCHITECTURE (Skyscrapers, Glass Towers, Spires, Helipads)
+  var pa = [], na = [], ua = [], ia = [], ca = [], vc = 0;
+  var bldgData = [];
+
+  function addBuilding(cx, cz, w, d, h, baseColorHex, hasSpire, hasHelipad) {
+    var g = new THREE.BoxGeometry(w, h, d);
+    g.translate(cx, h / 2, cz);
+    var u = g.attributes.uv;
+    var ou = Math.floor(rnd() * 4) / 4;
+    var ov = Math.floor(rnd() * 4) / 4;
+    for (var k = 0; k < 24; k++) {
+      var f = k >> 2;
+      if (f === 2 || f === 3) { // roof/floor
+        u.setXY(k, 0.05, 0.05);
+      } else {
+        u.setXY(k, u.getX(k) * (f < 2 ? d : w) / 14 + ou, u.getY(k) * h / 18 + ov);
+      }
+    }
+
+    // append attributes
+    var posArr = g.attributes.position.array;
+    var nrmArr = g.attributes.normal.array;
+    var uvArr = g.attributes.uv.array;
+    for (var i = 0; i < posArr.length; i++) pa.push(posArr[i]);
+    for (var i = 0; i < nrmArr.length; i++) na.push(nrmArr[i]);
+    for (var i = 0; i < uvArr.length; i++) ua.push(uvArr[i]);
+    for (var k = 0; k < g.index.count; k++) ia.push(g.index.array[k] + vc);
+
+    bldgData.push({
+      x: cx, z: cz, w: w, d: d, h: h, s: vc,
+      col: baseColorHex,
+      hasSpire: hasSpire,
+      hasHelipad: hasHelipad
+    });
+    vc += 24;
+  }
+
+  // Generate City Grid (Modern Downtown, Midtown, Waterfront Blocks)
+  var N_BLOCKS = 18;
+  var BLOCK_GAP = 28;
+  var cityCenterX = 0, cityCenterZ = 120;
+
+  for (var i = 0; i < N_BLOCKS; i++) {
+    for (var j = 0; j < N_BLOCKS; j++) {
+      var bx = (i - N_BLOCKS / 2 + 0.5) * BLOCK_GAP + cityCenterX;
+      var bz = (j - N_BLOCKS / 2 + 0.5) * BLOCK_GAP + cityCenterZ;
+      var distFromCenter = Math.hypot(bx - cityCenterX, bz - cityCenterZ) / (N_BLOCKS * BLOCK_GAP * 0.5);
+
+      // Height distribution: dense skyscraper cluster in center
+      var maxH = Math.pow(Math.max(0, 1.0 - distFromCenter), 1.8) * 220 + 20;
+      var h = maxH * (0.6 + rnd() * 0.5) + rnd() * 15;
+      var w = 14 + rnd() * 8;
+      var d_b = 14 + rnd() * 8;
+
+      var hasSpire = (h > 120 && rnd() < 0.4);
+      var hasHelipad = (h > 90 && !hasSpire && rnd() < 0.3);
+
+      addBuilding(bx, bz, w, d_b, h, 0x64748b, hasSpire, hasHelipad);
+    }
+  }
+
+  // Build Merged Geometry for Buildings
+  var bldgGeom = new THREE.BufferGeometry();
+  bldgGeom.setAttribute('position', new THREE.Float32BufferAttribute(pa, 3));
+  bldgGeom.setAttribute('normal', new THREE.Float32BufferAttribute(na, 3));
+  bldgGeom.setAttribute('uv', new THREE.Float32BufferAttribute(ua, 2));
+  bldgGeom.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(vc * 3), 3));
+  bldgGeom.setIndex(ia);
+
+  var cityMesh = new THREE.Mesh(bldgGeom, bldgMaterial);
+  cityMesh.castShadow = true;
+  cityMesh.receiveShadow = true;
+  scene.add(cityMesh);
+
+  // Spires and Red Blinking Obstruction Beacons on Skyscraper Tops
+  var spireGroup = new THREE.Group();
+  var beaconGroup = new THREE.Group();
+  var helipadGroup = new THREE.Group();
+
+  bldgData.forEach(function(b) {
+    if (b.hasSpire) {
+      var spireH = 25 + rnd() * 20;
+      var spire = new THREE.Mesh(new THREE.ConeGeometry(0.8, spireH, 8), new THREE.MeshLambertMaterial({color: 0x94a3b8}));
+      spire.position.set(b.x, b.h + spireH / 2, b.z);
+      spireGroup.add(spire);
+
+      // Red flashing beacon
+      var beacon = new THREE.Mesh(new THREE.SphereGeometry(1.2, 8, 8), new THREE.MeshBasicMaterial({color: 0xef4444}));
+      beacon.position.set(b.x, b.h + spireH, b.z);
+      beaconGroup.add(beacon);
+    } else if (b.hasHelipad) {
+      // Helipad roof marker with green perimeter
+      var pad = new THREE.Mesh(new THREE.CylinderGeometry(6, 6, 0.4, 16), new THREE.MeshLambertMaterial({color: 0x334155}));
+      pad.position.set(b.x, b.h + 0.2, b.z);
+      helipadGroup.add(pad);
+    }
+  });
+  scene.add(spireGroup, beaconGroup, helipadGroup);
+
+  // 2. WATERFRONT RIVER & SUSPENSION BRIDGE CONNECTING CITY TO AIRPORT
+  var waterGeom = new THREE.PlaneGeometry(3600, 180);
+  var waterTex = makeCanvasTexture(256, 256, function(g, w, h) {
+    g.fillStyle = '#0f3854';
+    g.fillRect(0, 0, w, h);
+    for (var i = 0; i < 400; i++) {
+      g.fillStyle = 'rgba(255,255,255,0.08)';
+      g.fillRect(rnd() * w, rnd() * h, 10 + rnd() * 25, 2);
+    }
+  });
+  var waterMat = new THREE.MeshStandardMaterial({
+    color: 0x1e506d,
+    roughness: 0.15,
+    metalness: 0.8,
+    map: waterTex
+  });
+  var river = new THREE.Mesh(waterGeom, waterMat);
+  river.rotation.x = -Math.PI / 2;
+  river.position.set(0, 0.4, -140);
+  scene.add(river);
+
+  // Suspension Bridge over River
+  var bridgeGroup = new THREE.Group();
+  var bridgeDeck = new THREE.Mesh(new THREE.BoxGeometry(32, 3, 200), new THREE.MeshStandardMaterial({color: 0x334155, roughness: 0.6}));
+  bridgeDeck.position.set(0, 8, -140);
+  bridgeGroup.add(bridgeDeck);
+
+  // Twin Bridge Pylons
+  [-50, 50].forEach(function(zOff) {
+    var pylon = new THREE.Mesh(new THREE.BoxGeometry(4, 60, 4), new THREE.MeshStandardMaterial({color: 0xdbeafe, roughness: 0.3}));
+    pylon.position.set(0, 32, -140 + zOff);
+    bridgeGroup.add(pylon);
+  });
+  scene.add(bridgeGroup);
+
+  // 3. COMPLETE REALISTIC AIRPORT INFRASTRUCTURE
+  var airportGroup = new THREE.Group();
+  // Main Airport Ground Surface
+  var airportBase = new THREE.Mesh(new THREE.PlaneGeometry(1600, 700), new THREE.MeshLambertMaterial({color: 0x242b35}));
+  airportBase.rotation.x = -Math.PI / 2;
+  airportBase.position.set(0, 0.5, -450);
+  airportGroup.add(airportBase);
+
+  // Runway 09L / 27R (1,200m long, 60m wide)
+  var runway = new THREE.Mesh(new THREE.PlaneGeometry(1200, 50), new THREE.MeshStandardMaterial({color: 0x181a1f, roughness: 0.8}));
+  runway.rotation.x = -Math.PI / 2;
+  runway.position.set(0, 0.6, -520);
+  airportGroup.add(runway);
+
+  // Parallel Taxiway
+  var taxiway = new THREE.Mesh(new THREE.PlaneGeometry(1160, 22), new THREE.MeshStandardMaterial({color: 0x24282e, roughness: 0.8}));
+  taxiway.rotation.x = -Math.PI / 2;
+  taxiway.position.set(0, 0.58, -440);
+  airportGroup.add(taxiway);
+
+  // High-Speed Taxiway Turnoffs
+  [-380, -120, 140, 380].forEach(function(tx) {
+    var turnoff = new THREE.Mesh(new THREE.PlaneGeometry(20, 80), new THREE.MeshStandardMaterial({color: 0x24282e, roughness: 0.8}));
+    turnoff.rotation.x = -Math.PI / 2;
+    turnoff.position.set(tx, 0.58, -480);
+    airportGroup.add(turnoff);
+  });
+
+  // Runway Markings (Centerlines, Piano Keys, Threshold Stripes)
+  var markMat = new THREE.MeshBasicMaterial({color: 0xf8fafc});
+  for (var k = -520; k <= 520; k += 40) {
+    var cl = new THREE.Mesh(new THREE.PlaneGeometry(24, 2.2), markMat);
+    cl.rotation.x = -Math.PI / 2;
+    cl.position.set(k, 0.65, -520);
+    airportGroup.add(cl);
+  }
+
+  // Piano Key Thresholds
+  [-570, 570].forEach(function(endX) {
+    for (var s = -18; s <= 18; s += 4) {
+      var key = new THREE.Mesh(new THREE.PlaneGeometry(25, 2.0), markMat);
+      key.rotation.x = -Math.PI / 2;
+      key.position.set(endX, 0.65, -520 + s);
+      airportGroup.add(key);
+    }
+  });
+
+  // Runway Approach Lighting System (ALS) with Sequenced Flashing Strobes ("Rabbit")
+  var alsTowers = [];
+  var alsStrobes = [];
+  for (var a = 0; a < 14; a++) {
+    var ax = -590 - a * 30;
+    var tower = new THREE.Mesh(new THREE.BoxGeometry(0.8, 4 + a * 0.8, 12), new THREE.MeshBasicMaterial({color: 0xef4444}));
+    tower.position.set(ax, (4 + a * 0.8) / 2, -520);
+    airportGroup.add(tower);
+
+    // Strobe on top
+    var strobe = new THREE.Mesh(new THREE.SphereGeometry(1.2, 8, 8), new THREE.MeshBasicMaterial({color: 0xffffff}));
+    strobe.position.set(ax, 4 + a * 0.8 + 0.6, -520);
+    alsStrobes.push(strobe);
+    airportGroup.add(strobe);
+  }
+
+  // Runway Edge Lights (White) & Taxiway Lights (Cyan/Blue)
+  var edgeLightGeom = new THREE.BoxGeometry(0.8, 1.2, 0.8);
+  var whiteLightMat = new THREE.MeshBasicMaterial({color: 0xffffff});
+  var blueLightMat = new THREE.MeshBasicMaterial({color: 0x38bdf8});
+
+  for (var rx = -580; rx <= 580; rx += 45) {
+    [-546, -494].forEach(function(rz) {
+      var l = new THREE.Mesh(edgeLightGeom, whiteLightMat);
+      l.position.set(rx, 1.0, rz);
+      airportGroup.add(l);
+    });
+  }
+
+  // Modern Airport Terminal with Curved Roof & Glass Gates
+  var terminal = new THREE.Mesh(new THREE.BoxGeometry(280, 24, 60), new THREE.MeshStandardMaterial({color: 0x475569, roughness: 0.3}));
+  terminal.position.set(0, 12, -320);
+  airportGroup.add(terminal);
+
+  // Terminal Glass Facade
+  var termGlass = new THREE.Mesh(new THREE.PlaneGeometry(270, 16), new THREE.MeshStandardMaterial({color: 0x38bdf8, roughness: 0.1, metalness: 0.8, transparent: true, opacity: 0.6}));
+  termGlass.position.set(0, 12, -289.8);
+  airportGroup.add(termGlass);
+
+  // 4 Jetways (Passenger Boarding Bridges)
+  [-90, -30, 30, 90].forEach(function(jx) {
+    var jetway = new THREE.Mesh(new THREE.BoxGeometry(10, 8, 30), new THREE.MeshStandardMaterial({color: 0xdbeafe, roughness: 0.5}));
+    jetway.position.set(jx, 9, -360);
+    airportGroup.add(jetway);
+  });
+
+  // Air Traffic Control (ATC) Tower with Rotating Radar
+  var towerShaft = new THREE.Mesh(new THREE.CylinderGeometry(4.5, 6, 65, 16), new THREE.MeshStandardMaterial({color: 0xdbeafe, roughness: 0.4}));
+  towerShaft.position.set(-160, 32.5, -340);
+  airportGroup.add(towerShaft);
+
+  var towerCab = new THREE.Mesh(new THREE.CylinderGeometry(11, 7.5, 12, 16), new THREE.MeshLambertMaterial({color: 0x0284c7, emissive: 0x075985}));
+  towerCab.position.set(-160, 68, -340);
+  airportGroup.add(towerCab);
+
+  // Rotating Radar Dome & Antenna
+  var radarArm = new THREE.Mesh(new THREE.BoxGeometry(14, 2, 1.2), new THREE.MeshBasicMaterial({color: 0xf97316}));
+  radarArm.position.set(-160, 76, -340);
+  airportGroup.add(radarArm);
+
+  scene.add(airportGroup);
+
+  // 4. HIGH-FIDELITY ANIMATED AIRLINER (CAP-101)
+  var planeRoot = new THREE.Group();
+  var planeVisual = new THREE.Group();
+  planeVisual.scale.set(1.1, 1.1, 1.1);
+
+  var aeroWhite = new THREE.MeshStandardMaterial({color: 0xf8fafc, roughness: 0.25, metalness: 0.2});
+  var liveryBlue = new THREE.MeshStandardMaterial({color: 0x0284c7, roughness: 0.3, metalness: 0.4});
+  var darkAero = new THREE.MeshStandardMaterial({color: 0x1e293b, roughness: 0.6});
+  var cockpitGlass = new THREE.MeshStandardMaterial({color: 0x0f172a, roughness: 0.1, metalness: 0.9});
+
+  // Fuselage (Length 38m)
+  var fuseBody = new THREE.Mesh(new THREE.CylinderGeometry(2.4, 2.4, 26, 16).rotateZ(Math.PI / 2), aeroWhite);
+  planeVisual.add(fuseBody);
+
+  var noseCone = new THREE.Mesh(new THREE.ConeGeometry(2.4, 7, 16).rotateZ(-Math.PI / 2), aeroWhite);
+  noseCone.position.x = 16.5;
+  planeVisual.add(noseCone);
+
+  var tailCone = new THREE.Mesh(new THREE.ConeGeometry(2.4, 10, 16).rotateZ(Math.PI / 2), aeroWhite);
+  tailCone.position.x = -18;
+  planeVisual.add(tailCone);
+
+  // Cockpit Windshield Glass
+  var windshield = new THREE.Mesh(new THREE.BoxGeometry(3.5, 1.4, 2.5), cockpitGlass);
+  windshield.position.set(14.5, 1.2, 0);
+  planeVisual.add(windshield);
+
+  // Swept Wings with Winglets
+  var mainWing = new THREE.Mesh(new THREE.BoxGeometry(9, 0.4, 36), aeroWhite);
+  mainWing.position.set(1, -0.6, 0);
+  planeVisual.add(mainWing);
+
+  // Upward Winglets
+  [-18, 18].forEach(function(wz) {
+    var winglet = new THREE.Mesh(new THREE.BoxGeometry(2.4, 3.2, 0.3), liveryBlue);
+    winglet.position.set(-1.5, 1.0, wz);
+    planeVisual.add(winglet);
+  });
+
+  // Vertical Tail Fin with Airline Livery
+  var vTail = new THREE.Mesh(new THREE.BoxGeometry(6.5, 9.5, 0.5), liveryBlue);
+  vTail.position.set(-16, 5.5, 0);
+  vTail.rotation.z = -0.3;
+  planeVisual.add(vTail);
+
+  // Horizontal Stabilizers
+  var hTail = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.3, 14), aeroWhite);
+  hTail.position.set(-17.5, 2.0, 0);
+  planeVisual.add(hTail);
+
+  // Twin Turbofan Jet Engines with Spinning Fans
+  var engineFans = [];
+  [-8.5, 8.5].forEach(function(ez) {
+    var pod = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.4, 7, 16).rotateZ(Math.PI / 2), darkAero);
+    pod.position.set(3, -2.5, ez);
+    planeVisual.add(pod);
+
+    // Spinning Fan Spinner
+    var fan = new THREE.Mesh(new THREE.ConeGeometry(0.7, 1.5, 8).rotateZ(-Math.PI / 2), new THREE.MeshBasicMaterial({color: 0x94a3b8}));
+    fan.position.set(6.6, -2.5, ez);
+    planeVisual.add(fan);
+    engineFans.push(fan);
+  });
+
+  // Aircraft Navigation & Strobe Lights
+  var leftNav = new THREE.Mesh(new THREE.SphereGeometry(0.4, 8, 8), new THREE.MeshBasicMaterial({color: 0xef4444})); // Red
+  leftNav.position.set(-1, -0.6, 18.2);
+  var rightNav = new THREE.Mesh(new THREE.SphereGeometry(0.4, 8, 8), new THREE.MeshBasicMaterial({color: 0x10b981})); // Green
+  rightNav.position.set(-1, -0.6, -18.2);
+  var beaconTop = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), new THREE.MeshBasicMaterial({color: 0xef4444}));
+  beaconTop.position.set(0, 3.2, 0);
+  planeVisual.add(leftNav, rightNav, beaconTop);
+
+  // Retractable Landing Gear Assembly
+  var planeGear = new THREE.Group();
+  // Nose Gear
+  var nStrut = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 2.6), darkAero);
+  nStrut.position.set(13, -2.2, 0);
+  var nTire = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.4, 16).rotateX(Math.PI / 2), darkAero);
+  nTire.position.set(13, -3.5, 0);
+  planeGear.add(nStrut, nTire);
+
+  // Main Gear (Left & Right)
+  [-3.8, 3.8].forEach(function(mz) {
+    var mStrut = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 2.6), darkAero);
+    mStrut.position.set(0, -2.2, mz);
+    var mTire = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.6, 16).rotateX(Math.PI / 2), darkAero);
+    mTire.position.set(0, -3.5, mz);
+    planeGear.add(mStrut, mTire);
+  });
+  planeVisual.add(planeGear);
+
+  planeRoot.add(planeVisual);
+  scene.add(planeRoot);
+
+  // 5. MOVING CITY TRAFFIC (Cars & Buses with Headlights and Taillights)
+  var trafficCount = 180;
+  var trafficCars = [];
+  var carMat = new THREE.MeshLambertMaterial({color: 0x64748b});
+  var carHeadlightMat = new THREE.MeshBasicMaterial({color: 0xffffff});
+  var carTaillightMat = new THREE.MeshBasicMaterial({color: 0xef4444});
+  var carGeo = new THREE.BoxGeometry(3.6, 1.4, 1.8);
+
+  for (var cIdx = 0; cIdx < trafficCount; cIdx++) {
+    var car = new THREE.Group();
+    var cMesh = new THREE.Mesh(carGeo, carMat);
+    cMesh.position.y = 0.7;
+    car.add(cMesh);
+
+    var hl = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 1.4), carHeadlightMat);
+    hl.position.set(1.9, 0.6, 0);
+    var tl = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 1.4), carTaillightMat);
+    tl.position.set(-1.9, 0.6, 0);
+    car.add(hl, tl);
+
+    // Random lane on city avenues
+    var isNorthSouth = rnd() < 0.5;
+    var lanePos = (Math.floor(rnd() * N_BLOCKS) - N_BLOCKS / 2 + 0.5) * BLOCK_GAP;
+    var progress = rnd() * (N_BLOCKS * BLOCK_GAP);
+    var speed = 20 + rnd() * 25;
+
+    trafficCars.push({
+      group: car,
+      isNS: isNorthSouth,
+      lane: lanePos,
+      prog: progress,
+      speed: speed,
+      dir: rnd() < 0.5 ? 1 : -1
+    });
+    scene.add(car);
+  }
+
+  // 6. DYNAMIC WEATHER PARTICLES (Snow & Rain)
+  var pCount = 3000;
+  var pGeom = new THREE.BufferGeometry();
+  var pPositions = new Float32Array(pCount * 3);
+  for (var p = 0; p < pCount; p++) {
+    pPositions[p * 3] = (rnd() * 2 - 1) * 1400;
+    pPositions[p * 3 + 1] = rnd() * 400;
+    pPositions[p * 3 + 2] = (rnd() * 2 - 1) * 1400;
+  }
+  pGeom.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+  var pMat = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 2.2,
+    transparent: true,
+    opacity: 0.85
+  });
+  var weatherParticles = new THREE.Points(pGeom, pMat);
+  scene.add(weatherParticles);
+
+  // 7. SKY DOME, SUN, MOON, STARS & CUMULUS CLOUDS
+  var skyUniforms = {
+    topColor: {value: new THREE.Color()},
+    bottomColor: {value: new THREE.Color()},
+    sunPos: {value: new THREE.Vector3()},
+    sunColor: {value: new THREE.Color()}
+  };
+  var skyShader = new THREE.ShaderMaterial({
+    uniforms: skyUniforms,
+    side: THREE.BackSide,
+    depthWrite: false,
+    vertexShader: 'varying vec3 vWorldPosition; void main() { vec4 worldPosition = modelMatrix * vec4(position, 1.0); vWorldPosition = worldPosition.xyz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+    fragmentShader: 'varying vec3 vWorldPosition; uniform vec3 topColor; uniform vec3 bottomColor; uniform vec3 sunPos; uniform vec3 sunColor; void main() { vec3 dir = normalize(vWorldPosition); float h = max(0.0, dir.y); vec3 sky = mix(bottomColor, topColor, pow(h, 0.45)); float sunDisc = max(0.0, dot(dir, normalize(sunPos))); sky += sunColor * pow(sunDisc, 60.0) * 0.8; gl_FragColor = vec4(sky, 1.0); }'
+  });
+  var skyMesh = new THREE.Mesh(new THREE.SphereGeometry(4500, 32, 16), skyShader);
+  scene.add(skyMesh);
+
+  // Cumulus Clouds
+  var cloudGroup = new THREE.Group();
+  var cloudMat = new THREE.MeshLambertMaterial({color: 0xffffff, transparent: true, opacity: 0.85});
+  for (var cl = 0; cl < 24; cl++) {
+    var cCluster = new THREE.Group();
+    var cSize = 25 + rnd() * 35;
+    for (var cb = 0; cb < 6; cb++) {
+      var puff = new THREE.Mesh(new THREE.SphereGeometry(cSize * (0.6 + rnd() * 0.5), 10, 8), cloudMat);
+      puff.position.set((cb - 3) * cSize * 0.8, rnd() * 8, rnd() * cSize * 0.6);
+      cCluster.add(puff);
+    }
+    cCluster.position.set((rnd() * 2 - 1) * 1600, 240 + rnd() * 120, (rnd() * 2 - 1) * 1600);
+    cloudGroup.add(cCluster);
+  }
+  scene.add(cloudGroup);
+
+  // 8. AUTONOMOUS FLIGHT LOOP TRAJECTORY CONTROLLER (95-Second Closed Pattern)
+  var circuitDuration = 95.0; // 95 seconds per pattern circuit
+  var circuitTimer = 0.0;
+
+  function evaluateFlightPattern(tSec) {
+    // Phase 1: Takeoff roll on Runway 09L (0s to 15s)
+    // Runway 09L runs from X = -450 to +450 along Z = -520
+    var x, y, z, pitch = 0, roll = 0, yaw = 0, speedKts = 0, gear = 1.0, phase = "";
+
+    if (tSec < 6.0) {
+      // Brakes release & spool up
+      phase = "LINEUP & SPOOL";
+      x = -450 + (tSec / 6.0) * 80;
+      y = 4.2; z = -520;
+      speedKts = (tSec / 6.0) * 60;
+      gear = 1.0;
+    } else if (tSec < 15.0) {
+      // High-speed takeoff roll to Vr (145 kts)
+      phase = "TAKEOFF ROLL";
+      var progress = (tSec - 6.0) / 9.0;
+      x = -370 + progress * 400;
+      y = 4.2; z = -520;
+      speedKts = 60 + progress * 85;
+      gear = 1.0;
+    } else if (tSec < 22.0) {
+      // Rotation & Initial Climb
+      phase = "ROTATION & LIFTOFF";
+      var p = (tSec - 15.0) / 7.0;
+      x = 30 + p * 350;
+      y = 4.2 + Math.pow(p, 1.5) * 120;
+      z = -520;
+      pitch = p * 16.0;
+      speedKts = 145 + p * 25;
+      gear = (p > 0.4) ? Math.max(0.0, 1.0 - (p - 0.4) * 2.5) : 1.0;
+    } else if (tSec < 38.0) {
+      // Crosswind Turn (Left turn over river towards north)
+      phase = "CROSSWIND CLIMB";
+      var p = (tSec - 22.0) / 16.0;
+      var angle = p * Math.PI * 0.5; // Turn from 090 to 000
+      x = 380 + Math.sin(angle) * 380;
+      z = -520 + (1.0 - Math.cos(angle)) * 400;
+      y = 124.2 + p * 280;
+      yaw = angle;
+      roll = Math.sin(p * Math.PI) * 24.0; // Bank left
+      pitch = 10.0 - p * 4.0;
+      speedKts = 170 + p * 25;
+      gear = 0.0;
+    } else if (tSec < 58.0) {
+      // Downwind Leg (Cruise past city skyline at 1,500 ft)
+      phase = "DOWNWIND SKYLINE CRUISE";
+      var p = (tSec - 38.0) / 20.0;
+      x = 760 - p * 1520; // Flying West (-X) parallel to runway
+      z = -120; // Flying directly over waterfront between city and airport!
+      y = 404.2 + Math.sin(p * Math.PI) * 20;
+      yaw = Math.PI; // Heading West
+      roll = 0.0;
+      pitch = 0.5;
+      speedKts = 195;
+      gear = 0.0;
+    } else if (tSec < 72.0) {
+      // Base Turn (Bank left towards final approach corridor)
+      phase = "BASE LEG TURN";
+      var p = (tSec - 58.0) / 14.0;
+      var angle = Math.PI + p * Math.PI * 0.5; // Turn from 180 to 270 (heading East)
+      x = -760 - Math.sin(p * Math.PI * 0.5) * 380;
+      z = -120 - (1.0 - Math.cos(p * Math.PI * 0.5)) * 400;
+      y = 404.2 - p * 220;
+      yaw = angle;
+      roll = Math.sin(p * Math.PI) * 25.0; // Bank left
+      pitch = -3.5;
+      speedKts = 195 - p * 45;
+      gear = (p > 0.5) ? (p - 0.5) * 2.0 : 0.0; // Extend gear on base
+    } else if (tSec < 86.0) {
+      // Final Approach on 3-degree glide slope
+      phase = "FINAL APPROACH 09L";
+      var p = (tSec - 72.0) / 14.0;
+      x = -1140 + p * 690; // Approaching from West along X = -1140 to -450
+      z = -520;
+      y = 184.2 - p * 178.0;
+      yaw = 0.0; // Heading East 090
+      roll = 0.0;
+      pitch = -2.5 + p * 5.0; // Flare at end
+      speedKts = 150 - p * 15;
+      gear = 1.0;
+    } else {
+      // Touchdown, Rollout & Deceleration on runway (86s to 95s)
+      phase = "TOUCHDOWN & REVERSE THRUST";
+      var p = (tSec - 86.0) / 9.0;
+      x = -450 + p * 450;
+      z = -520;
+      y = 4.2;
+      yaw = 0.0;
+      roll = 0.0;
+      pitch = (1.0 - p) * 2.5;
+      speedKts = 135 * (1.0 - p);
+      gear = 1.0;
+    }
+
+    return {
+      x: x, y: y, z: z,
+      pitch: pitch, roll: roll, yaw: yaw,
+      speed: speedKts, gear: gear, phase: phase
+    };
+  }
+
+  // 9. CLIMATE, DAY/NIGHT & WEATHER CONFIGURATIONS
+  var climates = {
+    cold: {
+      name: "Cold City • Winter Environment",
+      desc: "-12 °C • Heavy snow cover • Icy runways • Overcast",
+      metrics: "Air density: 1.35 kg/m³ • Altimeter: 29.98 inHg • Active Runway: 09L",
+      top: 0x475569, hor: 0x94a3b8, groundCol: 0xe2e8f0, bldgPal: [0x64748b, 0x475569, 0x94a3b8],
+      pType: 'snow', fogDensity: 0.0006
+    },
+    hot: {
+      name: "Hot Desert City • Summer Environment",
+      desc: "+42 °C • Sun-drenched desert terrain • Thermal heat haze",
+      metrics: "Air density: 1.12 kg/m³ • High density altitude • Active Runway: 09L",
+      top: 0x0284c7, hor: 0xfde047, groundCol: 0xd97706, bldgPal: [0xd97706, 0xb45309, 0xf59e0b],
+      pType: 'dust', fogDensity: 0.0004
+    },
+    spring: {
+      name: "Temperate City • Clear Spring",
+      desc: "+22 °C • Lush green urban landscape • Visibility unlimited",
+      metrics: "Air density: 1.20 kg/m³ • Standard atmosphere • Active Runway: 09L",
+      top: 0x0369a1, hor: 0x7dd3fc, groundCol: 0x15803d, bldgPal: [0x475569, 0x334155, 0x64748b],
+      pType: 'none', fogDensity: 0.0003
+    },
+    rain: {
+      name: "Stormy City • Heavy Rain & Thunder",
+      desc: "+14 °C • Heavy downpour • Wet reflective asphalt • Low cloud ceiling",
+      metrics: "Air density: 1.22 kg/m³ • Altimeter: 29.62 inHg • CAT-II ILS Active",
+      top: 0x1e293b, hor: 0x334155, groundCol: 0x0f172a, bldgPal: [0x1e293b, 0x0f172a, 0x334155],
+      pType: 'rain', fogDensity: 0.0012
+    }
+  };
+
+  var curClimate = 'cold';
+  var timeOfDay = 10.0;
+  var isAutoClock = false;
+  var cameraMode = 'chase';
+
+  // Apply Climate Colors
+  function applyClimate(key) {
+    curClimate = key;
+    var c = climates[key];
+    document.getElementById('envTitle').innerText = c.name;
+    document.getElementById('envDesc').innerText = c.desc;
+    document.getElementById('envMetrics').innerText = c.metrics;
+
+    // Update Building Vertex Colors
+    var colArr = bldgGeom.attributes.color.array;
+    var tempC = new THREE.Color();
+    bldgData.forEach(function(b, idx) {
+      tempC.setHex(c.bldgPal[idx % c.bldgPal.length]);
+      for (var k = 0; k < 24; k++) {
+        colArr[(b.s + k) * 3] = tempC.r;
+        colArr[(b.s + k) * 3 + 1] = tempC.g;
+        colArr[(b.s + k) * 3 + 2] = tempC.b;
+      }
+    });
+    bldgGeom.attributes.color.needsUpdate = true;
+
+    // Particle visibility
+    weatherParticles.visible = (c.pType !== 'none');
+    pMat.size = (c.pType === 'rain') ? 1.6 : 3.0;
+    pMat.color.setHex((c.pType === 'rain') ? 0x93c5fd : 0xffffff);
+
+    updateLighting();
+  }
+
+  // Day/Night Lighting & Celestial Math
+  function updateLighting() {
+    var c = climates[curClimate];
+    var sunAngle = ((timeOfDay - 6.0) / 12.0) * Math.PI;
+    var sunDir = new THREE.Vector3(Math.cos(sunAngle), Math.sin(sunAngle), 0.35).normalize();
+    var sunAlt = sunDir.y;
+
+    var isDay = sunAlt > 0.05;
+    var isTwilight = Math.abs(sunAlt) <= 0.15;
+    var dayFactor = Math.max(0.0, Math.min(1.0, (sunAlt + 0.1) / 0.4));
+
+    // Colors
+    var dayTop = new THREE.Color(c.top);
+    var dayHor = new THREE.Color(c.hor);
+    var nightTop = new THREE.Color(0x020617);
+    var nightHor = new THREE.Color(0x0b1329);
+    var twilightColor = new THREE.Color(0xf97316);
+
+    var curTop = nightTop.clone().lerp(dayTop, dayFactor);
+    var curHor = nightHor.clone().lerp(dayHor, dayFactor);
+    if (isTwilight) {
+      curHor.lerp(twilightColor, 0.6);
+    }
+
+    skyUniforms.topColor.value.copy(curTop);
+    skyUniforms.bottomColor.value.copy(curHor);
+    skyUniforms.sunPos.value.copy(sunDir);
+    skyUniforms.sunColor.value.setRGB(1.0, 0.9, 0.7).multiplyScalar(dayFactor);
+
+    sunLight.position.copy(sunDir).multiplyScalar(1500);
+    sunLight.intensity = Math.max(0.0, sunAlt * 1.6);
+
+    moonLight.position.copy(sunDir).multiplyScalar(-1500);
+    moonLight.intensity = Math.max(0.0, -sunAlt * 0.4);
+
+    hemiLight.intensity = 0.2 + dayFactor * 0.6;
+    hemiLight.color.copy(curTop);
+    hemiLight.groundColor.setHex(c.groundCol).multiplyScalar(0.3 + dayFactor * 0.7);
+
+    // Emissive night windows
+    bldgMaterial.emissiveIntensity = Math.max(0.0, (1.0 - dayFactor) * 1.4);
+
+    // Airport Lighting intensity at dusk/night
+    var nightLightFactor = Math.max(0.2, (1.0 - dayFactor));
+    whiteLightMat.color.setRGB(nightLightFactor, nightLightFactor, nightLightFactor);
+
+    // Fog
+    scene.fog = new THREE.FogExp2(curHor.getHex(), c.fogDensity);
+
+    // Update Time Label
+    var hrs = Math.floor(timeOfDay);
+    var mins = Math.floor((timeOfDay - hrs) * 60);
+    document.getElementById('lblTime').innerText = ('0' + hrs).slice(-2) + ':' + ('0' + mins).slice(-2);
+  }
+
+  // Universal 360° Interactive Mouse & Touch Camera Controls
+  var chaseAzimuth = 0.0;    // 0 = directly behind tail, sweeps full 360° (2*PI)
+  var chaseElevation = 0.28; // vertical elevation angle above/below plane
+  var chaseDistance = 65.0;  // camera distance from plane
+
+  var cockpitPan = 0.0;      // 360° pan in cockpit
+  var cockpitTilt = 0.0;     // tilt up/down in cockpit
+
+  var towerPan = 0.0;
+  var towerTilt = 0.0;
+
+  var skylinePan = 0.0;
+  var skylineTilt = 0.0;
+
+  var orbitAzimuth = 0.35;
+  var orbitElevation = 0.4;
+  var orbitDistance = 850;
+
+  var isDragging = false, lastMouseX = 0, lastMouseY = 0;
+
+  cv.addEventListener('pointerdown', function(e) {
+    cv.setPointerCapture(e.pointerId);
+    isDragging = true;
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+  });
+  cv.addEventListener('pointerup', function(e) { isDragging = false; });
+  cv.addEventListener('pointercancel', function(e) { isDragging = false; });
+
+  cv.addEventListener('pointermove', function(e) {
+    if (!isDragging) return;
+    var dx = e.clientX - lastMouseX;
+    var dy = e.clientY - lastMouseY;
+    lastMouseX = e.clientX;
+    lastMouseY = e.clientY;
+
+    if (cameraMode === 'chase') {
+      // Free 360° rotation around the aircraft
+      chaseAzimuth -= dx * 0.007;
+      chaseElevation = Math.max(-0.65, Math.min(1.4, chaseElevation + dy * 0.006));
+    } else if (cameraMode === 'cockpit') {
+      // Free 360° look around in cockpit
+      cockpitPan -= dx * 0.007;
+      cockpitTilt = Math.max(-1.3, Math.min(1.3, cockpitTilt - dy * 0.006));
+    } else if (cameraMode === 'tower') {
+      towerPan -= dx * 0.006;
+      towerTilt = Math.max(-1.1, Math.min(1.1, towerTilt - dy * 0.005));
+    } else if (cameraMode === 'skyline') {
+      skylinePan -= dx * 0.006;
+      skylineTilt = Math.max(-1.1, Math.min(1.1, skylineTilt - dy * 0.005));
+    } else if (cameraMode === 'orbit') {
+      orbitAzimuth -= dx * 0.005;
+      orbitElevation = Math.max(0.05, Math.min(1.5, orbitElevation + dy * 0.004));
+    }
+  });
+
+  cv.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    if (cameraMode === 'chase') {
+      chaseDistance = Math.max(14, Math.min(380, chaseDistance * (1 + e.deltaY * 0.0012)));
+    } else if (cameraMode === 'orbit') {
+      orbitDistance = Math.max(50, Math.min(2500, orbitDistance * (1 + e.deltaY * 0.001)));
+    } else if (cameraMode === 'cockpit') {
+      camera.fov = Math.max(25, Math.min(95, camera.fov + e.deltaY * 0.04));
+      camera.updateProjectionMatrix();
+    }
+  }, {passive: false});
+
+  window.resetCurrentCamera = function() {
+    chaseAzimuth = 0.0;
+    chaseElevation = 0.28;
+    chaseDistance = 65.0;
+    cockpitPan = 0.0;
+    cockpitTilt = 0.0;
+    towerPan = 0.0;
+    towerTilt = 0.0;
+    skylinePan = 0.0;
+    skylineTilt = 0.0;
+    camera.fov = 50;
+    camera.updateProjectionMatrix();
+  };
+
+  cv.addEventListener('dblclick', function() {
+    resetCurrentCamera();
+  });
+
+  
+  // Embedded N722BD Crash Trajectory for Crash History Mode
+  var crashTrajData = [{"ts": "2026-11-01T16:17:56Z", "x": -59290.7, "y": 624.84, "z": -18162.4, "alt": 41000.0, "spd": 486.0, "hdg": 98.0, "pitch": 0.0, "bank": 0.0, "vs": 0.0, "mach": 0.85, "g": 1.0, "q_phase": 0.0}, {"ts": "2026-11-01T17:17:53Z", "x": -17234.43, "y": 624.84, "z": -5100.51, "alt": 41000.0, "spd": 472.0, "hdg": 122.0, "pitch": 0.0, "bank": 75.0, "vs": 0.0, "mach": 0.82, "g": 2.25, "q_phase": 78970.5}, {"ts": "2026-11-01T17:40:20Z", "x": -4880.44, "y": 553.21, "z": 2562.34, "alt": 36300.0, "spd": 443.0, "hdg": 75.0, "pitch": -0.3, "bank": -75.0, "vs": -141000.0, "mach": 0.77, "g": 2.24, "q_phase": 78524.63}, {"ts": "2026-11-01T17:40:26Z", "x": -4813.37, "y": 551.69, "z": 2539.58, "alt": 36200.0, "spd": 439.0, "hdg": 68.0, "pitch": -1.2, "bank": -54.6, "vs": -3000.0, "mach": 0.77, "g": 1.88, "q_phase": 55526.77}, {"ts": "2026-11-01T17:40:28Z", "x": -4788.7, "y": 550.93, "z": 2528.91, "alt": 36150.0, "spd": 439.0, "hdg": 65.0, "pitch": -1.6, "bank": -31.1, "vs": -1500.0, "mach": 0.77, "g": 1.48, "q_phase": 30158.38}, {"ts": "2026-11-01T17:40:30Z", "x": -4769.58, "y": 550.55, "z": 2519.71, "alt": 36125.0, "spd": 438.0, "hdg": 63.0, "pitch": -1.0, "bank": -21.8, "vs": -750.0, "mach": 0.76, "g": 1.34, "q_phase": 21376.62}, {"ts": "2026-11-01T17:40:33Z", "x": -4747.28, "y": 549.4, "z": 2507.57, "alt": 36050.0, "spd": 436.0, "hdg": 60.0, "pitch": -2.6, "bank": -30.9, "vs": -2250.0, "mach": 0.76, "g": 1.45, "q_phase": 28468.68}, {"ts": "2026-11-01T17:40:35Z", "x": -4728.02, "y": 548.64, "z": 2496.39, "alt": 36000.0, "spd": 436.0, "hdg": 58.0, "pitch": -2.0, "bank": -21.8, "vs": -1500.0, "mach": 0.76, "g": 1.31, "q_phase": 19811.56}, {"ts": "2026-11-01T17:40:37Z", "x": -4700.92, "y": 547.88, "z": 2478.63, "alt": 35950.0, "spd": 435.0, "hdg": 56.0, "pitch": -1.3, "bank": -21.7, "vs": -1500.0, "mach": 0.76, "g": 1.33, "q_phase": 20731.12}, {"ts": "2026-11-01T17:40:40Z", "x": -4681.73, "y": 547.12, "z": 2465.39, "alt": 35900.0, "spd": 434.0, "hdg": 55.0, "pitch": -1.9, "bank": -11.2, "vs": -1500.0, "mach": 0.76, "g": 1.14, "q_phase": 8871.27}, {"ts": "2026-11-01T17:40:42Z", "x": -4663.75, "y": 545.97, "z": 2452.44, "alt": 35825.0, "spd": 434.0, "hdg": 54.0, "pitch": -3.0, "bank": -11.2, "vs": -2250.0, "mach": 0.76, "g": 1.11, "q_phase": 7164.62}, {"ts": "2026-11-01T17:40:44Z", "x": -4642.14, "y": 544.83, "z": 2436.43, "alt": 35750.0, "spd": 435.0, "hdg": 53.0, "pitch": -2.4, "bank": -11.3, "vs": -2250.0, "mach": 0.76, "g": 1.13, "q_phase": 8010.88}, {"ts": "2026-11-01T17:40:46Z", "x": -4625.22, "y": 544.07, "z": 2423.86, "alt": 35700.0, "spd": 435.0, "hdg": 53.0, "pitch": -2.1, "bank": 0.0, "vs": -1500.0, "mach": 0.76, "g": 0.95, "q_phase": -3269.12}, {"ts": "2026-11-01T17:40:48Z", "x": -4605.8, "y": 542.93, "z": 2409.13, "alt": 35625.0, "spd": 436.0, "hdg": 52.0, "pitch": -2.7, "bank": -11.3, "vs": -2250.0, "mach": 0.76, "g": 1.12, "q_phase": 7639.23}, {"ts": "2026-11-01T17:40:51Z", "x": -4583.51, "y": 541.02, "z": 2391.97, "alt": 35500.0, "spd": 438.0, "hdg": 52.0, "pitch": -3.9, "bank": 0.0, "vs": -3750.0, "mach": 0.76, "g": 0.9, "q_phase": -6117.93}, {"ts": "2026-11-01T17:40:53Z", "x": -4564.92, "y": 539.5, "z": 2377.61, "alt": 35400.0, "spd": 439.0, "hdg": 52.0, "pitch": -3.7, "bank": 0.0, "vs": -3000.0, "mach": 0.76, "g": 0.91, "q_phase": -5863.36}, {"ts": "2026-11-01T17:40:55Z", "x": -4550.76, "y": 538.35, "z": 2366.49, "alt": 35325.0, "spd": 440.0, "hdg": 52.0, "pitch": -3.6, "bank": 0.0, "vs": -2250.0, "mach": 0.76, "g": 0.91, "q_phase": -5738.09}, {"ts": "2026-11-01T17:40:57Z", "x": -4528.78, "y": 536.83, "z": 2349.04, "alt": 35225.0, "spd": 441.0, "hdg": 51.0, "pitch": -3.1, "bank": -11.4, "vs": -3000.0, "mach": 0.77, "g": 1.11, "q_phase": 7106.29}, {"ts": "2026-11-01T17:40:59Z", "x": -4509.2, "y": 535.69, "z": 2333.54, "alt": 35150.0, "spd": 441.0, "hdg": 51.0, "pitch": -2.6, "bank": 0.0, "vs": -2250.0, "mach": 0.77, "g": 0.93, "q_phase": -4139.98}, {"ts": "2026-11-01T17:41:30Z", "x": -4245.24, "y": 533.02, "z": 2120.28, "alt": 34975.0, "spd": 426.0, "hdg": 51.0, "pitch": -0.5, "bank": 0.0, "vs": -5250.0, "mach": 0.74, "g": 0.99, "q_phase": -711.19}, {"ts": "2026-11-01T17:42:03Z", "x": -3965.63, "y": 533.4, "z": 1895.25, "alt": 35000.0, "spd": 424.0, "hdg": 51.0, "pitch": 0.1, "bank": 0.0, "vs": 750.0, "mach": 0.74, "g": 1.0, "q_phase": 96.06}, {"ts": "2026-11-01T17:42:33Z", "x": -3706.47, "y": 533.4, "z": 1679.76, "alt": 35000.0, "spd": 435.0, "hdg": 50.0, "pitch": 0.0, "bank": -11.3, "vs": 0.0, "mach": 0.75, "g": 1.19, "q_phase": 11854.72}, {"ts": "2026-11-01T17:43:06Z", "x": -3428.72, "y": 533.4, "z": 1440.77, "alt": 35000.0, "spd": 448.0, "hdg": 49.0, "pitch": 0.0, "bank": -11.6, "vs": 0.0, "mach": 0.78, "g": 1.19, "q_phase": 12199.55}, {"ts": "2026-11-01T17:43:37Z", "x": -3152.79, "y": 533.4, "z": 1210.06, "alt": 35000.0, "spd": 459.0, "hdg": 51.0, "pitch": 0.0, "bank": 22.8, "vs": 0.0, "mach": 0.8, "g": 1.38, "q_phase": 23993.96}, {"ts": "2026-11-01T17:44:09Z", "x": -2852.22, "y": 533.78, "z": 966.94, "alt": 35025.0, "spd": 458.0, "hdg": 51.0, "pitch": 0.1, "bank": 0.0, "vs": 750.0, "mach": 0.79, "g": 1.0, "q_phase": 89.18}, {"ts": "2026-11-01T17:44:40Z", "x": -2573.79, "y": 533.4, "z": 744.91, "alt": 35000.0, "spd": 463.0, "hdg": 51.0, "pitch": -0.1, "bank": 0.0, "vs": -750.0, "mach": 0.8, "g": 1.0, "q_phase": -96.82}, {"ts": "2026-11-01T17:45:12Z", "x": -2274.43, "y": 533.4, "z": 501.36, "alt": 35000.0, "spd": 465.0, "hdg": 51.0, "pitch": 0.0, "bank": 0.0, "vs": 0.0, "mach": 0.81, "g": 1.0, "q_phase": 0.0}, {"ts": "2026-11-01T17:45:43Z", "x": -1987.22, "y": 533.4, "z": 274.52, "alt": 35000.0, "spd": 473.0, "hdg": 52.0, "pitch": 0.0, "bank": 12.2, "vs": 0.0, "mach": 0.82, "g": 1.2, "q_phase": 12860.41}, {"ts": "2026-11-01T17:46:15Z", "x": -1677.03, "y": 533.78, "z": 32.53, "alt": 35025.0, "spd": 471.0, "hdg": 51.0, "pitch": 0.1, "bank": -12.2, "vs": 750.0, "mach": 0.82, "g": 1.2, "q_phase": 12895.29}, {"ts": "2026-11-01T17:46:46Z", "x": -1387.29, "y": 533.78, "z": -203.75, "alt": 35025.0, "spd": 462.0, "hdg": 50.0, "pitch": 0.0, "bank": -11.9, "vs": 0.0, "mach": 0.8, "g": 1.2, "q_phase": 12570.01}, {"ts": "2026-11-01T17:47:12Z", "x": -1156.02, "y": 532.64, "z": -389.22, "alt": 34950.0, "spd": 444.0, "hdg": 58.0, "pitch": -0.2, "bank": 58.4, "vs": -2250.0, "mach": 0.77, "g": 1.97, "q_phase": 61143.33}, {"ts": "2026-11-01T17:47:14Z", "x": -1135.32, "y": 532.64, "z": -400.9, "alt": 34950.0, "spd": 442.0, "hdg": 61.0, "pitch": 0.0, "bank": 31.3, "vs": 0.0, "mach": 0.77, "g": 1.52, "q_phase": 32904.61}, {"ts": "2026-11-01T17:47:16Z", "x": -1115.25, "y": 533.02, "z": -411.31, "alt": 34975.0, "spd": 440.0, "hdg": 64.0, "pitch": 1.0, "bank": 31.1, "vs": 750.0, "mach": 0.76, "g": 1.54, "q_phase": 34308.57}, {"ts": "2026-11-01T17:47:18Z", "x": -1091.83, "y": 533.4, "z": -422.04, "alt": 35000.0, "spd": 438.0, "hdg": 66.0, "pitch": 0.8, "bank": 21.8, "vs": 750.0, "mach": 0.76, "g": 1.39, "q_phase": 24339.64}, {"ts": "2026-11-01T17:47:20Z", "x": -1070.02, "y": 533.4, "z": -431.13, "alt": 35000.0, "spd": 437.0, "hdg": 68.0, "pitch": 0.0, "bank": 21.8, "vs": 0.0, "mach": 0.76, "g": 1.36, "q_phase": 22954.04}, {"ts": "2026-11-01T17:47:22Z", "x": -1049.2, "y": 533.78, "z": -438.75, "alt": 35025.0, "spd": 438.0, "hdg": 70.0, "pitch": 1.0, "bank": 21.8, "vs": 750.0, "mach": 0.76, "g": 1.39, "q_phase": 24556.79}, {"ts": "2026-11-01T17:47:25Z", "x": -1022.63, "y": 533.4, "z": -447.36, "alt": 35000.0, "spd": 437.0, "hdg": 73.0, "pitch": -0.8, "bank": 31.0, "vs": -750.0, "mach": 0.76, "g": 1.5, "q_phase": 31366.71}, {"ts": "2026-11-01T17:47:27Z", "x": -1002.99, "y": 532.64, "z": -452.77, "alt": 34950.0, "spd": 437.0, "hdg": 75.0, "pitch": -2.1, "bank": 21.8, "vs": -1500.0, "mach": 0.76, "g": 1.31, "q_phase": 19571.18}, {"ts": "2026-11-01T17:47:29Z", "x": -975.66, "y": 532.26, "z": -458.57, "alt": 34925.0, "spd": 436.0, "hdg": 79.0, "pitch": -0.8, "bank": 38.6, "vs": -750.0, "mach": 0.76, "g": 1.62, "q_phase": 39402.89}, {"ts": "2026-11-01T17:47:31Z", "x": -954.77, "y": 532.64, "z": -462.08, "alt": 34950.0, "spd": 435.0, "hdg": 81.0, "pitch": 1.0, "bank": 21.7, "vs": 750.0, "mach": 0.75, "g": 1.39, "q_phase": 24486.09}, {"ts": "2026-11-01T17:47:33Z", "x": -928.31, "y": 533.4, "z": -465.18, "alt": 35000.0, "spd": 434.0, "hdg": 84.0, "pitch": 1.6, "bank": 30.8, "vs": 1500.0, "mach": 0.75, "g": 1.55, "q_phase": 35005.79}, {"ts": "2026-11-01T17:47:35Z", "x": -906.02, "y": 533.78, "z": -466.99, "alt": 35025.0, "spd": 432.0, "hdg": 86.0, "pitch": 1.0, "bank": 21.6, "vs": 750.0, "mach": 0.75, "g": 1.38, "q_phase": 24256.86}, {"ts": "2026-11-01T17:47:38Z", "x": -882.85, "y": 533.78, "z": -467.97, "alt": 35025.0, "spd": 432.0, "hdg": 88.0, "pitch": 0.0, "bank": 21.6, "vs": 0.0, "mach": 0.75, "g": 1.36, "q_phase": 22715.66}, {"ts": "2026-11-01T17:47:40Z", "x": -855.18, "y": 534.16, "z": -468.02, "alt": 35050.0, "spd": 432.0, "hdg": 90.0, "pitch": 0.8, "bank": 21.6, "vs": 750.0, "mach": 0.75, "g": 1.38, "q_phase": 23961.69}, {"ts": "2026-11-01T17:47:42Z", "x": -834.25, "y": 534.54, "z": -467.46, "alt": 35075.0, "spd": 432.0, "hdg": 91.0, "pitch": 1.0, "bank": 11.2, "vs": 750.0, "mach": 0.75, "g": 1.21, "q_phase": 13421.47}, {"ts": "2026-11-01T17:47:44Z", "x": -805.45, "y": 534.54, "z": -466.19, "alt": 35075.0, "spd": 432.0, "hdg": 93.0, "pitch": 0.0, "bank": 21.6, "vs": 0.0, "mach": 0.75, "g": 1.36, "q_phase": 22715.66}, {"ts": "2026-11-01T17:47:46Z", "x": -783.34, "y": 534.16, "z": -464.92, "alt": 35050.0, "spd": 432.0, "hdg": 93.0, "pitch": -1.0, "bank": 0.0, "vs": -750.0, "mach": 0.75, "g": 0.98, "q_phase": -1556.88}, {"ts": "2026-11-01T17:47:49Z", "x": -756.62, "y": 533.4, "z": -462.89, "alt": 35000.0, "spd": 433.0, "hdg": 94.0, "pitch": -1.6, "bank": 11.2, "vs": -1500.0, "mach": 0.75, "g": 1.15, "q_phase": 9229.1}, {"ts": "2026-11-01T17:47:51Z", "x": -735.69, "y": 532.64, "z": -460.79, "alt": 34950.0, "spd": 434.0, "hdg": 95.0, "pitch": -2.1, "bank": 11.2, "vs": -1500.0, "mach": 0.75, "g": 1.14, "q_phase": 8551.59}, {"ts": "2026-11-01T17:47:53Z", "x": -710.33, "y": 533.02, "z": -458.06, "alt": 34975.0, "spd": 432.0, "hdg": 95.0, "pitch": 0.9, "bank": 0.0, "vs": 750.0, "mach": 0.75, "g": 1.02, "q_phase": 1351.56}, {"ts": "2026-11-01T17:47:55Z", "x": -690.53, "y": 533.02, "z": -455.77, "alt": 34975.0, "spd": 432.0, "hdg": 97.0, "pitch": 0.0, "bank": 21.6, "vs": 0.0, "mach": 0.75, "g": 1.36, "q_phase": 22715.66}, {"ts": "2026-11-01T17:47:57Z", "x": -667.82, "y": 534.16, "z": -452.77, "alt": 35050.0, "spd": 434.0, "hdg": 97.0, "pitch": 2.9, "bank": 0.0, "vs": 2250.0, "mach": 0.75, "g": 1.07, "q_phase": 4511.25}, {"ts": "2026-11-01T17:47:59Z", "x": -644.51, "y": 534.16, "z": -449.68, "alt": 35050.0, "spd": 434.0, "hdg": 97.0, "pitch": 0.0, "bank": 0.0, "vs": 0.0, "mach": 0.75, "g": 1.0, "q_phase": 0.0}, {"ts": "2026-11-01T17:48:01Z", "x": -623.8, "y": 534.54, "z": -446.84, "alt": 35075.0, "spd": 435.0, "hdg": 98.0, "pitch": 1.0, "bank": 11.3, "vs": 750.0, "mach": 0.75, "g": 1.21, "q_phase": 13504.05}, {"ts": "2026-11-01T17:48:03Z", "x": -597.08, "y": 535.31, "z": -442.96, "alt": 35125.0, "spd": 435.0, "hdg": 98.0, "pitch": 1.6, "bank": 0.0, "vs": 1500.0, "mach": 0.76, "g": 1.04, "q_phase": 2553.24}, {"ts": "2026-11-01T17:48:05Z", "x": -575.05, "y": 536.07, "z": -439.34, "alt": 35175.0, "spd": 436.0, "hdg": 98.0, "pitch": 2.0, "bank": 0.0, "vs": 1500.0, "mach": 0.76, "g": 1.05, "q_phase": 3087.85}, {"ts": "2026-11-01T17:48:07Z", "x": -553.06, "y": 537.21, "z": -435.99, "alt": 35250.0, "spd": 437.0, "hdg": 99.0, "pitch": 2.9, "bank": 11.3, "vs": 2250.0, "mach": 0.76, "g": 1.26, "q_phase": 16552.95}, {"ts": "2026-11-01T17:48:39Z", "x": -180.42, "y": 477.77, "z": -372.17, "alt": 31350.0, "spd": 488.0, "hdg": 102.0, "pitch": -8.9, "bank": 33.8, "vs": -117000.0, "mach": 0.83, "g": 1.34, "q_phase": 21500.35}, {"ts": "2026-11-01T17:48:46Z", "x": -98.7, "y": 441.2, "z": -346.78, "alt": 28950.0, "spd": 505.0, "hdg": 111.0, "pitch": -23.1, "bank": 64.3, "vs": -72000.0, "mach": 0.85, "g": 1.49, "q_phase": 31175.11}, {"ts": "2026-11-01T17:48:48Z", "x": -75.04, "y": 431.67, "z": -335.86, "alt": 28325.0, "spd": 506.0, "hdg": 115.0, "pitch": -20.1, "bank": 42.8, "vs": -18750.0, "mach": 0.85, "g": 1.21, "q_phase": 13362.06}, {"ts": "2026-11-01T17:48:50Z", "x": -46.81, "y": 419.1, "z": -319.98, "alt": 27500.0, "spd": 504.0, "hdg": 120.0, "pitch": -21.2, "bank": 49.1, "vs": -24750.0, "mach": 0.85, "g": 1.29, "q_phase": 18163.67}, {"ts": "2026-11-01T17:48:52Z", "x": -26.71, "y": 409.58, "z": -306.39, "alt": 26875.0, "spd": 499.0, "hdg": 125.0, "pitch": -21.4, "bank": 48.8, "vs": -18750.0, "mach": 0.84, "g": 1.28, "q_phase": 17516.95}, {"ts": "2026-11-01T17:48:55Z", "x": -4.07, "y": 396.62, "z": -287.68, "alt": 26025.0, "spd": 493.0, "hdg": 132.0, "pitch": -23.8, "bank": 57.7, "vs": -25500.0, "mach": 0.82, "g": 1.37, "q_phase": 23117.93}, {"ts": "2026-11-01T17:48:57Z", "x": 13.49, "y": 384.43, "z": -269.6, "alt": 25225.0, "spd": 486.0, "hdg": 137.0, "pitch": -25.8, "bank": 48.0, "vs": -24000.0, "mach": 0.81, "g": 1.16, "q_phase": 9806.73}, {"ts": "2026-11-01T17:48:59Z", "x": 32.41, "y": 369.19, "z": -245.16, "alt": 24225.0, "spd": 479.0, "hdg": 145.0, "pitch": -26.2, "bank": 60.3, "vs": -30000.0, "mach": 0.79, "g": 1.35, "q_phase": 22047.48}, {"ts": "2026-11-01T17:49:01Z", "x": 47.06, "y": 352.43, "z": -220.01, "alt": 23125.0, "spd": 472.0, "hdg": 151.0, "pitch": -29.9, "bank": 52.3, "vs": -33000.0, "mach": 0.78, "g": 1.12, "q_phase": 7832.31}, {"ts": "2026-11-01T17:49:03Z", "x": 56.6, "y": 338.33, "z": -198.16, "alt": 22200.0, "spd": 465.0, "hdg": 158.0, "pitch": -30.6, "bank": 56.1, "vs": -27750.0, "mach": 0.76, "g": 1.17, "q_phase": 10776.18}, {"ts": "2026-11-01T17:49:06Z", "x": 63.0, "y": 320.42, "z": -176.58, "alt": 21025.0, "spd": 450.0, "hdg": 165.0, "pitch": -38.5, "bank": 55.3, "vs": -35250.0, "mach": 0.74, "g": 0.96, "q_phase": -2653.86}, {"ts": "2026-11-01T17:49:08Z", "x": 68.15, "y": 298.7, "z": -153.19, "alt": 19600.0, "spd": 437.0, "hdg": 169.0, "pitch": -42.2, "bank": 38.7, "vs": -42750.0, "mach": 0.71, "g": 0.59, "q_phase": -25941.47}, {"ts": "2026-11-01T17:49:10Z", "x": 71.25, "y": 275.84, "z": -127.02, "alt": 18100.0, "spd": 419.0, "hdg": 175.0, "pitch": -40.9, "bank": 49.0, "vs": -45000.0, "mach": 0.68, "g": 0.79, "q_phase": -13066.95}, {"ts": "2026-11-01T17:49:12Z", "x": 71.4, "y": 254.89, "z": -105.28, "alt": 16725.0, "spd": 402.0, "hdg": 180.0, "pitch": -43.9, "bank": 42.6, "vs": -41250.0, "mach": 0.65, "g": 0.61, "q_phase": -24533.65}, {"ts": "2026-11-01T17:49:14Z", "x": 70.34, "y": 236.6, "z": -89.01, "alt": 15525.0, "spd": 379.0, "hdg": 185.0, "pitch": -48.3, "bank": 40.9, "vs": -36000.0, "mach": 0.61, "g": 0.48, "q_phase": -33149.95}, {"ts": "2026-11-01T17:49:16Z", "x": 67.12, "y": 207.26, "z": -65.54, "alt": 13600.0, "spd": 352.0, "hdg": 191.0, "pitch": -51.1, "bank": 44.0, "vs": -57750.0, "mach": 0.56, "g": 0.46, "q_phase": -34329.01}, {"ts": "2026-11-01T17:49:19Z", "x": 61.44, "y": 179.07, "z": -44.31, "alt": 11750.0, "spd": 330.0, "hdg": 197.0, "pitch": -52.1, "bank": 42.2, "vs": -55500.0, "mach": 0.52, "g": 0.4, "q_phase": -37809.13}, {"ts": "2026-11-01T17:49:21Z", "x": 55.05, "y": 154.31, "z": -28.7, "alt": 10125.0, "spd": 298.0, "hdg": 209.0, "pitch": -55.7, "bank": 58.6, "vs": -48750.0, "mach": 0.47, "g": 0.58, "q_phase": -26368.64}, {"ts": "2026-11-01T17:49:23Z", "x": 47.59, "y": 133.35, "z": -17.78, "alt": 8750.0, "spd": 275.0, "hdg": 219.0, "pitch": -57.7, "bank": 51.5, "vs": -41250.0, "mach": 0.43, "g": 0.42, "q_phase": -36943.41}, {"ts": "2026-11-01T17:49:25Z", "x": 34.99, "y": 133.35, "z": -5.58, "alt": 8750.0, "spd": 255.0, "hdg": 233.0, "pitch": 0.0, "bank": 58.5, "vs": 0.0, "mach": 0.4, "g": 1.98, "q_phase": 61628.17}, {"ts": "2026-11-01T17:49:27Z", "x": 24.73, "y": 133.35, "z": -0.75, "alt": 8750.0, "spd": 241.0, "hdg": 248.0, "pitch": 0.0, "bank": 58.8, "vs": 0.0, "mach": 0.38, "g": 1.98, "q_phase": 61963.7}, {"ts": "2026-11-01T17:49:29Z", "x": 12.43, "y": 133.35, "z": 1.68, "alt": 8750.0, "spd": 232.0, "hdg": 268.0, "pitch": 0.0, "bank": 64.8, "vs": 0.0, "mach": 0.36, "g": 2.08, "q_phase": 68211.96}, {"ts": "2026-11-01T17:49:31Z", "x": 0.01, "y": 133.35, "z": 0.01, "alt": 8750.0, "spd": 231.0, "hdg": 277.0, "pitch": 0.0, "bank": 43.6, "vs": 0.0, "mach": 0.36, "g": 1.73, "q_phase": 45880.65}];
+  var simMode = 'normal'; // 'normal' or 'crash'
+  var crashTimeIdx = 0.0;
+
+  // 3D Visual Objects for Crash Mode
+  var crashGroup = new THREE.Group();
+  scene.add(crashGroup);
+  crashGroup.visible = false;
+
+  // Build Crash 3D Drop Curtain and Milestone Pins
+  (function initCrashModeVisuals() {
+    var pts = crashTrajData.map(function(p) { return new THREE.Vector3(p.x, p.y, p.z); });
+    var lineGeom = new THREE.BufferGeometry().setFromPoints(pts);
+    var lineMat = new THREE.LineBasicMaterial({color: 0xef4444, linewidth: 3});
+    var crashLine = new THREE.Line(lineGeom, lineMat);
+    crashGroup.add(crashLine);
+
+    // Wall drop curtain
+    var wallGeom = new THREE.BufferGeometry();
+    var wallVerts = [];
+    var wallColors = [];
+    var cCyan = new THREE.Color(0x38bdf8), cRed = new THREE.Color(0xef4444), cYel = new THREE.Color(0xfacc15);
+
+    for (var i = 0; i < pts.length - 1; i++) {
+      var p1 = pts[i], p2 = pts[i+1];
+      var tData = crashTrajData[i];
+      var col = tData.mach > 0.81 ? cRed : (tData.spd > 460 ? cYel : cCyan);
+
+      wallVerts.push(p1.x, p1.y, p1.z);
+      wallVerts.push(p1.x, 0, p1.z);
+      wallVerts.push(p2.x, p2.y, p2.z);
+
+      wallVerts.push(p2.x, p2.y, p2.z);
+      wallVerts.push(p1.x, 0, p1.z);
+      wallVerts.push(p2.x, 0, p2.z);
+
+      for (var k = 0; k < 6; k++) { wallColors.push(col.r, col.g, col.b); }
+    }
+    wallGeom.setAttribute('position', new THREE.Float32BufferAttribute(wallVerts, 3));
+    wallGeom.setAttribute('color', new THREE.Float32BufferAttribute(wallColors, 3));
+    var wallMat = new THREE.MeshBasicMaterial({vertexColors: true, side: THREE.DoubleSide, transparent: true, opacity: 0.35, depthWrite: false});
+    var dropWall = new THREE.Mesh(wallGeom, wallMat);
+    crashGroup.add(dropWall);
+
+    // Storm Clouds at FL350
+    var stormMat = new THREE.MeshStandardMaterial({color: 0x1e293b, roughness: 0.9, transparent: true, opacity: 0.8});
+    for (var sc = 0; sc < 25; sc++) {
+      var puff = new THREE.Mesh(new THREE.DodecahedronGeometry(70 + Math.random() * 80, 1), stormMat);
+      puff.position.set(-600 + (Math.random()-0.5)*1200, 490 + (Math.random()-0.5)*60, -300 + (Math.random()-0.5)*700);
+      crashGroup.add(puff);
+    }
+  })();
+
+  // Mode Switcher Handler
+  window.switchSimulationMode = function(mode) {
+    simMode = mode;
+    var bNorm = document.getElementById('btnModeNormal');
+    var bCrash = document.getElementById('btnModeCrash');
+    
+    if (mode === 'normal') {
+      bNorm.className = 'mode-opt-btn active';
+      bCrash.className = 'mode-opt-btn';
+      crashGroup.visible = false;
+      airportGroup.visible = true;
+      cityGroup.visible = true;
+      circuitTimer = 0.0;
+      setCamera('chase');
+      document.getElementById('telemPhase').innerText = 'RUNWAY 09L LINEUP';
+    } else {
+      bNorm.className = 'mode-opt-btn';
+      bCrash.className = 'mode-opt-btn active crash';
+      crashGroup.visible = true;
+      airportGroup.visible = false;
+      cityGroup.visible = false;
+      crashTimeIdx = 0.0;
+      setCamera('chase');
+      document.getElementById('telemPhase').innerText = 'FL350 CRUISE & ICING';
+    }
+  };
+
+  // High-Fidelity C-27J Spartan GLB Loader
+  var gltfLoader = new THREE.GLTFLoader();
+  var c27jModel = null;
+
+  (function loadC27JSpartan() {
+    var glbUrls = [
+      'c-27j_spartan__broken_arrow.glb',
+      'http://localhost:8088/c-27j_spartan__broken_arrow.glb'
+    ];
+
+    function applyLoadedModel(gltf) {
+      c27jModel = gltf.scene;
+
+      var bbox = new THREE.Box3().setFromObject(c27jModel);
+      var center = new THREE.Vector3();
+      bbox.getCenter(center);
+      var size = new THREE.Vector3();
+      bbox.getSize(size);
+
+      // Center model
+      c27jModel.position.x = -center.x;
+      c27jModel.position.y = -bbox.min.y; // wheels ground plane
+      c27jModel.position.z = -center.z;
+
+      var wrapper = new THREE.Group();
+      wrapper.add(c27jModel);
+
+      // Align model nose along +X:
+      wrapper.rotation.y = Math.PI / 2;
+
+      // Scale to match airport proportions
+      var maxDim = Math.max(size.x, size.y, size.z);
+      var targetLength = 26.0;
+      var scaleFactor = targetLength / maxDim;
+      wrapper.scale.set(scaleFactor, scaleFactor, scaleFactor);
+
+      // Materials and shadows
+      c27jModel.traverse(function(child) {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+          if (child.material) {
+            child.material.roughness = 0.35;
+            child.material.metalness = 0.25;
+          }
+        }
+      });
+
+      // Replace procedural plane with C-27J Spartan
+      while (planeVisual.children.length > 0) {
+        planeVisual.remove(planeVisual.children[0]);
+      }
+      planeVisual.add(wrapper);
+      console.log('C-27J Spartan GLB successfully applied to simulation!');
+      var tag = document.getElementById('modelStatusTag');
+      if (tag) tag.innerText = 'C-27J SPARTAN (ACTIVE)';
+    }
+
+    function tryLoad(idx) {
+      if (idx >= glbUrls.length) return;
+      gltfLoader.load(glbUrls[idx], function(gltf) {
+        applyLoadedModel(gltf);
+      }, undefined, function(err) {
+        console.warn('Failed to load url:', glbUrls[idx], err);
+        tryLoad(idx + 1);
+      });
+    }
+
+    tryLoad(0);
+  })();
+
+  // UI Interactive Handlers
+  window.setClimate = function(key) {
+    document.querySelectorAll('.control-groups .btn-group:first-child button').forEach(function(b){ b.classList.remove('active'); });
+    if (key === 'cold') document.getElementById('btnCold').classList.add('active');
+    if (key === 'hot') document.getElementById('btnHot').classList.add('active');
+    if (key === 'spring') document.getElementById('btnSpring').classList.add('active');
+    if (key === 'rain') document.getElementById('btnRain').classList.add('active');
+    applyClimate(key);
+  };
+
+  window.toggleClock = function() {
+    isAutoClock = !isAutoClock;
+    document.getElementById('btnClock').classList.toggle('active', isAutoClock);
+  };
+
+  window.setCamera = function(mode) {
+    cameraMode = mode;
+    document.querySelectorAll('.control-groups .btn-group:last-child button').forEach(function(b){ b.classList.remove('active'); });
+    if (mode === 'chase') document.getElementById('camChase').classList.add('active');
+    if (mode === 'cockpit') document.getElementById('camCockpit').classList.add('active');
+    if (mode === 'tower') document.getElementById('camTower').classList.add('active');
+    if (mode === 'skyline') document.getElementById('camSkyline').classList.add('active');
+    if (mode === 'orbit') document.getElementById('camOrbit').classList.add('active');
+
+    document.getElementById('cockpit-hud').style.display = (mode === 'cockpit') ? 'block' : 'none';
+  };
+
+  document.getElementById('rngTime').oninput = function() {
+    timeOfDay = parseFloat(this.value);
+    updateLighting();
+  };
+
+  window.addEventListener('resize', function() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // Main Animation Loop
+  var lastTime = performance.now();
+  var alsTimer = 0;
+
+  function animate(now) {
+    requestAnimationFrame(animate);
+    var dt = Math.min(0.1, (now - lastTime) / 1000);
+    lastTime = now;
+
+    // Advance Day Clock
+    if (isAutoClock) {
+      timeOfDay = (timeOfDay + dt * 0.5) % 24;
+      document.getElementById('rngTime').value = timeOfDay;
+      updateLighting();
+    }
+
+    // Advance Flight Circuit
+    var state;
+    if (simMode === 'normal') {
+      if (isFlightPlanRunning) {
+        circuitTimer = circuitTimer + dt;
+        if (circuitTimer >= circuitDuration) {
+          circuitTimer = circuitDuration;
+          stopFlightPlan("FULL FLIGHT PLAN COMPLETED (PASS)");
+        }
+      }
+      state = evaluateFlightPattern(circuitTimer);
+    } else {
+      // CRASH HISTORY MODE (N722BD)
+      crashTimeIdx = (crashTimeIdx + dt * 0.45) % (crashTrajData.length - 1);
+      var i0 = Math.floor(crashTimeIdx);
+      var i1 = Math.min(crashTrajData.length - 1, i0 + 1);
+      var alpha = crashTimeIdx - i0;
+      var cp0 = crashTrajData[i0];
+      var cp1 = crashTrajData[i1];
+
+      var cx = cp0.x + (cp1.x - cp0.x) * alpha;
+      var cy = cp0.y + (cp1.y - cp0.y) * alpha;
+      var cz = cp0.z + (cp1.z - cp0.z) * alpha;
+      var cPitch = cp0.pitch + (cp1.pitch - cp0.pitch) * alpha;
+      var cBank = cp0.bank + (cp1.bank - cp0.bank) * alpha;
+      var cHdg = cp0.hdg + (cp1.hdg - cp0.hdg) * alpha;
+
+      var cPhase = (cp0.alt > 34000) ? "FL350 CRUISE & ICING" : ((cp0.alt > 28000) ? "MACH TUCK OVERHEAT" : ((cp0.alt > 12000) ? "SPIRAL DIVE (-58k FPM)" : "IN-FLIGHT BREAKUP"));
+
+      state = {
+        x: cx,
+        y: cy,
+        z: cz,
+        pitch: cPitch,
+        roll: cBank,
+        yaw: THREE.MathUtils.degToRad(-cHdg + 90),
+        speed: cp0.spd,
+        gear: (cp0.alt < 10000 ? 0.0 : 0.0),
+        phase: cPhase
+      };
+    }
+
+    // Apply Position & Attitude to Plane
+    planeRoot.position.set(state.x, state.y, state.z);
+    planeVisual.rotation.order = 'YXZ';
+    planeVisual.rotation.y = state.yaw;
+    planeVisual.rotation.z = THREE.MathUtils.degToRad(-state.pitch);
+    planeVisual.rotation.x = THREE.MathUtils.degToRad(-state.roll);
+
+    // Retractable Landing Gear animation
+    planeGear.position.y = (1.0 - state.gear) * 2.5;
+    planeGear.scale.set(1.0, Math.max(0.01, state.gear), 1.0);
+
+    // Spin Jet Turbofan blades
+    engineFans.forEach(function(f) { f.rotation.x += dt * 30; });
+
+    // Rotate ATC Radar
+    radarArm.rotation.y += dt * 3.5;
+
+    // Approach Lighting Strobes ("The Rabbit" sequence)
+    alsTimer += dt * 6.0;
+    var activeStrobeIdx = Math.floor(alsTimer) % alsStrobes.length;
+    alsStrobes.forEach(function(s, idx) {
+      s.visible = (idx === activeStrobeIdx) || (sunLight.intensity < 0.4);
+    });
+
+    // Update Moving Cars
+    trafficCars.forEach(function(c) {
+      c.prog += c.speed * dt * c.dir;
+      var maxProg = N_BLOCKS * BLOCK_GAP;
+      if (c.prog > maxProg) c.prog = -maxProg;
+      if (c.prog < -maxProg) c.prog = maxProg;
+
+      if (c.isNS) {
+        c.group.position.set(c.lane, 0.4, c.prog + cityCenterZ);
+        c.group.rotation.y = c.dir > 0 ? 0 : Math.PI;
+      } else {
+        c.group.position.set(c.prog + cityCenterX, 0.4, c.lane + cityCenterZ);
+        c.group.rotation.y = c.dir > 0 ? Math.PI / 2 : -Math.PI / 2;
+      }
+    });
+
+    // Animate Weather Particles
+    var pArr = weatherParticles.geometry.attributes.position.array;
+    var isRain = climates[curClimate].pType === 'rain';
+    for (var p = 0; p < pCount; p++) {
+      pArr[p * 3 + 1] -= (isRain ? 180 : 35) * dt;
+      if (pArr[p * 3 + 1] < 0) pArr[p * 3 + 1] = 400;
+    }
+    weatherParticles.geometry.attributes.position.needsUpdate = true;
+
+    // Update Telemetry HUD Readouts
+    document.getElementById('telemSpeed').innerText = Math.round(state.speed);
+    document.getElementById('telemAlt').innerText = Math.round(state.y * 3.28);
+    document.getElementById('telemPitch').innerText = state.pitch.toFixed(1);
+    document.getElementById('telemRoll').innerText = state.roll.toFixed(1);
+    document.getElementById('telemPhase').innerText = state.phase;
+    var gearStr = (state.gear > 0.8) ? "DOWN" : ((state.gear < 0.1) ? "UP" : "IN TRANSIT");
+    document.getElementById('telemGear').innerText = gearStr;
+    document.getElementById('telemGear').style.color = (state.gear > 0.8) ? "var(--accent-emerald)" : ((state.gear < 0.1) ? "var(--accent-cyan)" : "var(--accent-orange)");
+    document.getElementById('telemHdg').innerText = Math.round((THREE.MathUtils.radToDeg(state.yaw) + 360) % 360);
+
+    // Compute JSBSim Component Telemetry based on flight state
+    var n1 = (state.phase.indexOf('TAKEOFF') >= 0 || state.phase.indexOf('ROTATION') >= 0 || state.phase.indexOf('CLIMB') >= 0) ? 96.5 : (state.phase.indexOf('CRUISE') >= 0 ? 82.0 : (state.phase.indexOf('TOUCHDOWN') >= 0 ? 74.0 : 42.0));
+    var thrust = (n1 / 100.0) * 52000;
+    var fuelFlow = (n1 / 100.0) * 4800;
+    var aoa = (state.pitch * 0.75 + (state.phase.indexOf('CLIMB') >= 0 ? 3.5 : 0.8));
+    var mach = state.speed / 661.47;
+    var qbar = 0.5 * 0.0023769 * Math.pow(state.speed * 1.6878, 2);
+    var gLoad = 1.0 + Math.abs(state.roll) * 0.015 + (state.pitch > 8 ? 0.22 : 0.0);
+    var vs = (state.phase.indexOf('CLIMB') >= 0 ? 1650 : (state.phase.indexOf('FINAL') >= 0 || state.phase.indexOf('BASE') >= 0 ? -750 : (state.phase.indexOf('ROTATION') >= 0 ? 1200 : 0)));
+
+    document.getElementById('telEng1N1').innerText = n1.toFixed(1) + '%';
+    document.getElementById('telEng2N1').innerText = n1.toFixed(1) + '%';
+    document.getElementById('telThrust').innerText = Math.round(thrust).toLocaleString() + ' lbf';
+    document.getElementById('telFuelFlow').innerText = Math.round(fuelFlow).toLocaleString() + ' pph';
+    document.getElementById('telAoA').innerText = (aoa >= 0 ? '+' : '') + aoa.toFixed(1) + '°';
+    document.getElementById('telMach').innerText = mach.toFixed(2) + ' M';
+    document.getElementById('telQbar').innerText = Math.round(qbar) + ' psf';
+    document.getElementById('telG').innerText = gLoad.toFixed(2) + ' G';
+    document.getElementById('telVS').innerText = (vs >= 0 ? '+' : '') + vs.toLocaleString() + ' fpm';
+
+    // Check if test flight completed
+    if (isTestFlightMode && !testFlightCompleted && circuitTimer > (circuitDuration - 2.0)) {
+      testFlightCompleted = true;
+      document.getElementById('reportCard').style.display = 'block';
+    }
+
+    // Cockpit HUD text
+    document.getElementById('hudSpd').textContent = Math.round(state.speed);
+    document.getElementById('hudAlt').textContent = Math.round(state.y * 3.28);
+
+    // Camera Views with 360° Interactive Mouse Orbit
+    var planePos = planeRoot.position;
+    if (cameraMode === 'chase') {
+      // 360° Spherical Orbit centered on the aircraft
+      // Start directly behind aircraft (-X in local frame) and rotate by chaseAzimuth & chaseElevation
+      var camOffset = new THREE.Vector3(
+        -chaseDistance * Math.cos(chaseElevation) * Math.cos(chaseAzimuth),
+        chaseDistance * Math.sin(chaseElevation),
+        chaseDistance * Math.cos(chaseElevation) * Math.sin(chaseAzimuth)
+      );
+      // Align offset with aircraft heading yaw
+      camOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), state.yaw);
+
+      camera.position.set(
+        planePos.x + camOffset.x,
+        Math.max(1.8, planePos.y + camOffset.y),
+        planePos.z + camOffset.z
+      );
+      // Look directly at the aircraft fuselage / center
+      camera.lookAt(planePos.x, planePos.y + 3.0, planePos.z);
+
+    } else if (cameraMode === 'cockpit') {
+      // Cockpit POV with 360° head free-look
+      var cockOffset = new THREE.Vector3(14, 1.8, 0);
+      cockOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), state.yaw);
+      camera.position.copy(planePos).add(cockOffset);
+
+      var totalPan = state.yaw + cockpitPan;
+      var lookTarget = new THREE.Vector3(
+        Math.cos(totalPan) * Math.cos(cockpitTilt) * 120,
+        Math.sin(cockpitTilt) * 120 + state.pitch * 1.5,
+        Math.sin(totalPan) * Math.cos(cockpitTilt) * 120
+      );
+      camera.lookAt(camera.position.clone().add(lookTarget));
+
+    } else if (cameraMode === 'tower') {
+      var towerPos = new THREE.Vector3(-160, 70, -340);
+      camera.position.copy(towerPos);
+      if (Math.abs(towerPan) < 0.01 && Math.abs(towerTilt) < 0.01) {
+        camera.lookAt(planePos.clone().add(new THREE.Vector3(0, 3, 0)));
+      } else {
+        var baseDir = planePos.clone().sub(towerPos).normalize();
+        baseDir.applyAxisAngle(new THREE.Vector3(0, 1, 0), towerPan);
+        baseDir.y += towerTilt;
+        camera.lookAt(towerPos.clone().add(baseDir.multiplyScalar(200)));
+      }
+
+    } else if (cameraMode === 'skyline') {
+      var skyPos = new THREE.Vector3(0, 190, 80);
+      camera.position.copy(skyPos);
+      if (Math.abs(skylinePan) < 0.01 && Math.abs(skylineTilt) < 0.01) {
+        camera.lookAt(planePos.clone().add(new THREE.Vector3(0, 3, 0)));
+      } else {
+        var baseDir = planePos.clone().sub(skyPos).normalize();
+        baseDir.applyAxisAngle(new THREE.Vector3(0, 1, 0), skylinePan);
+        baseDir.y += skylineTilt;
+        camera.lookAt(skyPos.clone().add(baseDir.multiplyScalar(200)));
+      }
+
+    } else if (cameraMode === 'orbit') {
+      camera.position.set(
+        Math.sin(orbitAzimuth) * Math.cos(orbitElevation) * orbitDistance,
+        Math.sin(orbitElevation) * orbitDistance + 10,
+        Math.cos(orbitAzimuth) * Math.cos(orbitElevation) * orbitDistance - 180
+      );
+      camera.lookAt(0, 40, -180);
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  // Initialize
+  applyClimate('cold');
+  requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>
