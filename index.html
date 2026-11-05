@@ -679,6 +679,9 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   top: 72px;
   right: 14px;
   width: 270px;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  scrollbar-width: thin;
   padding: 12px 14px;
   z-index: 28;
   display: flex;
@@ -1255,7 +1258,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     </div>
 
     <!-- Option 1: Left Wing Slat / Spar Dent -->
-    <button id="dockScBtnWing" class="sc-quick-btn active" onclick="selectQuantumScenario('wing_dent')">
+    <button id="dockScBtnWing" class="sc-quick-btn" onclick="selectQuantumScenario('wing_dent')">
       <div class="sc-q-indicator" style="background:#ef4444; color:#ef4444;"></div>
       <div class="sc-q-info">
         <div class="sc-q-title" style="color:#dc2626;">Dent 1: Left Wing Slat (Crash)</div>
@@ -1282,7 +1285,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     </button>
 
     <!-- Option 4: Nominal Airframe -->
-    <button id="dockScBtnNominal" class="sc-quick-btn" onclick="selectQuantumScenario('nominal')">
+    <button id="dockScBtnNominal" class="sc-quick-btn active" onclick="selectQuantumScenario('nominal')">
       <div class="sc-q-indicator" style="background:#059669; color:#059669;"></div>
       <div class="sc-q-info">
         <div class="sc-q-title" style="color:#059669;">Nominal Airframe (Safe Flight)</div>
@@ -1827,9 +1830,9 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 
 <!-- Weather & Environment Info Box -->
 <div class="panel info-box">
-  <h2 id="envTitle">Cold City &bull; Winter Environment</h2>
-  <p id="envDesc">-12 °C &bull; Dense snow cover &bull; Overcast atmosphere</p>
-  <p id="envMetrics">Air density: 1.35 kg/m³ &bull; Altimeter: 29.98 inHg &bull; Active Runway: 09L</p>
+  <h2 id="envTitle">Temperate City &bull; Clear Spring</h2>
+  <p id="envDesc">+22 &deg;C &bull; Lush green urban landscape &bull; Visibility unlimited</p>
+  <p id="envMetrics">Air density: 1.20 kg/m³ &bull; Standard atmosphere &bull; Active Runway: 09L</p>
   <p class="note">Watch CAP-101 taxi, take off on Runway 09L, climb over the river, bank around the skyscrapers, and land safely on the same runway!</p>
 </div>
 
@@ -2830,6 +2833,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       circuitTimer = 0.0;
       setCamera('chase');
       document.getElementById('telemPhase').innerText = 'RUNWAY 09L LINEUP';
+      if (typeof selectQuantumScenario === 'function') selectQuantumScenario('nominal');
     } else {
       bNorm.className = 'mode-opt-btn';
       bCrash.className = 'mode-opt-btn active crash';
@@ -3325,7 +3329,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   // =========================================================================
   // 3-LAYER QUANTUM AIRFRAME INSPECTION, DEFECT PREDICTION & FLIGHT VERIFIER
   // =========================================================================
-  var activeQuantumScenario = 'wing_dent'; // Default to wing dent so flaw is immediately highlighted
+  var activeQuantumScenario = 'nominal'; // Default to nominal airframe for clean normal flight
   var isQuantumScanActive = false;
   var verificationFlightActive = false;
   var qVerificationTriggered = false;
@@ -3545,31 +3549,40 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   function updateComponentHighlights(scId) {
     if (scId === 'microcrack') scId = 'wing_dent';
     if (scId === 'fastener') scId = 'engine_dent';
-    if (!compWingBox) return;
+    if (!compWingBox || !componentHighlightGroup) return;
 
-    if (scId === 'wing_dent') {
+    if (scId === 'nominal') {
+      // Normal Flight: Completely clear all 3 error overlays, boxes, and badges!
+      componentHighlightGroup.visible = false;
+      if (compWingBox.parent) compWingBox.parent.visible = false;
+      if (compFuselageBox.parent) compFuselageBox.parent.visible = false;
+      if (compEngineBox.parent) compEngineBox.parent.visible = false;
+    } else if (scId === 'wing_dent') {
+      // Highlight ONLY the Left Wing Dent
+      componentHighlightGroup.visible = true;
       compWingBox.parent.visible = true;
       compFuselageBox.parent.visible = false;
       compEngineBox.parent.visible = false;
       compWingBox.material.color.setHex(0xef4444);
     } else if (scId === 'fuselage_dent') {
+      // Highlight ONLY the Fuselage Crown Dent
+      componentHighlightGroup.visible = true;
       compWingBox.parent.visible = false;
       compFuselageBox.parent.visible = true;
       compEngineBox.parent.visible = false;
       compFuselageBox.material.color.setHex(0xf97316);
     } else if (scId === 'engine_dent') {
+      // Highlight ONLY the Port Engine Dent
+      componentHighlightGroup.visible = true;
       compWingBox.parent.visible = false;
       compFuselageBox.parent.visible = false;
       compEngineBox.parent.visible = true;
       compEngineBox.material.color.setHex(0xf59e0b);
     } else {
-      // Nominal: gently display all 3 as inspected/airworthy green
-      compWingBox.parent.visible = true;
-      compFuselageBox.parent.visible = true;
-      compEngineBox.parent.visible = true;
-      compWingBox.material.color.setHex(0x10b981);
-      compFuselageBox.material.color.setHex(0x10b981);
-      compEngineBox.material.color.setHex(0x10b981);
+      componentHighlightGroup.visible = false;
+      if (compWingBox.parent) compWingBox.parent.visible = false;
+      if (compFuselageBox.parent) compFuselageBox.parent.visible = false;
+      if (compEngineBox.parent) compEngineBox.parent.visible = false;
     }
   }
 
@@ -3607,14 +3620,12 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     nominalLine = new THREE.Line(nomLineGeo, new THREE.LineBasicMaterial({color: 0x34d399, transparent: true, opacity: 0.85}));
     trajectoryGroup.add(nominalLine);
 
-    // Milestone Beacons along nominal path
+    // Airborne Milestone Beacons along nominal flight path
     var milestones = [
-      new THREE.Vector3(-450, 1.8, -520),
-      new THREE.Vector3(30, 2.0, -520),
+      new THREE.Vector3(120, 45.0, -520),
       new THREE.Vector3(380, 120.6, -520),
       new THREE.Vector3(380, 400.6, -120),
-      new THREE.Vector3(-580, 160.6, -520),
-      new THREE.Vector3(-250, 1.8, -520)
+      new THREE.Vector3(-580, 160.6, -520)
     ];
     milestones.forEach(function(pos) {
       var orb = new THREE.Mesh(new THREE.SphereGeometry(1.2, 12, 12), new THREE.MeshBasicMaterial({color: 0x10b981}));
@@ -3888,34 +3899,42 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   }
 
   function updateQuantumOverlayMaterials() {
-    var sc = quantumScenarios[activeQuantumScenario] || quantumScenarios.wing_dent;
-    if (!nvHotspotRings.length) return;
+    var sc = quantumScenarios[activeQuantumScenario] || quantumScenarios.nominal;
+    if (!nvHotspotRings.length || !quantumOverlayGroup) return;
 
-    if (sc.id === 'wing_dent' || sc.id === 'microcrack') {
+    if (sc.id === 'nominal' || activeQuantumScenario === 'nominal') {
+      // Normal Flight: Completely clear all quantum overlay rings and wireframes!
+      quantumOverlayGroup.visible = false;
+      if (nvHotspotMesh) nvHotspotMesh.visible = false;
+      if (subsurfaceRibWireframe) subsurfaceRibWireframe.visible = false;
+    } else if (sc.id === 'wing_dent' || sc.id === 'microcrack') {
+      quantumOverlayGroup.visible = true;
       nvHotspotMesh.visible = true;
       nvHotspotMesh.position.set(0.5, 3.65, -7.5); // Left wing spar Rib 4
       nvHotspotRings[0].material.color.setHex(0xef4444);
       nvHotspotRings[1].material.color.setHex(0xf97316);
       nvHotspotRings[2].material.color.setHex(0xfacc15);
+      if (subsurfaceRibWireframe) subsurfaceRibWireframe.visible = false;
     } else if (sc.id === 'fuselage_dent') {
+      quantumOverlayGroup.visible = true;
       nvHotspotMesh.visible = true;
       nvHotspotMesh.position.set(8.0, 4.85, 0.0); // Fuselage crown Bay 14
       nvHotspotRings[0].material.color.setHex(0xf97316);
       nvHotspotRings[1].material.color.setHex(0xfacc15);
       nvHotspotRings[2].material.color.setHex(0xfef08a);
+      if (subsurfaceRibWireframe) subsurfaceRibWireframe.visible = false;
     } else if (sc.id === 'engine_dent' || sc.id === 'fastener') {
+      quantumOverlayGroup.visible = true;
       nvHotspotMesh.visible = true;
       nvHotspotMesh.position.set(6.06, 3.65, -6.28); // Port engine nacelle
       nvHotspotRings[0].material.color.setHex(0xf59e0b);
       nvHotspotRings[1].material.color.setHex(0xfbbf24);
       nvHotspotRings[2].material.color.setHex(0xfef08a);
+      if (subsurfaceRibWireframe) subsurfaceRibWireframe.visible = false;
     } else {
-      // Nominal
-      nvHotspotMesh.visible = true;
-      nvHotspotMesh.position.set(0.5, 3.65, -7.5);
-      nvHotspotRings[0].material.color.setHex(0x10b981);
-      nvHotspotRings[1].material.color.setHex(0x34d399);
-      nvHotspotRings[2].material.color.setHex(0x6ee7b7);
+      quantumOverlayGroup.visible = false;
+      if (nvHotspotMesh) nvHotspotMesh.visible = false;
+      if (subsurfaceRibWireframe) subsurfaceRibWireframe.visible = false;
     }
   }
 
@@ -4284,6 +4303,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     if (params.get('scenario')) {
       var sc = params.get('scenario');
       if (quantumScenarios[sc]) selectQuantumScenario(sc);
+    } else {
+      selectQuantumScenario('nominal');
     }
     if (params.has('openQuantumModal')) {
       openQuantumInspector();
