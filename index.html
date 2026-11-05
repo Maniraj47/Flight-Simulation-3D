@@ -439,6 +439,49 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   50% { box-shadow: 0 0 22px rgba(239, 68, 68, 0.9); transform: scale(1.02); }
 }
 
+/* Simulation Playback Speed Multiplier Controls (1x, 2x, 3x) */
+.sim-speed-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  padding: 2px 6px !important;
+}
+.speed-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  padding: 0 4px;
+  font-family: monospace;
+  letter-spacing: 0.05em;
+}
+.btn-speed {
+  background: rgba(15, 23, 42, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #94a3b8 !important;
+  font-family: monospace !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 4px 8px !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 28px !important;
+}
+.btn-speed:hover {
+  color: #fff !important;
+  border-color: #38bdf8 !important;
+  background: rgba(56, 189, 248, 0.2) !important;
+}
+.btn-speed.active {
+  background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+  border-color: #38bdf8 !important;
+  color: #fff !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important;
+}
+
 /* Telemetry HUD - Positioned Cleanly on Left, Never Overlapping */
 .hud-telemetry {
   position: fixed;
@@ -804,17 +847,87 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   color: #fff;
   box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
 }
+.q-scenario-btn.active.sc-wing,
 .q-scenario-btn.active.sc-microcrack {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(15, 23, 42, 0.9));
   border: 1px solid #ef4444;
   color: #fff;
   box-shadow: 0 0 18px rgba(239, 68, 68, 0.4);
 }
+.q-scenario-btn.active.sc-fuselage {
+  background: linear-gradient(135deg, rgba(249, 115, 22, 0.35), rgba(15, 23, 42, 0.9));
+  border: 1px solid #f97316;
+  color: #fff;
+  box-shadow: 0 0 18px rgba(249, 115, 22, 0.4);
+}
+.q-scenario-btn.active.sc-engine,
 .q-scenario-btn.active.sc-fastener {
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(15, 23, 42, 0.9));
   border: 1px solid #f59e0b;
   color: #fff;
   box-shadow: 0 0 18px rgba(245, 158, 11, 0.4);
+}
+
+/* On-screen Fast Scenario Switcher Buttons */
+.sc-quick-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  margin-top: 4px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+.sc-quick-btn:hover {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+.sc-quick-btn.active {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: #38bdf8;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+}
+.sc-q-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px currentColor;
+}
+.sc-q-info {
+  flex: 1;
+  min-width: 0;
+}
+.sc-q-title {
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sc-q-desc {
+  font-size: 9px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.trajectory-legend-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 4px 6px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  margin-top: 4px;
 }
 
 /* 3 Layer Inspection Cards Grid */
@@ -1067,6 +1180,14 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     <div class="panel" style="padding: 2px;">
       <button id="btnFlightAction" class="btn-flight-action start" onclick="toggleFlightPlanAction()">&#9992; START FLIGHT PLAN</button>
     </div>
+
+    <!-- Simulation Playback Speed: 1x, 2x, 3x -->
+    <div class="panel sim-speed-group" title="Simulation Speed Multiplier (Press 1, 2, or 3 on keyboard)">
+      <span class="speed-label">&#9889; SPEED</span>
+      <button id="btnSpeed1x" class="btn-speed active" onclick="setSimSpeed(1)">1x</button>
+      <button id="btnSpeed2x" class="btn-speed" onclick="setSimSpeed(2)">2x</button>
+      <button id="btnSpeed3x" class="btn-speed" onclick="setSimSpeed(3)">3x</button>
+    </div>
   </div>
 </div>
 
@@ -1096,14 +1217,69 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     </div>
   </button>
 
-    <!-- Quantum NDT Button -->
-  <button class="mode-opt-btn" onclick="openQuantumInspector()" style="padding: 8px 10px; margin-top: 4px; border: 1px solid rgba(168, 85, 247, 0.4); background: rgba(88, 28, 135, 0.25);" title="Open 3-Layer Quantum Airframe Inspector">
-    <div class="mode-btn-icon" style="color: #c084fc;">&#9883;</div>
+  <!-- Differentiated 3D Flight Trajectories Toggle -->
+  <button id="btnTogglePaths" class="mode-opt-btn" onclick="toggleTrajectoryVisuals()" style="padding: 7px 10px; margin-top: 4px; border: 1px solid rgba(56, 189, 248, 0.4); background: rgba(15, 23, 42, 0.6);" title="Toggle 3D Flight Trajectory Ribbons">
+    <div class="mode-btn-icon" style="color: #38bdf8;">&#128506;&#65039;</div>
     <div class="mode-btn-text">
-      <h3 style="font-size: 12px; color: #c084fc;">Quantum Airframe NDT</h3>
-      <p style="font-size: 10px;">3 Layers &bull; Flaw Prediction &bull; Sensor Reduction</p>
+      <h3 style="font-size: 11px; color: #38bdf8;">3D Trajectories: <span id="pathToggleStatus" style="color:#10b981;">VISIBLE</span></h3>
+      <p style="font-size: 9px; margin-top: 1px;">
+        <span style="color:#10b981;">&#9679; Nominal</span> &bull; <span style="color:#ef4444;">&#9679; Crash Divergence</span>
+      </p>
     </div>
   </button>
+
+  <!-- Quantum NDT Button -->
+  <button class="mode-opt-btn" onclick="openQuantumInspector()" style="padding: 7px 10px; margin-top: 4px; border: 1px solid rgba(168, 85, 247, 0.4); background: rgba(88, 28, 135, 0.25);" title="Open 3-Layer Quantum Airframe Inspector">
+    <div class="mode-btn-icon" style="color: #c084fc;">&#9883;</div>
+    <div class="mode-btn-text">
+      <h3 style="font-size: 11px; color: #c084fc;">Quantum Airframe NDT</h3>
+      <p style="font-size: 9px;">3 Layers &bull; Flaw Prediction &bull; Sensor Reduction</p>
+    </div>
+  </button>
+
+  <!-- Quantum Airframe Dent Scenarios -->
+  <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.12);">
+    <div style="font-size: 10px; font-weight: 700; color: #f87171; text-transform: uppercase; letter-spacing: 0.05em; display:flex; justify-content:space-between; align-items:center;">
+      <span>Quantum Dent Scenarios:</span>
+      <span style="font-size:8px; color:#94a3b8;">1-Click</span>
+    </div>
+
+    <!-- Option 1: Left Wing Slat / Spar Dent -->
+    <button id="dockScBtnWing" class="sc-quick-btn active" onclick="selectQuantumScenario('wing_dent')">
+      <div class="sc-q-indicator" style="background:#ef4444; color:#ef4444;"></div>
+      <div class="sc-q-info">
+        <div class="sc-q-title" style="color:#f87171;">Dent 1: Left Wing Slat (Crash)</div>
+        <div class="sc-q-desc">Rib 4 Spar Shear at 2.2G &bull; Spiral Dive to River</div>
+      </div>
+    </button>
+
+    <!-- Option 2: Fuselage Crown Dent -->
+    <button id="dockScBtnFuselage" class="sc-quick-btn" onclick="selectQuantumScenario('fuselage_dent')">
+      <div class="sc-q-indicator" style="background:#f97316; color:#f97316;"></div>
+      <div class="sc-q-info">
+        <div class="sc-q-title" style="color:#fb923c;">Dent 2: Fuselage Crown (Crash)</div>
+        <div class="sc-q-desc">Skin Delamination at Vr &bull; Lawn Dart Overrun</div>
+      </div>
+    </button>
+
+    <!-- Option 3: Port Engine Nacelle Dent -->
+    <button id="dockScBtnEngine" class="sc-quick-btn" onclick="selectQuantumScenario('engine_dent')">
+      <div class="sc-q-indicator" style="background:#f59e0b; color:#f59e0b;"></div>
+      <div class="sc-q-info">
+        <div class="sc-q-title" style="color:#fbbf24;">Dent 3: Engine Nacelle (Crash)</div>
+        <div class="sc-q-desc">Turbine Shroud Rub &bull; Fuel Fire Flat Spin into Bay</div>
+      </div>
+    </button>
+
+    <!-- Option 4: Nominal Airframe -->
+    <button id="dockScBtnNominal" class="sc-quick-btn" onclick="selectQuantumScenario('nominal')">
+      <div class="sc-q-indicator" style="background:#10b981; color:#10b981;"></div>
+      <div class="sc-q-info">
+        <div class="sc-q-title" style="color:#34d399;">Nominal Airframe (Safe Flight)</div>
+        <div class="sc-q-desc">Airworthy Baseline &bull; Pattern &bull; Safe Touchdown</div>
+      </div>
+    </button>
+  </div>
 
   <!-- Flight Fleet & Scenario Switcher -->
   <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.12); font-size: 10px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em;">
@@ -1135,8 +1311,9 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 <!-- Flight Telemetry HUD -->
 <div id="telemetryCard" class="panel hud-telemetry interactive">
   <div class="telem-header">
-    <div style="font-size: 11px; font-weight: 700; color: var(--accent-cyan); display:flex; align-items:center;">
+    <div style="font-size: 11px; font-weight: 700; color: var(--accent-cyan); display:flex; align-items:center; gap: 4px;">
       AIRLINER CAP-101
+      <span id="telemSimSpeed" style="font-size: 10px; font-family: monospace; color: #38bdf8; background: rgba(56,189,248,0.15); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(56,189,248,0.3);">1x SPEED</span>
       <button class="telem-min-btn" onclick="toggleTelemMinimize()" title="Minimize/Expand Telemetry">&#9724; Min</button>
     </div>
     <div id="telemPhase" class="flight-phase-badge">RUNWAY HOLD</div>
@@ -1257,20 +1434,28 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
             <span style="font-size:10px; color:#94a3b8;">Zero microcracks. Safe under all flight loads up to 2.50G.</span>
           </button>
           
-          <button id="scBtnMicrocrack" class="q-scenario-btn sc-microcrack" onclick="selectQuantumScenario('microcrack')">
+          <button id="scBtnWing" class="q-scenario-btn sc-wing sc-microcrack" onclick="selectQuantumScenario('wing_dent')">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong style="font-size:12px; color:#f87171;">&#9888; Scenario B: Left Wing Spar Microcrack</strong>
-              <span style="font-size:9px; background:rgba(239,68,68,0.25); color:#f87171; padding:2px 5px; border-radius:4px; font-weight:700;">FAIL PREDICTED</span>
+              <strong style="font-size:12px; color:#f87171;">&#9888; Dent 1: Wing Slat &amp; Spar</strong>
+              <span style="font-size:9px; background:rgba(239,68,68,0.25); color:#f87171; padding:2px 5px; border-radius:4px; font-weight:700;">CRASH PREDICTED</span>
             </div>
-            <span style="font-size:10px; color:#94a3b8;">Subsurface 1.8mm crack in Rib 4. Divergence predicted at G &gt; 2.05G.</span>
+            <span style="font-size:10px; color:#94a3b8;">Rib 4 fatigue crack under slat dent. Wing spar shears under 2.2G turn &rarr; River Crash.</span>
           </button>
 
-          <button id="scBtnFastener" class="q-scenario-btn sc-fastener" onclick="selectQuantumScenario('fastener')">
+          <button id="scBtnFuselage" class="q-scenario-btn sc-fuselage" onclick="selectQuantumScenario('fuselage_dent')">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong style="font-size:12px; color:#f59e0b;">&#9874; Scenario C: Fastener Shear &amp; Corrosion</strong>
-              <span style="font-size:9px; background:rgba(245,158,11,0.25); color:#f59e0b; padding:2px 5px; border-radius:4px; font-weight:700;">VIBRATION ALERT</span>
+              <strong style="font-size:12px; color:#fb923c;">&#9888; Dent 2: Fuselage Crown (Bay 14)</strong>
+              <span style="font-size:9px; background:rgba(249,115,22,0.25); color:#fb923c; padding:2px 5px; border-radius:4px; font-weight:700;">CRASH PREDICTED</span>
             </div>
-            <span style="font-size:10px; color:#94a3b8;">Port engine mount torque relaxation. Vibration spike predicted on spool.</span>
+            <span style="font-size:10px; color:#94a3b8;">Hail dent delaminates at rotation. Elevator cables severed &rarr; Lawn Dart Overrun Crash.</span>
+          </button>
+
+          <button id="scBtnEngine" class="q-scenario-btn sc-engine sc-fastener" onclick="selectQuantumScenario('engine_dent')">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong style="font-size:12px; color:#f59e0b;">&#9888; Dent 3: Port Engine Nacelle</strong>
+              <span style="font-size:9px; background:rgba(245,158,11,0.25); color:#f59e0b; padding:2px 5px; border-radius:4px; font-weight:700;">CRASH PREDICTED</span>
+            </div>
+            <span style="font-size:10px; color:#94a3b8;">Shroud rub ovalization at climb thrust. Uncontained turbine explosion &rarr; Bay Flat Spin Crash.</span>
           </button>
         </div>
       </div>
@@ -1431,7 +1616,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   <div class="debrief-card">
     <div class="debrief-header">
       <div>
-        <h2 style="font-size:16px;margin:0;color:#fff;display:flex;align-items:center;gap:8px;">
+        <h2 id="debriefModalTitle" style="font-size:16px;margin:0;color:#fff;display:flex;align-items:center;gap:8px;">
           <span style="color:#10b981;">&#10004;</span> FLIGHT PLAN TRIP DEBRIEFING & ANALYSIS
         </h2>
         <p style="font-size:11px;color:#94a3b8;margin:2px 0 0 0;">Capital City International (KCAP) Runway 09L Pattern Trip Log</p>
@@ -2171,7 +2356,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   var isTestFlightMode = false;
   var testFlightCompleted = false;
 
-  function evaluateFlightPattern(tSec) {
+  function evaluateNominalFlightPattern(tSec) {
     // 8-Phase Closed Traffic Pattern (KCAP Airport Runway 09L)
     // Coordinated flight dynamics with pitch rotation, true bank angles, and runway pavement ground contact
     var x, y, z, pitch = 0, roll = 0, yaw = 0, speedKts = 0, gear = 1.0, phase = "";
@@ -2272,6 +2457,78 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       speed: speedKts, gear: gear, phase: phase
     };
   }
+  window.__evaluateNominalFlightPattern = evaluateNominalFlightPattern;
+
+  // Dynamic In-Flight Crash Trajectory Evaluator
+  function evaluateCrashTrajectory(scId, tSec, tf, ti) {
+    var p = Math.max(0.0, Math.min(1.0, (tSec - tf) / (ti - tf)));
+
+    if (scId === 'wing_dent' || scId === 'microcrack') {
+      // Option 1: Left Wing Spar Shears at 2.2G turn -> Violent Asymmetric Roll Stall -> Spiral Dive to River
+      var roll = 24.0 - Math.pow(p, 1.3) * 720.0; // Multiple tumbling rolls
+      var pitch = 11.9 - Math.pow(p, 1.2) * 58.0; // Plunges down to -46 deg
+      var yaw = -1.178 - p * 4.2;
+      var x = 564.8 - Math.sin(p * Math.PI * 0.6) * 80.0;
+      var z = -396.5 + p * 180.0; // Arcs into river at z = -216.5
+      var y = Math.max(0.6, 276.1 * (1.0 - Math.pow(p, 1.25)) + 0.6);
+      var spd = 180 + p * 65; // Accelerating to 245 kts
+      return {
+        x: x, y: y, z: z,
+        pitch: pitch, roll: roll, yaw: yaw,
+        speed: spd, gear: 0.0, phase: "SPAR SHEAR • UNCONTROLLED DIVE"
+      };
+    } else if (scId === 'fuselage_dent') {
+      // Option 2: Crown Skin Delamination at Rotation -> Elevator Pitch Cables Severed -> Lawn Dart Overrun
+      var pitch = 11.0 - Math.pow(p, 1.4) * 52.0; // Severe pitch-down to -41 deg
+      var roll = Math.sin(p * Math.PI * 3.0) * 14.0;
+      var yaw = Math.sin(p * Math.PI * 2.0) * 0.06;
+      var x = 205 + p * 135; // Overrun terrain at x = 340
+      var z = -520;
+      var y = Math.max(0.6, 47.7 + Math.sin(p * Math.PI * 0.3) * 6.0 - Math.pow(p, 1.7) * 53.7);
+      var spd = 157 + p * 15;
+      return {
+        x: x, y: y, z: z,
+        pitch: pitch, roll: roll, yaw: yaw,
+        speed: spd, gear: 0.5 * (1.0 - p), phase: "ELEVATOR SEVERED • LAWN DART DIVE"
+      };
+    } else {
+      // Option 3: Port Engine Shroud Rub Explosion at Climb Spool -> Wing Fire & Flat Spin into Bay
+      var yaw = -0.393 - Math.pow(p, 1.25) * 16.5; // Uncontrollable multi-rotation flat spin
+      var roll = -32.0 + Math.sin(p * Math.PI * 4.0) * 22.0;
+      var pitch = -14.0 + Math.sin(p * Math.PI * 2.0) * 12.0;
+      var x = 456.5 - Math.sin(p * Math.PI * 0.6) * 40.0;
+      var z = -504.8 + p * 120.0; // Bay waters at z = -384.8
+      var y = Math.max(0.6, 175.2 * (1.0 - Math.pow(p, 1.2)) + 0.6);
+      var spd = Math.max(90, 173 - p * 45); // Stalling down to 128 kts
+      return {
+        x: x, y: y, z: z,
+        pitch: pitch, roll: roll, yaw: yaw,
+        speed: spd, gear: 0.0, phase: "TURBINE EXPLOSION • FLAT SPIN"
+      };
+    }
+  }
+
+  function getImpactState(scId) {
+    if (scId === 'wing_dent' || scId === 'microcrack') {
+      return { x: 490.0, y: 0.6, z: -216.5, pitch: -42.0, roll: -180.0, yaw: -5.378, speed: 0, gear: 0.0, phase: "CATASTROPHIC IMPACT • RIVER SITE" };
+    } else if (scId === 'fuselage_dent') {
+      return { x: 340.0, y: 0.6, z: -520.0, pitch: -41.0, roll: 0.0, yaw: 0.0, speed: 0, gear: 0.0, phase: "CATASTROPHIC IMPACT • RUNWAY OVERRUN" };
+    } else {
+      return { x: 420.0, y: 0.6, z: -384.8, pitch: -18.0, roll: -32.0, yaw: -16.893, speed: 0, gear: 0.0, phase: "CATASTROPHIC IMPACT • INDUSTRIAL BAY" };
+    }
+  }
+
+  function evaluateFlightPattern(tSec) {
+    var sc = quantumScenarios[activeQuantumScenario] || quantumScenarios.wing_dent;
+    if (!sc.failPred || tSec < sc.failTime) {
+      return evaluateNominalFlightPattern(tSec);
+    } else if (tSec < sc.impactTime) {
+      return evaluateCrashTrajectory(activeQuantumScenario, tSec, sc.failTime, sc.impactTime);
+    } else {
+      return getImpactState(activeQuantumScenario);
+    }
+  }
+  window.__evaluateFlightPattern = evaluateFlightPattern;
   window.__evaluateFlightPattern = evaluateFlightPattern;
 
   // 9. CLIMATE, DAY/NIGHT & WEATHER CONFIGURATIONS
@@ -2483,8 +2740,19 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   });
 
   
-  // Embedded N722BD Crash Trajectory for Crash History Mode
-  var crashTrajData = [{"ts": "2026-11-01T16:17:56Z", "x": -59290.7, "y": 624.84, "z": -18162.4, "alt": 41000.0, "spd": 486.0, "hdg": 98.0, "pitch": 0.0, "bank": 0.0, "vs": 0.0, "mach": 0.85, "g": 1.0, "q_phase": 0.0}, {"ts": "2026-11-01T17:17:53Z", "x": -17234.43, "y": 624.84, "z": -5100.51, "alt": 41000.0, "spd": 472.0, "hdg": 122.0, "pitch": 0.0, "bank": 75.0, "vs": 0.0, "mach": 0.82, "g": 2.25, "q_phase": 78970.5}, {"ts": "2026-11-01T17:40:20Z", "x": -4880.44, "y": 553.21, "z": 2562.34, "alt": 36300.0, "spd": 443.0, "hdg": 75.0, "pitch": -0.3, "bank": -75.0, "vs": -141000.0, "mach": 0.77, "g": 2.24, "q_phase": 78524.63}, {"ts": "2026-11-01T17:40:26Z", "x": -4813.37, "y": 551.69, "z": 2539.58, "alt": 36200.0, "spd": 439.0, "hdg": 68.0, "pitch": -1.2, "bank": -54.6, "vs": -3000.0, "mach": 0.77, "g": 1.88, "q_phase": 55526.77}, {"ts": "2026-11-01T17:40:28Z", "x": -4788.7, "y": 550.93, "z": 2528.91, "alt": 36150.0, "spd": 439.0, "hdg": 65.0, "pitch": -1.6, "bank": -31.1, "vs": -1500.0, "mach": 0.77, "g": 1.48, "q_phase": 30158.38}, {"ts": "2026-11-01T17:40:30Z", "x": -4769.58, "y": 550.55, "z": 2519.71, "alt": 36125.0, "spd": 438.0, "hdg": 63.0, "pitch": -1.0, "bank": -21.8, "vs": -750.0, "mach": 0.76, "g": 1.34, "q_phase": 21376.62}, {"ts": "2026-11-01T17:40:33Z", "x": -4747.28, "y": 549.4, "z": 2507.57, "alt": 36050.0, "spd": 436.0, "hdg": 60.0, "pitch": -2.6, "bank": -30.9, "vs": -2250.0, "mach": 0.76, "g": 1.45, "q_phase": 28468.68}, {"ts": "2026-11-01T17:40:35Z", "x": -4728.02, "y": 548.64, "z": 2496.39, "alt": 36000.0, "spd": 436.0, "hdg": 58.0, "pitch": -2.0, "bank": -21.8, "vs": -1500.0, "mach": 0.76, "g": 1.31, "q_phase": 19811.56}, {"ts": "2026-11-01T17:40:37Z", "x": -4700.92, "y": 547.88, "z": 2478.63, "alt": 35950.0, "spd": 435.0, "hdg": 56.0, "pitch": -1.3, "bank": -21.7, "vs": -1500.0, "mach": 0.76, "g": 1.33, "q_phase": 20731.12}, {"ts": "2026-11-01T17:40:40Z", "x": -4681.73, "y": 547.12, "z": 2465.39, "alt": 35900.0, "spd": 434.0, "hdg": 55.0, "pitch": -1.9, "bank": -11.2, "vs": -1500.0, "mach": 0.76, "g": 1.14, "q_phase": 8871.27}, {"ts": "2026-11-01T17:40:42Z", "x": -4663.75, "y": 545.97, "z": 2452.44, "alt": 35825.0, "spd": 434.0, "hdg": 54.0, "pitch": -3.0, "bank": -11.2, "vs": -2250.0, "mach": 0.76, "g": 1.11, "q_phase": 7164.62}, {"ts": "2026-11-01T17:40:44Z", "x": -4642.14, "y": 544.83, "z": 2436.43, "alt": 35750.0, "spd": 435.0, "hdg": 53.0, "pitch": -2.4, "bank": -11.3, "vs": -2250.0, "mach": 0.76, "g": 1.13, "q_phase": 8010.88}, {"ts": "2026-11-01T17:40:46Z", "x": -4625.22, "y": 544.07, "z": 2423.86, "alt": 35700.0, "spd": 435.0, "hdg": 53.0, "pitch": -2.1, "bank": 0.0, "vs": -1500.0, "mach": 0.76, "g": 0.95, "q_phase": -3269.12}, {"ts": "2026-11-01T17:40:48Z", "x": -4605.8, "y": 542.93, "z": 2409.13, "alt": 35625.0, "spd": 436.0, "hdg": 52.0, "pitch": -2.7, "bank": -11.3, "vs": -2250.0, "mach": 0.76, "g": 1.12, "q_phase": 7639.23}, {"ts": "2026-11-01T17:40:51Z", "x": -4583.51, "y": 541.02, "z": 2391.97, "alt": 35500.0, "spd": 438.0, "hdg": 52.0, "pitch": -3.9, "bank": 0.0, "vs": -3750.0, "mach": 0.76, "g": 0.9, "q_phase": -6117.93}, {"ts": "2026-11-01T17:40:53Z", "x": -4564.92, "y": 539.5, "z": 2377.61, "alt": 35400.0, "spd": 439.0, "hdg": 52.0, "pitch": -3.7, "bank": 0.0, "vs": -3000.0, "mach": 0.76, "g": 0.91, "q_phase": -5863.36}, {"ts": "2026-11-01T17:40:55Z", "x": -4550.76, "y": 538.35, "z": 2366.49, "alt": 35325.0, "spd": 440.0, "hdg": 52.0, "pitch": -3.6, "bank": 0.0, "vs": -2250.0, "mach": 0.76, "g": 0.91, "q_phase": -5738.09}, {"ts": "2026-11-01T17:40:57Z", "x": -4528.78, "y": 536.83, "z": 2349.04, "alt": 35225.0, "spd": 441.0, "hdg": 51.0, "pitch": -3.1, "bank": -11.4, "vs": -3000.0, "mach": 0.77, "g": 1.11, "q_phase": 7106.29}, {"ts": "2026-11-01T17:40:59Z", "x": -4509.2, "y": 535.69, "z": 2333.54, "alt": 35150.0, "spd": 441.0, "hdg": 51.0, "pitch": -2.6, "bank": 0.0, "vs": -2250.0, "mach": 0.77, "g": 0.93, "q_phase": -4139.98}, {"ts": "2026-11-01T17:41:30Z", "x": -4245.24, "y": 533.02, "z": 2120.28, "alt": 34975.0, "spd": 426.0, "hdg": 51.0, "pitch": -0.5, "bank": 0.0, "vs": -5250.0, "mach": 0.74, "g": 0.99, "q_phase": -711.19}, {"ts": "2026-11-01T17:42:03Z", "x": -3965.63, "y": 533.4, "z": 1895.25, "alt": 35000.0, "spd": 424.0, "hdg": 51.0, "pitch": 0.1, "bank": 0.0, "vs": 750.0, "mach": 0.74, "g": 1.0, "q_phase": 96.06}, {"ts": "2026-11-01T17:42:33Z", "x": -3706.47, "y": 533.4, "z": 1679.76, "alt": 35000.0, "spd": 435.0, "hdg": 50.0, "pitch": 0.0, "bank": -11.3, "vs": 0.0, "mach": 0.75, "g": 1.19, "q_phase": 11854.72}, {"ts": "2026-11-01T17:43:06Z", "x": -3428.72, "y": 533.4, "z": 1440.77, "alt": 35000.0, "spd": 448.0, "hdg": 49.0, "pitch": 0.0, "bank": -11.6, "vs": 0.0, "mach": 0.78, "g": 1.19, "q_phase": 12199.55}, {"ts": "2026-11-01T17:43:37Z", "x": -3152.79, "y": 533.4, "z": 1210.06, "alt": 35000.0, "spd": 459.0, "hdg": 51.0, "pitch": 0.0, "bank": 22.8, "vs": 0.0, "mach": 0.8, "g": 1.38, "q_phase": 23993.96}, {"ts": "2026-11-01T17:44:09Z", "x": -2852.22, "y": 533.78, "z": 966.94, "alt": 35025.0, "spd": 458.0, "hdg": 51.0, "pitch": 0.1, "bank": 0.0, "vs": 750.0, "mach": 0.79, "g": 1.0, "q_phase": 89.18}, {"ts": "2026-11-01T17:44:40Z", "x": -2573.79, "y": 533.4, "z": 744.91, "alt": 35000.0, "spd": 463.0, "hdg": 51.0, "pitch": -0.1, "bank": 0.0, "vs": -750.0, "mach": 0.8, "g": 1.0, "q_phase": -96.82}, {"ts": "2026-11-01T17:45:12Z", "x": -2274.43, "y": 533.4, "z": 501.36, "alt": 35000.0, "spd": 465.0, "hdg": 51.0, "pitch": 0.0, "bank": 0.0, "vs": 0.0, "mach": 0.81, "g": 1.0, "q_phase": 0.0}, {"ts": "2026-11-01T17:45:43Z", "x": -1987.22, "y": 533.4, "z": 274.52, "alt": 35000.0, "spd": 473.0, "hdg": 52.0, "pitch": 0.0, "bank": 12.2, "vs": 0.0, "mach": 0.82, "g": 1.2, "q_phase": 12860.41}, {"ts": "2026-11-01T17:46:15Z", "x": -1677.03, "y": 533.78, "z": 32.53, "alt": 35025.0, "spd": 471.0, "hdg": 51.0, "pitch": 0.1, "bank": -12.2, "vs": 750.0, "mach": 0.82, "g": 1.2, "q_phase": 12895.29}, {"ts": "2026-11-01T17:46:46Z", "x": -1387.29, "y": 533.78, "z": -203.75, "alt": 35025.0, "spd": 462.0, "hdg": 50.0, "pitch": 0.0, "bank": -11.9, "vs": 0.0, "mach": 0.8, "g": 1.2, "q_phase": 12570.01}, {"ts": "2026-11-01T17:47:12Z", "x": -1156.02, "y": 532.64, "z": -389.22, "alt": 34950.0, "spd": 444.0, "hdg": 58.0, "pitch": -0.2, "bank": 58.4, "vs": -2250.0, "mach": 0.77, "g": 1.97, "q_phase": 61143.33}, {"ts": "2026-11-01T17:47:14Z", "x": -1135.32, "y": 532.64, "z": -400.9, "alt": 34950.0, "spd": 442.0, "hdg": 61.0, "pitch": 0.0, "bank": 31.3, "vs": 0.0, "mach": 0.77, "g": 1.52, "q_phase": 32904.61}, {"ts": "2026-11-01T17:47:16Z", "x": -1115.25, "y": 533.02, "z": -411.31, "alt": 34975.0, "spd": 440.0, "hdg": 64.0, "pitch": 1.0, "bank": 31.1, "vs": 750.0, "mach": 0.76, "g": 1.54, "q_phase": 34308.57}, {"ts": "2026-11-01T17:47:18Z", "x": -1091.83, "y": 533.4, "z": -422.04, "alt": 35000.0, "spd": 438.0, "hdg": 66.0, "pitch": 0.8, "bank": 21.8, "vs": 750.0, "mach": 0.76, "g": 1.39, "q_phase": 24339.64}, {"ts": "2026-11-01T17:47:20Z", "x": -1070.02, "y": 533.4, "z": -431.13, "alt": 35000.0, "spd": 437.0, "hdg": 68.0, "pitch": 0.0, "bank": 21.8, "vs": 0.0, "mach": 0.76, "g": 1.36, "q_phase": 22954.04}, {"ts": "2026-11-01T17:47:22Z", "x": -1049.2, "y": 533.78, "z": -438.75, "alt": 35025.0, "spd": 438.0, "hdg": 70.0, "pitch": 1.0, "bank": 21.8, "vs": 750.0, "mach": 0.76, "g": 1.39, "q_phase": 24556.79}, {"ts": "2026-11-01T17:47:25Z", "x": -1022.63, "y": 533.4, "z": -447.36, "alt": 35000.0, "spd": 437.0, "hdg": 73.0, "pitch": -0.8, "bank": 31.0, "vs": -750.0, "mach": 0.76, "g": 1.5, "q_phase": 31366.71}, {"ts": "2026-11-01T17:47:27Z", "x": -1002.99, "y": 532.64, "z": -452.77, "alt": 34950.0, "spd": 437.0, "hdg": 75.0, "pitch": -2.1, "bank": 21.8, "vs": -1500.0, "mach": 0.76, "g": 1.31, "q_phase": 19571.18}, {"ts": "2026-11-01T17:47:29Z", "x": -975.66, "y": 532.26, "z": -458.57, "alt": 34925.0, "spd": 436.0, "hdg": 79.0, "pitch": -0.8, "bank": 38.6, "vs": -750.0, "mach": 0.76, "g": 1.62, "q_phase": 39402.89}, {"ts": "2026-11-01T17:47:31Z", "x": -954.77, "y": 532.64, "z": -462.08, "alt": 34950.0, "spd": 435.0, "hdg": 81.0, "pitch": 1.0, "bank": 21.7, "vs": 750.0, "mach": 0.75, "g": 1.39, "q_phase": 24486.09}, {"ts": "2026-11-01T17:47:33Z", "x": -928.31, "y": 533.4, "z": -465.18, "alt": 35000.0, "spd": 434.0, "hdg": 84.0, "pitch": 1.6, "bank": 30.8, "vs": 1500.0, "mach": 0.75, "g": 1.55, "q_phase": 35005.79}, {"ts": "2026-11-01T17:47:35Z", "x": -906.02, "y": 533.78, "z": -466.99, "alt": 35025.0, "spd": 432.0, "hdg": 86.0, "pitch": 1.0, "bank": 21.6, "vs": 750.0, "mach": 0.75, "g": 1.38, "q_phase": 24256.86}, {"ts": "2026-11-01T17:47:38Z", "x": -882.85, "y": 533.78, "z": -467.97, "alt": 35025.0, "spd": 432.0, "hdg": 88.0, "pitch": 0.0, "bank": 21.6, "vs": 0.0, "mach": 0.75, "g": 1.36, "q_phase": 22715.66}, {"ts": "2026-11-01T17:47:40Z", "x": -855.18, "y": 534.16, "z": -468.02, "alt": 35050.0, "spd": 432.0, "hdg": 90.0, "pitch": 0.8, "bank": 21.6, "vs": 750.0, "mach": 0.75, "g": 1.38, "q_phase": 23961.69}, {"ts": "2026-11-01T17:47:42Z", "x": -834.25, "y": 534.54, "z": -467.46, "alt": 35075.0, "spd": 432.0, "hdg": 91.0, "pitch": 1.0, "bank": 11.2, "vs": 750.0, "mach": 0.75, "g": 1.21, "q_phase": 13421.47}, {"ts": "2026-11-01T17:47:44Z", "x": -805.45, "y": 534.54, "z": -466.19, "alt": 35075.0, "spd": 432.0, "hdg": 93.0, "pitch": 0.0, "bank": 21.6, "vs": 0.0, "mach": 0.75, "g": 1.36, "q_phase": 22715.66}, {"ts": "2026-11-01T17:47:46Z", "x": -783.34, "y": 534.16, "z": -464.92, "alt": 35050.0, "spd": 432.0, "hdg": 93.0, "pitch": -1.0, "bank": 0.0, "vs": -750.0, "mach": 0.75, "g": 0.98, "q_phase": -1556.88}, {"ts": "2026-11-01T17:47:49Z", "x": -756.62, "y": 533.4, "z": -462.89, "alt": 35000.0, "spd": 433.0, "hdg": 94.0, "pitch": -1.6, "bank": 11.2, "vs": -1500.0, "mach": 0.75, "g": 1.15, "q_phase": 9229.1}, {"ts": "2026-11-01T17:47:51Z", "x": -735.69, "y": 532.64, "z": -460.79, "alt": 34950.0, "spd": 434.0, "hdg": 95.0, "pitch": -2.1, "bank": 11.2, "vs": -1500.0, "mach": 0.75, "g": 1.14, "q_phase": 8551.59}, {"ts": "2026-11-01T17:47:53Z", "x": -710.33, "y": 533.02, "z": -458.06, "alt": 34975.0, "spd": 432.0, "hdg": 95.0, "pitch": 0.9, "bank": 0.0, "vs": 750.0, "mach": 0.75, "g": 1.02, "q_phase": 1351.56}, {"ts": "2026-11-01T17:47:55Z", "x": -690.53, "y": 533.02, "z": -455.77, "alt": 34975.0, "spd": 432.0, "hdg": 97.0, "pitch": 0.0, "bank": 21.6, "vs": 0.0, "mach": 0.75, "g": 1.36, "q_phase": 22715.66}, {"ts": "2026-11-01T17:47:57Z", "x": -667.82, "y": 534.16, "z": -452.77, "alt": 35050.0, "spd": 434.0, "hdg": 97.0, "pitch": 2.9, "bank": 0.0, "vs": 2250.0, "mach": 0.75, "g": 1.07, "q_phase": 4511.25}, {"ts": "2026-11-01T17:47:59Z", "x": -644.51, "y": 534.16, "z": -449.68, "alt": 35050.0, "spd": 434.0, "hdg": 97.0, "pitch": 0.0, "bank": 0.0, "vs": 0.0, "mach": 0.75, "g": 1.0, "q_phase": 0.0}, {"ts": "2026-11-01T17:48:01Z", "x": -623.8, "y": 534.54, "z": -446.84, "alt": 35075.0, "spd": 435.0, "hdg": 98.0, "pitch": 1.0, "bank": 11.3, "vs": 750.0, "mach": 0.75, "g": 1.21, "q_phase": 13504.05}, {"ts": "2026-11-01T17:48:03Z", "x": -597.08, "y": 535.31, "z": -442.96, "alt": 35125.0, "spd": 435.0, "hdg": 98.0, "pitch": 1.6, "bank": 0.0, "vs": 1500.0, "mach": 0.76, "g": 1.04, "q_phase": 2553.24}, {"ts": "2026-11-01T17:48:05Z", "x": -575.05, "y": 536.07, "z": -439.34, "alt": 35175.0, "spd": 436.0, "hdg": 98.0, "pitch": 2.0, "bank": 0.0, "vs": 1500.0, "mach": 0.76, "g": 1.05, "q_phase": 3087.85}, {"ts": "2026-11-01T17:48:07Z", "x": -553.06, "y": 537.21, "z": -435.99, "alt": 35250.0, "spd": 437.0, "hdg": 99.0, "pitch": 2.9, "bank": 11.3, "vs": 2250.0, "mach": 0.76, "g": 1.26, "q_phase": 16552.95}, {"ts": "2026-11-01T17:48:39Z", "x": -180.42, "y": 477.77, "z": -372.17, "alt": 31350.0, "spd": 488.0, "hdg": 102.0, "pitch": -8.9, "bank": 33.8, "vs": -117000.0, "mach": 0.83, "g": 1.34, "q_phase": 21500.35}, {"ts": "2026-11-01T17:48:46Z", "x": -98.7, "y": 441.2, "z": -346.78, "alt": 28950.0, "spd": 505.0, "hdg": 111.0, "pitch": -23.1, "bank": 64.3, "vs": -72000.0, "mach": 0.85, "g": 1.49, "q_phase": 31175.11}, {"ts": "2026-11-01T17:48:48Z", "x": -75.04, "y": 431.67, "z": -335.86, "alt": 28325.0, "spd": 506.0, "hdg": 115.0, "pitch": -20.1, "bank": 42.8, "vs": -18750.0, "mach": 0.85, "g": 1.21, "q_phase": 13362.06}, {"ts": "2026-11-01T17:48:50Z", "x": -46.81, "y": 419.1, "z": -319.98, "alt": 27500.0, "spd": 504.0, "hdg": 120.0, "pitch": -21.2, "bank": 49.1, "vs": -24750.0, "mach": 0.85, "g": 1.29, "q_phase": 18163.67}, {"ts": "2026-11-01T17:48:52Z", "x": -26.71, "y": 409.58, "z": -306.39, "alt": 26875.0, "spd": 499.0, "hdg": 125.0, "pitch": -21.4, "bank": 48.8, "vs": -18750.0, "mach": 0.84, "g": 1.28, "q_phase": 17516.95}, {"ts": "2026-11-01T17:48:55Z", "x": -4.07, "y": 396.62, "z": -287.68, "alt": 26025.0, "spd": 493.0, "hdg": 132.0, "pitch": -23.8, "bank": 57.7, "vs": -25500.0, "mach": 0.82, "g": 1.37, "q_phase": 23117.93}, {"ts": "2026-11-01T17:48:57Z", "x": 13.49, "y": 384.43, "z": -269.6, "alt": 25225.0, "spd": 486.0, "hdg": 137.0, "pitch": -25.8, "bank": 48.0, "vs": -24000.0, "mach": 0.81, "g": 1.16, "q_phase": 9806.73}, {"ts": "2026-11-01T17:48:59Z", "x": 32.41, "y": 369.19, "z": -245.16, "alt": 24225.0, "spd": 479.0, "hdg": 145.0, "pitch": -26.2, "bank": 60.3, "vs": -30000.0, "mach": 0.79, "g": 1.35, "q_phase": 22047.48}, {"ts": "2026-11-01T17:49:01Z", "x": 47.06, "y": 352.43, "z": -220.01, "alt": 23125.0, "spd": 472.0, "hdg": 151.0, "pitch": -29.9, "bank": 52.3, "vs": -33000.0, "mach": 0.78, "g": 1.12, "q_phase": 7832.31}, {"ts": "2026-11-01T17:49:03Z", "x": 56.6, "y": 338.33, "z": -198.16, "alt": 22200.0, "spd": 465.0, "hdg": 158.0, "pitch": -30.6, "bank": 56.1, "vs": -27750.0, "mach": 0.76, "g": 1.17, "q_phase": 10776.18}, {"ts": "2026-11-01T17:49:06Z", "x": 63.0, "y": 320.42, "z": -176.58, "alt": 21025.0, "spd": 450.0, "hdg": 165.0, "pitch": -38.5, "bank": 55.3, "vs": -35250.0, "mach": 0.74, "g": 0.96, "q_phase": -2653.86}, {"ts": "2026-11-01T17:49:08Z", "x": 68.15, "y": 298.7, "z": -153.19, "alt": 19600.0, "spd": 437.0, "hdg": 169.0, "pitch": -42.2, "bank": 38.7, "vs": -42750.0, "mach": 0.71, "g": 0.59, "q_phase": -25941.47}, {"ts": "2026-11-01T17:49:10Z", "x": 71.25, "y": 275.84, "z": -127.02, "alt": 18100.0, "spd": 419.0, "hdg": 175.0, "pitch": -40.9, "bank": 49.0, "vs": -45000.0, "mach": 0.68, "g": 0.79, "q_phase": -13066.95}, {"ts": "2026-11-01T17:49:12Z", "x": 71.4, "y": 254.89, "z": -105.28, "alt": 16725.0, "spd": 402.0, "hdg": 180.0, "pitch": -43.9, "bank": 42.6, "vs": -41250.0, "mach": 0.65, "g": 0.61, "q_phase": -24533.65}, {"ts": "2026-11-01T17:49:14Z", "x": 70.34, "y": 236.6, "z": -89.01, "alt": 15525.0, "spd": 379.0, "hdg": 185.0, "pitch": -48.3, "bank": 40.9, "vs": -36000.0, "mach": 0.61, "g": 0.48, "q_phase": -33149.95}, {"ts": "2026-11-01T17:49:16Z", "x": 67.12, "y": 207.26, "z": -65.54, "alt": 13600.0, "spd": 352.0, "hdg": 191.0, "pitch": -51.1, "bank": 44.0, "vs": -57750.0, "mach": 0.56, "g": 0.46, "q_phase": -34329.01}, {"ts": "2026-11-01T17:49:19Z", "x": 61.44, "y": 179.07, "z": -44.31, "alt": 11750.0, "spd": 330.0, "hdg": 197.0, "pitch": -52.1, "bank": 42.2, "vs": -55500.0, "mach": 0.52, "g": 0.4, "q_phase": -37809.13}, {"ts": "2026-11-01T17:49:21Z", "x": 55.05, "y": 154.31, "z": -28.7, "alt": 10125.0, "spd": 298.0, "hdg": 209.0, "pitch": -55.7, "bank": 58.6, "vs": -48750.0, "mach": 0.47, "g": 0.58, "q_phase": -26368.64}, {"ts": "2026-11-01T17:49:23Z", "x": 47.59, "y": 133.35, "z": -17.78, "alt": 8750.0, "spd": 275.0, "hdg": 219.0, "pitch": -57.7, "bank": 51.5, "vs": -41250.0, "mach": 0.43, "g": 0.42, "q_phase": -36943.41}, {"ts": "2026-11-01T17:49:25Z", "x": 34.99, "y": 133.35, "z": -5.58, "alt": 8750.0, "spd": 255.0, "hdg": 233.0, "pitch": 0.0, "bank": 58.5, "vs": 0.0, "mach": 0.4, "g": 1.98, "q_phase": 61628.17}, {"ts": "2026-11-01T17:49:27Z", "x": 24.73, "y": 133.35, "z": -0.75, "alt": 8750.0, "spd": 241.0, "hdg": 248.0, "pitch": 0.0, "bank": 58.8, "vs": 0.0, "mach": 0.38, "g": 1.98, "q_phase": 61963.7}, {"ts": "2026-11-01T17:49:29Z", "x": 12.43, "y": 133.35, "z": 1.68, "alt": 8750.0, "spd": 232.0, "hdg": 268.0, "pitch": 0.0, "bank": 64.8, "vs": 0.0, "mach": 0.36, "g": 2.08, "q_phase": 68211.96}, {"ts": "2026-11-01T17:49:31Z", "x": 0.01, "y": 133.35, "z": 0.01, "alt": 8750.0, "spd": 231.0, "hdg": 277.0, "pitch": 0.0, "bank": 43.6, "vs": 0.0, "mach": 0.36, "g": 1.73, "q_phase": 45880.65}];
+  // Embedded N722BD Crash Trajectory for Crash History Mode (Active airframe airspace)
+  var crashTrajData = [{"ts": "2026-11-01T17:40:20Z", "x": -4880.44, "y": 553.21, "z": 2562.34, "alt": 36300.0, "spd": 443.0, "hdg": 75.0, "pitch": -0.3, "bank": -75.0, "vs": -141000.0, "mach": 0.77, "g": 2.24, "q_phase": 78524.63}, {"ts": "2026-11-01T17:40:26Z", "x": -4813.37, "y": 551.69, "z": 2539.58, "alt": 36200.0, "spd": 439.0, "hdg": 68.0, "pitch": -1.2, "bank": -54.6, "vs": -3000.0, "mach": 0.77, "g": 1.88, "q_phase": 55526.77},
+{"ts": "2026-11-01T17:40:28Z", "x": -4788.7, "y": 550.93, "z": 2528.91, "alt": 36150.0, "spd": 439.0, "hdg": 65.0, "pitch": -1.6, "bank": -31.1, "vs": -1500.0, "mach": 0.77, "g": 1.48, "q_phase": 30158.38}, {"ts": "2026-11-01T17:40:30Z", "x": -4769.58, "y": 550.55, "z": 2519.71, "alt": 36125.0, "spd": 438.0, "hdg": 63.0, "pitch": -1.0, "bank": -21.8, "vs": -750.0, "mach": 0.76, "g": 1.34, "q_phase": 21376.62}, {"ts": "2026-11-01T17:40:33Z", "x": -4747.28, "y": 549.4, "z": 2507.57, "alt": 36050.0, "spd": 436.0, "hdg": 60.0, "pitch": -2.6, "bank": -30.9, "vs": -2250.0, "mach": 0.76, "g": 1.45, "q_phase": 28468.68}, {"ts": "2026-11-01T17:40:35Z", "x": -4728.02, "y": 548.64, "z": 2496.39, "alt": 36000.0, "spd": 436.0, "hdg": 58.0, "pitch": -2.0, "bank": -21.8, "vs": -1500.0, "mach": 0.76, "g": 1.31, "q_phase": 19811.56}, {"ts": "2026-11-01T17:40:37Z", "x": -4700.92, "y": 547.88, "z": 2478.63, "alt": 35950.0, "spd": 435.0, "hdg": 56.0, "pitch": -1.3, "bank": -21.7, "vs": -1500.0, "mach": 0.76, "g": 1.33, "q_phase": 20731.12}, {"ts": "2026-11-01T17:40:40Z", "x": -4681.73, "y": 547.12, "z": 2465.39, "alt": 35900.0, "spd": 434.0, "hdg": 55.0, "pitch": -1.9, "bank": -11.2, "vs": -1500.0, "mach": 0.76, "g": 1.14, "q_phase": 8871.27}, {"ts": "2026-11-01T17:40:42Z", "x": -4663.75, "y": 545.97, "z": 2452.44, "alt": 35825.0, "spd": 434.0, "hdg": 54.0, "pitch": -3.0, "bank": -11.2, "vs": -2250.0, "mach": 0.76, "g": 1.11, "q_phase": 7164.62}, {"ts": "2026-11-01T17:40:44Z", "x": -4642.14, "y": 544.83, "z": 2436.43, "alt": 35750.0, "spd": 435.0, "hdg": 53.0, "pitch": -2.4, "bank": -11.3, "vs": -2250.0, "mach": 0.76, "g": 1.13, "q_phase": 8010.88}, {"ts": "2026-11-01T17:40:46Z", "x": -4625.22, "y": 544.07, "z": 2423.86, "alt": 35700.0, "spd": 435.0, "hdg": 53.0, "pitch": -2.1, "bank": 0.0, "vs": -1500.0, "mach": 0.76, "g": 0.95, "q_phase": -3269.12}, {"ts": "2026-11-01T17:40:48Z", "x": -4605.8, "y": 542.93, "z": 2409.13, "alt": 35625.0, "spd": 436.0, "hdg": 52.0, "pitch": -2.7, "bank": -11.3, "vs": -2250.0, "mach": 0.76, "g": 1.12, "q_phase": 7639.23}, {"ts": "2026-11-01T17:40:51Z", "x": -4583.51, "y": 541.02, "z": 2391.97, "alt": 35500.0, "spd": 438.0, "hdg": 52.0, "pitch": -3.9, "bank": 0.0, "vs": -3750.0, "mach": 0.76, "g": 0.9, "q_phase": -6117.93}, {"ts": "2026-11-01T17:40:53Z", "x": -4564.92, "y": 539.5, "z": 2377.61, "alt": 35400.0, "spd": 439.0, "hdg": 52.0, "pitch": -3.7, "bank": 0.0, "vs": -3000.0, "mach": 0.76, "g": 0.91, "q_phase": -5863.36}, {"ts": "2026-11-01T17:40:55Z", "x": -4550.76, "y": 538.35, "z": 2366.49, "alt": 35325.0, "spd": 440.0, "hdg": 52.0, "pitch": -3.6, "bank": 0.0, "vs": -2250.0, "mach": 0.76, "g": 0.91, "q_phase": -5738.09}, {"ts": "2026-11-01T17:40:57Z", "x": -4528.78, "y": 536.83, "z": 2349.04, "alt": 35225.0, "spd": 441.0, "hdg": 51.0, "pitch": -3.1, "bank": -11.4, "vs": -3000.0, "mach": 0.77, "g": 1.11, "q_phase": 7106.29}, {"ts": "2026-11-01T17:40:59Z", "x": -4509.2, "y": 535.69, "z": 2333.54, "alt": 35150.0, "spd": 441.0, "hdg": 51.0, "pitch": -2.6, "bank": 0.0, "vs": -2250.0, "mach": 0.77, "g": 0.93, "q_phase": -4139.98}, {"ts": "2026-11-01T17:41:30Z", "x": -4245.24, "y": 533.02, "z": 2120.28, "alt": 34975.0, "spd": 426.0, "hdg": 51.0, "pitch": -0.5, "bank": 0.0, "vs": -5250.0, "mach": 0.74, "g": 0.99, "q_phase": -711.19}, {"ts": "2026-11-01T17:42:03Z", "x": -3965.63, "y": 533.4, "z": 1895.25, "alt": 35000.0, "spd": 424.0, "hdg": 51.0, "pitch": 0.1, "bank": 0.0, "vs": 750.0, "mach": 0.74, "g": 1.0, "q_phase": 96.06}, {"ts": "2026-11-01T17:42:33Z", "x": -3706.47, "y": 533.4, "z": 1679.76, "alt": 35000.0, "spd": 435.0, "hdg": 50.0, "pitch": 0.0, "bank": -11.3, "vs": 0.0, "mach": 0.75, "g": 1.19, "q_phase": 11854.72}, {"ts": "2026-11-01T17:43:06Z", "x": -3428.72, "y": 533.4, "z": 1440.77, "alt": 35000.0, "spd": 448.0, "hdg": 49.0, "pitch": 0.0, "bank": -11.6, "vs": 0.0, "mach": 0.78, "g": 1.19, "q_phase": 12199.55}, {"ts": "2026-11-01T17:43:37Z", "x": -3152.79, "y": 533.4, "z": 1210.06, "alt": 35000.0, "spd": 459.0, "hdg": 51.0, "pitch": 0.0, "bank": 22.8, "vs": 0.0, "mach": 0.8, "g": 1.38, "q_phase": 23993.96}, {"ts": "2026-11-01T17:44:09Z", "x": -2852.22, "y": 533.78, "z": 966.94, "alt": 35025.0, "spd": 458.0, "hdg": 51.0, "pitch": 0.1, "bank": 0.0, "vs": 750.0, "mach": 0.79, "g": 1.0, "q_phase": 89.18}, {"ts": "2026-11-01T17:44:40Z", "x": -2573.79, "y": 533.4, "z": 744.91, "alt": 35000.0, "spd": 463.0, "hdg": 51.0, "pitch": -0.1, "bank": 0.0, "vs": -750.0, "mach": 0.8, "g": 1.0, "q_phase": -96.82}, {"ts": "2026-11-01T17:45:12Z", "x": -2274.43, "y": 533.4, "z": 501.36, "alt": 35000.0, "spd": 465.0, "hdg": 51.0, "pitch": 0.0, "bank": 0.0, "vs": 0.0, "mach": 0.81, "g": 1.0, "q_phase": 0.0}, {"ts": "2026-11-01T17:45:43Z", "x": -1987.22, "y": 533.4, "z": 274.52, "alt": 35000.0, "spd": 473.0, "hdg": 52.0, "pitch": 0.0, "bank": 12.2, "vs": 0.0, "mach": 0.82, "g": 1.2, "q_phase": 12860.41}, {"ts": "2026-11-01T17:46:15Z", "x": -1677.03, "y": 533.78, "z": 32.53, "alt": 35025.0, "spd": 471.0, "hdg": 51.0, "pitch": 0.1, "bank": -12.2, "vs": 750.0, "mach": 0.82, "g": 1.2, "q_phase": 12895.29}, {"ts": "2026-11-01T17:46:46Z", "x": -1387.29, "y": 533.78, "z": -203.75, "alt": 35025.0, "spd": 462.0, "hdg": 50.0, "pitch": 0.0, "bank": -11.9, "vs": 0.0, "mach": 0.8, "g": 1.2, "q_phase": 12570.01}, {"ts": "2026-11-01T17:47:12Z", "x": -1156.02, "y": 532.64, "z": -389.22, "alt": 34950.0, "spd": 444.0, "hdg": 58.0, "pitch": -0.2, "bank": 58.4, "vs": -2250.0, "mach": 0.77, "g": 1.97, "q_phase": 61143.33}, {"ts": "2026-11-01T17:47:14Z", "x": -1135.32, "y": 532.64, "z": -400.9, "alt": 34950.0, "spd": 442.0, "hdg": 61.0, "pitch": 0.0, "bank": 31.3, "vs": 0.0, "mach": 0.77, "g": 1.52, "q_phase": 32904.61}, {"ts": "2026-11-01T17:47:16Z", "x": -1115.25, "y": 533.02, "z": -411.31, "alt": 34975.0, "spd": 440.0, "hdg": 64.0, "pitch": 1.0, "bank": 31.1, "vs": 750.0, "mach": 0.76, "g": 1.54, "q_phase": 34308.57}, {"ts": "2026-11-01T17:47:18Z", "x": -1091.83, "y": 533.4, "z": -422.04, "alt": 35000.0, "spd": 438.0, "hdg": 66.0, "pitch": 0.8, "bank": 21.8, "vs": 750.0, "mach": 0.76, "g": 1.39, "q_phase": 24339.64}, {"ts": "2026-11-01T17:47:20Z", "x": -1070.02, "y": 533.4, "z": -431.13, "alt": 35000.0, "spd": 437.0, "hdg": 68.0, "pitch": 0.0, "bank": 21.8, "vs": 0.0, "mach": 0.76, "g": 1.36, "q_phase": 22954.04}, {"ts": "2026-11-01T17:47:22Z", "x": -1049.2, "y": 533.78, "z": -438.75, "alt": 35025.0, "spd": 438.0, "hdg": 70.0, "pitch": 1.0, "bank": 21.8, "vs": 750.0, "mach": 0.76, "g": 1.39, "q_phase": 24556.79}, {"ts": "2026-11-01T17:47:25Z", "x": -1022.63, "y": 533.4, "z": -447.36, "alt": 35000.0, "spd": 437.0, "hdg": 73.0, "pitch": -0.8, "bank": 31.0, "vs": -750.0, "mach": 0.76, "g": 1.5, "q_phase": 31366.71}, {"ts": "2026-11-01T17:47:27Z", "x": -1002.99, "y": 532.64, "z": -452.77, "alt": 34950.0, "spd": 437.0, "hdg": 75.0, "pitch": -2.1, "bank": 21.8, "vs": -1500.0, "mach": 0.76, "g": 1.31, "q_phase": 19571.18}, {"ts": "2026-11-01T17:47:29Z", "x": -975.66, "y": 532.26, "z": -458.57, "alt": 34925.0, "spd": 436.0, "hdg": 79.0, "pitch": -0.8, "bank": 38.6, "vs": -750.0, "mach": 0.76, "g": 1.62, "q_phase": 39402.89}, {"ts": "2026-11-01T17:47:31Z", "x": -954.77, "y": 532.64, "z": -462.08, "alt": 34950.0, "spd": 435.0, "hdg": 81.0, "pitch": 1.0, "bank": 21.7, "vs": 750.0, "mach": 0.75, "g": 1.39, "q_phase": 24486.09}, {"ts": "2026-11-01T17:47:33Z", "x": -928.31, "y": 533.4, "z": -465.18, "alt": 35000.0, "spd": 434.0, "hdg": 84.0, "pitch": 1.6, "bank": 30.8, "vs": 1500.0, "mach": 0.75, "g": 1.55, "q_phase": 35005.79}, {"ts": "2026-11-01T17:47:35Z", "x": -906.02, "y": 533.78, "z": -466.99, "alt": 35025.0, "spd": 432.0, "hdg": 86.0, "pitch": 1.0, "bank": 21.6, "vs": 750.0, "mach": 0.75, "g": 1.38, "q_phase": 24256.86}, {"ts": "2026-11-01T17:47:38Z", "x": -882.85, "y": 533.78, "z": -467.97, "alt": 35025.0, "spd": 432.0, "hdg": 88.0, "pitch": 0.0, "bank": 21.6, "vs": 0.0, "mach": 0.75, "g": 1.36, "q_phase": 22715.66}, {"ts": "2026-11-01T17:47:40Z", "x": -855.18, "y": 534.16, "z": -468.02, "alt": 35050.0, "spd": 432.0, "hdg": 90.0, "pitch": 0.8, "bank": 21.6, "vs": 750.0, "mach": 0.75, "g": 1.38, "q_phase": 23961.69}, {"ts": "2026-11-01T17:47:42Z", "x": -834.25, "y": 534.54, "z": -467.46, "alt": 35075.0, "spd": 432.0, "hdg": 91.0, "pitch": 1.0, "bank": 11.2, "vs": 750.0, "mach": 0.75, "g": 1.21, "q_phase": 13421.47}, {"ts": "2026-11-01T17:47:44Z", "x": -805.45, "y": 534.54, "z": -466.19, "alt": 35075.0, "spd": 432.0, "hdg": 93.0, "pitch": 0.0, "bank": 21.6, "vs": 0.0, "mach": 0.75, "g": 1.36, "q_phase": 22715.66}, {"ts": "2026-11-01T17:47:46Z", "x": -783.34, "y": 534.16, "z": -464.92, "alt": 35050.0, "spd": 432.0, "hdg": 93.0, "pitch": -1.0, "bank": 0.0, "vs": -750.0, "mach": 0.75, "g": 0.98, "q_phase": -1556.88}, {"ts": "2026-11-01T17:47:49Z", "x": -756.62, "y": 533.4, "z": -462.89, "alt": 35000.0, "spd": 433.0, "hdg": 94.0, "pitch": -1.6, "bank": 11.2, "vs": -1500.0, "mach": 0.75, "g": 1.15, "q_phase": 9229.1}, {"ts": "2026-11-01T17:47:51Z", "x": -735.69, "y": 532.64, "z": -460.79, "alt": 34950.0, "spd": 434.0, "hdg": 95.0, "pitch": -2.1, "bank": 11.2, "vs": -1500.0, "mach": 0.75, "g": 1.14, "q_phase": 8551.59}, {"ts": "2026-11-01T17:47:53Z", "x": -710.33, "y": 533.02, "z": -458.06, "alt": 34975.0, "spd": 432.0, "hdg": 95.0, "pitch": 0.9, "bank": 0.0, "vs": 750.0, "mach": 0.75, "g": 1.02, "q_phase": 1351.56}, {"ts": "2026-11-01T17:47:55Z", "x": -690.53, "y": 533.02, "z": -455.77, "alt": 34975.0, "spd": 432.0, "hdg": 97.0, "pitch": 0.0, "bank": 21.6, "vs": 0.0, "mach": 0.75, "g": 1.36, "q_phase": 22715.66}, {"ts": "2026-11-01T17:47:57Z", "x": -667.82, "y": 534.16, "z": -452.77, "alt": 35050.0, "spd": 434.0, "hdg": 97.0, "pitch": 2.9, "bank": 0.0, "vs": 2250.0, "mach": 0.75, "g": 1.07, "q_phase": 4511.25}, {"ts": "2026-11-01T17:47:59Z", "x": -644.51, "y": 534.16, "z": -449.68, "alt": 35050.0, "spd": 434.0, "hdg": 97.0, "pitch": 0.0, "bank": 0.0, "vs": 0.0, "mach": 0.75, "g": 1.0, "q_phase": 0.0}, {"ts": "2026-11-01T17:48:01Z", "x": -623.8, "y": 534.54, "z": -446.84, "alt": 35075.0, "spd": 435.0, "hdg": 98.0, "pitch": 1.0, "bank": 11.3, "vs": 750.0, "mach": 0.75, "g": 1.21, "q_phase": 13504.05}, {"ts": "2026-11-01T17:48:03Z", "x": -597.08, "y": 535.31, "z": -442.96, "alt": 35125.0, "spd": 435.0, "hdg": 98.0, "pitch": 1.6, "bank": 0.0, "vs": 1500.0, "mach": 0.76, "g": 1.04, "q_phase": 2553.24}, {"ts": "2026-11-01T17:48:05Z", "x": -575.05, "y": 536.07, "z": -439.34, "alt": 35175.0, "spd": 436.0, "hdg": 98.0, "pitch": 2.0, "bank": 0.0, "vs": 1500.0, "mach": 0.76, "g": 1.05, "q_phase": 3087.85}, {"ts": "2026-11-01T17:48:07Z", "x": -553.06, "y": 537.21, "z": -435.99, "alt": 35250.0, "spd": 437.0, "hdg": 99.0, "pitch": 2.9, "bank": 11.3, "vs": 2250.0, "mach": 0.76, "g": 1.26, "q_phase": 16552.95}, {"ts": "2026-11-01T17:48:39Z", "x": -180.42, "y": 477.77, "z": -372.17, "alt": 31350.0, "spd": 488.0, "hdg": 102.0, "pitch": -8.9, "bank": 33.8, "vs": -117000.0, "mach": 0.83, "g": 1.34, "q_phase": 21500.35}, {"ts": "2026-11-01T17:48:46Z", "x": -98.7, "y": 441.2, "z": -346.78, "alt": 28950.0, "spd": 505.0, "hdg": 111.0, "pitch": -23.1, "bank": 64.3, "vs": -72000.0, "mach": 0.85, "g": 1.49, "q_phase": 31175.11}, {"ts": "2026-11-01T17:48:48Z", "x": -75.04, "y": 431.67, "z": -335.86, "alt": 28325.0, "spd": 506.0, "hdg": 115.0, "pitch": -20.1, "bank": 42.8, "vs": -18750.0, "mach": 0.85, "g": 1.21, "q_phase": 13362.06}, {"ts": "2026-11-01T17:48:50Z", "x": -46.81, "y": 419.1, "z": -319.98, "alt": 27500.0, "spd": 504.0, "hdg": 120.0, "pitch": -21.2, "bank": 49.1, "vs": -24750.0, "mach": 0.85, "g": 1.29, "q_phase": 18163.67}, {"ts": "2026-11-01T17:48:52Z", "x": -26.71, "y": 409.58, "z": -306.39, "alt": 26875.0, "spd": 499.0, "hdg": 125.0, "pitch": -21.4, "bank": 48.8, "vs": -18750.0, "mach": 0.84, "g": 1.28, "q_phase": 17516.95}, {"ts": "2026-11-01T17:48:55Z", "x": -4.07, "y": 396.62, "z": -287.68, "alt": 26025.0, "spd": 493.0, "hdg": 132.0, "pitch": -23.8, "bank": 57.7, "vs": -25500.0, "mach": 0.82, "g": 1.37, "q_phase": 23117.93}, {"ts": "2026-11-01T17:48:57Z", "x": 13.49, "y": 384.43, "z": -269.6, "alt": 25225.0, "spd": 486.0, "hdg": 137.0, "pitch": -25.8, "bank": 48.0, "vs": -24000.0, "mach": 0.81, "g": 1.16, "q_phase": 9806.73}, {"ts": "2026-11-01T17:48:59Z", "x": 32.41, "y": 369.19, "z": -245.16, "alt": 24225.0, "spd": 479.0, "hdg": 145.0, "pitch": -26.2, "bank": 60.3, "vs": -30000.0, "mach": 0.79, "g": 1.35, "q_phase": 22047.48}, {"ts": "2026-11-01T17:49:01Z", "x": 47.06, "y": 352.43, "z": -220.01, "alt": 23125.0, "spd": 472.0, "hdg": 151.0, "pitch": -29.9, "bank": 52.3, "vs": -33000.0, "mach": 0.78, "g": 1.12, "q_phase": 7832.31}, {"ts": "2026-11-01T17:49:03Z", "x": 56.6, "y": 338.33, "z": -198.16, "alt": 22200.0, "spd": 465.0, "hdg": 158.0, "pitch": -30.6, "bank": 56.1, "vs": -27750.0, "mach": 0.76, "g": 1.17, "q_phase": 10776.18}, {"ts": "2026-11-01T17:49:06Z", "x": 63.0, "y": 320.42, "z": -176.58, "alt": 21025.0, "spd": 450.0, "hdg": 165.0, "pitch": -38.5, "bank": 55.3, "vs": -35250.0, "mach": 0.74, "g": 0.96, "q_phase": -2653.86}, {"ts": "2026-11-01T17:49:08Z", "x": 68.15, "y": 298.7, "z": -153.19, "alt": 19600.0, "spd": 437.0, "hdg": 169.0, "pitch": -42.2, "bank": 38.7, "vs": -42750.0, "mach": 0.71, "g": 0.59, "q_phase": -25941.47}, {"ts": "2026-11-01T17:49:10Z", "x": 71.25, "y": 275.84, "z": -127.02, "alt": 18100.0, "spd": 419.0, "hdg": 175.0, "pitch": -40.9, "bank": 49.0, "vs": -45000.0, "mach": 0.68, "g": 0.79, "q_phase": -13066.95}, {"ts": "2026-11-01T17:49:12Z", "x": 71.4, "y": 254.89, "z": -105.28, "alt": 16725.0, "spd": 402.0, "hdg": 180.0, "pitch": -43.9, "bank": 42.6, "vs": -41250.0, "mach": 0.65, "g": 0.61, "q_phase": -24533.65}, {"ts": "2026-11-01T17:49:14Z", "x": 70.34, "y": 236.6, "z": -89.01, "alt": 15525.0, "spd": 379.0, "hdg": 185.0, "pitch": -48.3, "bank": 40.9, "vs": -36000.0, "mach": 0.61, "g": 0.48, "q_phase": -33149.95}, {"ts": "2026-11-01T17:49:16Z", "x": 67.12, "y": 207.26, "z": -65.54, "alt": 13600.0, "spd": 352.0, "hdg": 191.0, "pitch": -51.1, "bank": 44.0, "vs": -57750.0, "mach": 0.56, "g": 0.46, "q_phase": -34329.01}, {"ts": "2026-11-01T17:49:19Z", "x": 61.44, "y": 179.07, "z": -44.31, "alt": 11750.0, "spd": 330.0, "hdg": 197.0, "pitch": -52.1, "bank": 42.2, "vs": -55500.0, "mach": 0.52, "g": 0.4, "q_phase": -37809.13}, {"ts": "2026-11-01T17:49:21Z", "x": 55.05, "y": 154.31, "z": -28.7, "alt": 10125.0, "spd": 298.0, "hdg": 209.0, "pitch": -55.7, "bank": 58.6, "vs": -48750.0, "mach": 0.47, "g": 0.58, "q_phase": -26368.64}, {"ts": "2026-11-01T17:49:23Z", "x": 47.59, "y": 133.35, "z": -17.78, "alt": 8750.0, "spd": 275.0, "hdg": 219.0, "pitch": -57.7, "bank": 51.5, "vs": -41250.0, "mach": 0.43, "g": 0.42, "q_phase": -36943.41}, {"ts": "2026-11-01T17:49:25Z", "x": 34.99, "y": 133.35, "z": -5.58, "alt": 8750.0, "spd": 255.0, "hdg": 233.0, "pitch": 0.0, "bank": 58.5, "vs": 0.0, "mach": 0.4, "g": 1.98, "q_phase": 61628.17}, {"ts": "2026-11-01T17:49:27Z", "x": 24.73, "y": 133.35, "z": -0.75, "alt": 8750.0, "spd": 241.0, "hdg": 248.0, "pitch": 0.0, "bank": 58.8, "vs": 0.0, "mach": 0.38, "g": 1.98, "q_phase": 61963.7}, {"ts": "2026-11-01T17:49:29Z", "x": 12.43, "y": 133.35, "z": 1.68, "alt": 8750.0, "spd": 232.0, "hdg": 268.0, "pitch": 0.0, "bank": 64.8, "vs": 0.0, "mach": 0.36, "g": 2.08, "q_phase": 68211.96}, {"ts": "2026-11-01T17:49:31Z", "x": 0.01, "y": 133.35, "z": 0.01, "alt": 8750.0, "spd": 231.0, "hdg": 277.0, "pitch": 0.0, "bank": 43.6, "vs": 0.0, "mach": 0.36, "g": 1.73, "q_phase": 45880.65}];
+
+  // Precalculate cumulative distances along crash trajectory to guarantee uniform, high-speed movement (never slows down)
+  var crashCumDists = [0];
+  for (var i = 1; i < crashTrajData.length; i++) {
+    var p0 = crashTrajData[i - 1], p1 = crashTrajData[i];
+    var dx = p1.x - p0.x, dy = p1.y - p0.y, dz = p1.z - p0.z;
+    crashCumDists.push(crashCumDists[i - 1] + Math.sqrt(dx * dx + dy * dy + dz * dz));
+  }
+  var crashTotalDist = crashCumDists[crashCumDists.length - 1];
+  var crashDistance = 0.0;
   var simMode = 'normal'; // 'normal' or 'crash'
   var crashTimeIdx = 0.0;
 
@@ -2557,7 +2825,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       bCrash.className = 'mode-opt-btn active crash';
       crashGroup.visible = true;
       airportGroup.visible = false;
-      cityGroup.visible = false;
+      cityGroup.visible = true;
+      crashDistance = 0.0;
       crashTimeIdx = 0.0;
       setCamera('chase');
       document.getElementById('telemPhase').innerText = 'FL350 CRUISE & ICING';
@@ -2690,9 +2959,12 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
         rotatingPropellers.push(propGroup);
       });
 
-      // Ensure 3D Quantum Sensor Overlays stay mounted on C-27J Spartan
+      // Ensure 3D Quantum Sensor Overlays and Component Highlights stay mounted on C-27J Spartan
       if (typeof quantumOverlayGroup !== 'undefined' && quantumOverlayGroup) {
         planeVisual.add(quantumOverlayGroup);
+      }
+      if (typeof componentHighlightGroup !== 'undefined' && componentHighlightGroup) {
+        planeVisual.add(componentHighlightGroup);
       }
 
       console.log('C-27J Spartan GLB successfully applied to simulation!');
@@ -2728,6 +3000,32 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     document.getElementById('btnClock').classList.toggle('active', isAutoClock);
   };
 
+  // Simulation Speed Multiplier Controls (1x, 2x, 3x)
+  window.simSpeed = 1.0;
+  window.setSimSpeed = function(spd) {
+    window.simSpeed = Math.max(1, Math.min(3, parseFloat(spd) || 1));
+    ['btnSpeed1x', 'btnSpeed2x', 'btnSpeed3x'].forEach(function(bId) {
+      var btn = document.getElementById(bId);
+      if (btn) btn.classList.remove('active');
+    });
+    var activeBtn = document.getElementById('btnSpeed' + window.simSpeed + 'x');
+    if (activeBtn) activeBtn.classList.add('active');
+
+    var hudSpeed = document.getElementById('telemSimSpeed');
+    if (hudSpeed) {
+      hudSpeed.innerText = window.simSpeed + 'x SPEED';
+      hudSpeed.style.color = window.simSpeed === 3 ? '#ef4444' : (window.simSpeed === 2 ? '#f59e0b' : '#38bdf8');
+      hudSpeed.style.borderColor = window.simSpeed === 3 ? 'rgba(239,68,68,0.4)' : (window.simSpeed === 2 ? 'rgba(245,158,11,0.4)' : 'rgba(56,189,248,0.3)');
+    }
+  };
+
+  window.addEventListener('keydown', function(e) {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    if (e.key === '1') setSimSpeed(1);
+    else if (e.key === '2') setSimSpeed(2);
+    else if (e.key === '3') setSimSpeed(3);
+  });
+
   window.setCamera = function(mode) {
     cameraMode = mode;
     document.querySelectorAll('.control-groups .btn-group:last-child button').forEach(function(b){ b.classList.remove('active'); });
@@ -2746,6 +3044,15 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   };
 
   window.toggleFlightPlanAction = function() {
+    var sc = quantumScenarios[activeQuantumScenario] || quantumScenarios.wing_dent;
+    if (circuitTimer >= circuitDuration || (sc.failPred && circuitTimer >= sc.impactTime)) {
+      circuitTimer = 0.0;
+      impactExplosionTriggered = false;
+      explosionActive = false;
+      while (explosionGroup.children.length > 0) {
+        explosionGroup.remove(explosionGroup.children[0]);
+      }
+    }
     isFlightPlanRunning = !isFlightPlanRunning;
     var btn = document.getElementById('btnFlightAction');
     if (btn) {
@@ -2772,35 +3079,188 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       var badge = document.getElementById('debriefStatusBadge');
       if (badge && statusMsg) badge.innerText = statusMsg;
 
-      // Populate Quantum Predictive Verification Scorecard in Debrief Modal
-      var sc = quantumScenarios[activeQuantumScenario];
-      var dbVerdict = document.getElementById('dbQuantumVerdictBadge');
-      if (dbVerdict) {
-        dbVerdict.innerText = 'PREDICTION 100% VERIFIED';
-        dbVerdict.className = (sc.id === 'microcrack' ? 'badge-crit' : (sc.id === 'fastener' ? 'badge-warn' : 'badge-pass'));
-      }
-      var dbSumm = document.getElementById('dbQuantumSummaryText');
-      if (dbSumm) {
-        if (sc.id === 'microcrack') {
-          dbSumm.innerHTML = '<strong style="color:#ef4444;">&bull; PREDICTION VERIFIED ACCURATE:</strong> Pre-flight VQC correctly predicted Left Wing Spar aeroelastic divergence under peak 2.18G crosswind turn. Flaw manifested exactly at predicted load threshold (1,840 &mu;&epsilon; recorded).';
-        } else if (sc.id === 'fastener') {
-          dbSumm.innerHTML = '<strong style="color:#f59e0b;">&bull; PREDICTION VERIFIED ACCURATE:</strong> Pre-flight NV magnetometer predicted fastener shear &amp; vibration breach at full spool. Engine mount vibration reached 21.4 mm/s RMS.';
+      var sc = quantumScenarios[activeQuantumScenario] || quantumScenarios.wing_dent;
+      var isCrash = sc.failPred;
+
+      // Update Modal Header
+      var titleElem = document.getElementById('debriefModalTitle');
+      if (titleElem) {
+        if (isCrash) {
+          titleElem.innerHTML = '<span style="color:#ef4444;">&#128165;</span> CATASTROPHIC IMPACT FORENSIC DEBRIEF';
+          if (badge) {
+            badge.className = 'badge-crit';
+            badge.innerText = 'CATASTROPHIC CRASH (PREDICTION VERIFIED)';
+          }
         } else {
-          dbSumm.innerHTML = '<strong style="color:#10b981;">&bull; PREDICTION VERIFIED ACCURATE:</strong> Pre-flight GO prediction confirmed. Airframe safely sustained 2.18G maneuvers with 0 microstrain anomalies (peak strain 418 &mu;&epsilon;).';
+          titleElem.innerHTML = '<span style="color:#10b981;">&#10004;</span> FLIGHT PLAN TRIP DEBRIEFING & ANALYSIS';
+          if (badge) {
+            badge.className = 'badge-pass';
+            badge.innerText = 'TRIP LOG COMPLETE [AIRWORTHY PASS]';
+          }
         }
       }
+
+      // Populate Quantum Predictive Verification Scorecard in Debrief Modal
+      var dbVerdict = document.getElementById('dbQuantumVerdictBadge');
+      if (dbVerdict) {
+        if (sc.id === 'wing_dent' || sc.id === 'microcrack') {
+          dbVerdict.innerText = 'PREDICTION 100% VERIFIED [SPAR SHEARED]';
+          dbVerdict.className = 'badge-crit';
+        } else if (sc.id === 'fuselage_dent') {
+          dbVerdict.innerText = 'PREDICTION 100% VERIFIED [ELEVATOR SEVERED]';
+          dbVerdict.className = 'badge-crit';
+        } else if (sc.id === 'engine_dent' || sc.id === 'fastener') {
+          dbVerdict.innerText = 'PREDICTION 100% VERIFIED [TURBINE BURST]';
+          dbVerdict.className = 'badge-crit';
+        } else {
+          dbVerdict.innerText = 'PREDICTION 100% VERIFIED [AIRWORTHY PASS]';
+          dbVerdict.className = 'badge-pass';
+        }
+      }
+
+      var dbSumm = document.getElementById('dbQuantumSummaryText');
+      if (dbSumm) {
+        if (sc.id === 'wing_dent' || sc.id === 'microcrack') {
+          dbSumm.innerHTML = '<strong style="color:#ef4444;">&bull; PREDICTION VERIFIED ACCURATE:</strong> Pre-flight NV Magnetometer (&Delta;&nu; = 56 MHz) and VQC (P<sub>fail</sub> = 94.1%) correctly predicted Left Wing Rib 4 spar fracture at 2.18G aero load (t = 28.0s). Flaw manifested at predicted stress threshold (1,840 &mu;&epsilon; recorded), triggering asymmetric roll stall and spiral dive impact into the river waterfront at t = 34.5s (245 kts).';
+        } else if (sc.id === 'fuselage_dent') {
+          dbSumm.innerHTML = '<strong style="color:#ef4444;">&bull; PREDICTION VERIFIED ACCURATE:</strong> Pre-flight Quantum Ghost Imaging (350 &mu;m delamination void) and VQC (P<sub>fail</sub> = 91.8%) correctly predicted Fuselage Crown Bay 14 failure at rotation (t = 18.5s). Elevator control cables severed, forcing uncommanded lawn dart impact into runway overrun terrain at t = 22.0s (172 kts).';
+        } else if (sc.id === 'engine_dent' || sc.id === 'fastener') {
+          dbSumm.innerHTML = '<strong style="color:#ef4444;">&bull; PREDICTION VERIFIED ACCURATE:</strong> Pre-flight NV Magnetometer eddy current analysis (0.85 mm clearance breach) and VQC (P<sub>fail</sub> = 96.2%) correctly predicted shroud rub at climb spool (96.5% N1, t = 24.0s). Uncontained turbine disc burst severed fuel lines, causing wing fire and flat spin crash into industrial bay at t = 31.0s (128 kts).';
+        } else {
+          dbSumm.innerHTML = '<strong style="color:#10b981;">&bull; PREDICTION VERIFIED ACCURATE:</strong> Pre-flight GO prediction confirmed (P<sub>fail</sub> = 2.4%). Airframe safely sustained 2.18G maneuvers with zero microstrain anomalies (peak strain 418 &mu;&epsilon; vs 1,800 &mu;&epsilon; margin). Full 8-phase circuit flown with safe ILS touchdown on Runway 09L.';
+        }
+      }
+
       var dbPred = document.getElementById('dbPredTarget');
       if (dbPred) dbPred.innerText = sc.targetShort;
+
       var dbAct = document.getElementById('dbActualLoad');
       if (dbAct) {
-        dbAct.innerText = (sc.id === 'microcrack' ? 'Peak 2.18G • 1,840 με (DIVERGENCE)' : 'Peak 2.18G • 418 με (NOMINAL)');
-        dbAct.style.color = (sc.id === 'microcrack' ? '#ef4444' : '#10b981');
+        if (sc.id === 'wing_dent' || sc.id === 'microcrack') {
+          dbAct.innerText = 'Peak 2.18G • 1,840 με (SPAR SHEARED • 245 kts IMPACT)';
+          dbAct.style.color = '#ef4444';
+        } else if (sc.id === 'fuselage_dent') {
+          dbAct.innerText = 'Rotation 1.15G • 1,650 με (ELEVATOR SEVERED • 172 kts IMPACT)';
+          dbAct.style.color = '#ef4444';
+        } else if (sc.id === 'engine_dent' || sc.id === 'fastener') {
+          dbAct.innerText = 'Climb Spool 96.5% N1 • 1,920 με (TURBINE BURST • 128 kts IMPACT)';
+          dbAct.style.color = '#ef4444';
+        } else {
+          dbAct.innerText = 'Peak 2.18G • 418 με (100% NOMINAL • 120 kts TOUCHDOWN)';
+          dbAct.style.color = '#10b981';
+        }
+      }
+
+      // Populate Grid Statistics
+      var dbDur = document.getElementById('dbDuration');
+      var dbTkf = document.getElementById('dbTakeoff');
+      var dbAlt = document.getElementById('dbMaxAlt');
+      var dbSpd = document.getElementById('dbMaxSpd');
+      var dbG = document.getElementById('dbGLoad');
+      var dbFuel = document.getElementById('dbFuel');
+      var dbSink = document.getElementById('dbSink');
+      var dbRoll = document.getElementById('dbRollout');
+
+      if (sc.id === 'wing_dent' || sc.id === 'microcrack') {
+        if (dbDur) dbDur.innerText = '00:35 min';
+        if (dbTkf) dbTkf.innerText = '472 m (145 kts)';
+        if (dbAlt) dbAlt.innerText = '906 ft AGL';
+        if (dbSpd) dbSpd.innerText = '245 kts (M 0.37)';
+        if (dbG) dbG.innerText = '+2.18 G';
+        if (dbFuel) dbFuel.innerText = '114 lbs';
+        if (dbSink) dbSink.innerText = '-9,800 ft/min (DIVE)';
+        if (dbRoll) dbRoll.innerText = 'N/A (RIVER IMPACT)';
+      } else if (sc.id === 'fuselage_dent') {
+        if (dbDur) dbDur.innerText = '00:22 min';
+        if (dbTkf) dbTkf.innerText = '485 m (145 kts)';
+        if (dbAlt) dbAlt.innerText = '156 ft AGL';
+        if (dbSpd) dbSpd.innerText = '172 kts (M 0.26)';
+        if (dbG) dbG.innerText = '+1.15 G';
+        if (dbFuel) dbFuel.innerText = '72 lbs';
+        if (dbSink) dbSink.innerText = '-6,200 ft/min (DIVE)';
+        if (dbRoll) dbRoll.innerText = 'N/A (OVERRUN IMPACT)';
+      } else if (sc.id === 'engine_dent' || sc.id === 'fastener') {
+        if (dbDur) dbDur.innerText = '00:31 min';
+        if (dbTkf) dbTkf.innerText = '472 m (145 kts)';
+        if (dbAlt) dbAlt.innerText = '574 ft AGL';
+        if (dbSpd) dbSpd.innerText = '182 kts (M 0.28)';
+        if (dbG) dbG.innerText = '+1.25 G';
+        if (dbFuel) dbFuel.innerText = '102 lbs';
+        if (dbSink) dbSink.innerText = '-4,400 ft/min (SPIN)';
+        if (dbRoll) dbRoll.innerText = 'N/A (BAY IMPACT)';
+      } else {
+        if (dbDur) dbDur.innerText = '01:35 min';
+        if (dbTkf) dbTkf.innerText = '472 m (145 kts)';
+        if (dbAlt) dbAlt.innerText = '1,326 ft AGL';
+        if (dbSpd) dbSpd.innerText = '198 kts (M 0.30)';
+        if (dbG) dbG.innerText = '+2.18 G';
+        if (dbFuel) dbFuel.innerText = '312 lbs';
+        if (dbSink) dbSink.innerText = '-136 ft/min (FLARE)';
+        if (dbRoll) dbRoll.innerText = '392 m';
+      }
+
+      // Populate Chronological Log Rows
+      var logContainer = document.getElementById('debriefLogRows');
+      if (logContainer) {
+        var logRows = [];
+        if (sc.id === 'wing_dent' || sc.id === 'microcrack') {
+          logRows = [
+            { t: 'T+00:00', tag: '[TAKEOFF ROLL]', desc: 'Full takeoff thrust 96.5% N1 applied. Runway 09L line-up and acceleration.' },
+            { t: 'T+00:18', tag: '[ROTATION Vr]', desc: 'Rotation at 145 kts. Pitch +11.5°. Normal liftoff and positive rate achieved.' },
+            { t: 'T+00:22', tag: '[CROSSWIND BANK]', desc: 'Initiated 25° climbing turn over bay. Dynamic aeroelastic wing loading building.' },
+            { t: 'T+00:28', tag: '[WING SPAR SHEAR]', desc: 'CRITICAL FAILURE: Left Wing Spar (Rib 4) shears at 2.18G load. Pre-flight VQC prediction verified!' },
+            { t: 'T+00:30', tag: '[UNCOMMANDED ROLL]', desc: 'Violent asymmetric roll stall (-720° tumbling rotation). Complete loss of port wing lift.' },
+            { t: 'T+00:34.5', tag: '[CATASTROPHIC IMPACT]', desc: 'Impact into river waterfront at 245 kts. Impact site: (490.0, 0.6, -216.5). Fireball recorded.' }
+          ];
+        } else if (sc.id === 'fuselage_dent') {
+          logRows = [
+            { t: 'T+00:00', tag: '[TAKEOFF ROLL]', desc: 'Full takeoff thrust applied. Runway 09L line-up and acceleration past 100 kts.' },
+            { t: 'T+00:16', tag: '[V1 DECISION]', desc: 'Decision speed 135 kts. Rotation initiated. Pitch control yoke pulled aft.' },
+            { t: 'T+00:18.5', tag: '[CROWN DELAMINATION]', desc: 'CRITICAL FAILURE: Bay 14 crown skin buckled under rotation moment. Elevator control cables severed!' },
+            { t: 'T+00:20', tag: '[LAWN DART DIVE]', desc: 'Uncommanded elevator pitch-down to -41°. Aerodynamic elevator authority zero.' },
+            { t: 'T+00:22.0', tag: '[CATASTROPHIC IMPACT]', desc: 'Overrun impact into terrain at 172 kts. Coordinates: (340.0, 0.6, -520.0). Pre-flight prediction verified!' }
+          ];
+        } else if (sc.id === 'engine_dent' || sc.id === 'fastener') {
+          logRows = [
+            { t: 'T+00:00', tag: '[TAKEOFF ROLL]', desc: 'Twin Allison AE2100D2 engines started. Line-up on Runway 09L.' },
+            { t: 'T+00:18', tag: '[ROTATION Vr]', desc: 'Liftoff at 145 kts. Landing gear retraction sequence initiated.' },
+            { t: 'T+00:22', tag: '[CLIMB SPOOL]', desc: 'Engine throttles advanced to climb rated 96.5% N1. Port casing thermal growth accelerates.' },
+            { t: 'T+00:24.0', tag: '[TURBINE EXPLOSION]', desc: 'CRITICAL FAILURE: Port Nacelle #1 blade rub breaches shroud! Uncontained turbine disc burst.' },
+            { t: 'T+00:26', tag: '[WING FIRE & STALL]', desc: 'Fuel lines severed. Port wing ignited. Severe yaw asymmetry initiates flat spin.' },
+            { t: 'T+00:31.0', tag: '[CATASTROPHIC IMPACT]', desc: 'Flat spin water impact into industrial bay at 128 kts. Site: (420.0, 0.6, -384.8). Verified!' }
+          ];
+        } else {
+          logRows = [
+            { t: 'T+00:00', tag: '[TAKEOFF ROLL]', desc: 'Full takeoff thrust 96.5% N1. Runway 09L line-up and acceleration.' },
+            { t: 'T+00:18', tag: '[ROTATION Vr]', desc: 'Smooth rotation at 145 kts. Gear retracted with positive climb rate.' },
+            { t: 'T+00:28', tag: '[CROSSWIND TURN]', desc: 'Sustained 2.18G climbing turn with 418 με peak strain (<450 με margin). Zero flutter.' },
+            { t: 'T+00:48', tag: '[DOWNWIND CRUISE]', desc: 'Level flight at 1,326 ft AGL, 198 kts over downtown skyscraper district.' },
+            { t: 'T+00:68', tag: '[BASE TO FINAL]', desc: 'Alignment with Runway 09L ILS glideslope at 135 kts.' },
+            { t: 'T+00:85', tag: '[TOUCHDOWN]', desc: 'Smooth landing flare on Runway 09L centerline at -136 ft/min sink. Flawless flight plan.' }
+          ];
+        }
+
+        var html = '';
+        logRows.forEach(function(row) {
+          var tagCol = row.tag.indexOf('CRITICAL') >= 0 || row.tag.indexOf('IMPACT') >= 0 || row.tag.indexOf('SHEAR') >= 0 || row.tag.indexOf('BURST') >= 0 || row.tag.indexOf('DELAMINATION') >= 0 ? '#ef4444' : '#10b981';
+          html += '<div class="log-row">';
+          html += '<span class="log-t">' + row.t + '</span>';
+          html += '<span class="log-tag" style="color:' + tagCol + '">' + row.tag + '</span>';
+          html += '<span class="log-e">' + row.desc + '</span>';
+          html += '</div>';
+        });
+        logContainer.innerHTML = html;
       }
     }
   };
 
   window.restartFlightPlan = function() {
     circuitTimer = 0.0;
+    impactExplosionTriggered = false;
+    explosionActive = false;
+    while (explosionGroup.children.length > 0) {
+      explosionGroup.remove(explosionGroup.children[0]);
+    }
     isFlightPlanRunning = true;
     closeDebriefModal();
     var btn = document.getElementById('btnFlightAction');
@@ -2853,10 +3313,11 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   // =========================================================================
   // 3-LAYER QUANTUM AIRFRAME INSPECTION, DEFECT PREDICTION & FLIGHT VERIFIER
   // =========================================================================
-  var activeQuantumScenario = 'microcrack'; // Default to microcrack so defect is immediately apparent
+  var activeQuantumScenario = 'wing_dent'; // Default to wing dent so flaw is immediately highlighted
   var isQuantumScanActive = false;
   var verificationFlightActive = false;
   var qVerificationTriggered = false;
+  var impactExplosionTriggered = false;
 
   var quantumScenarios = {
     nominal: {
@@ -2864,6 +3325,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       name: 'Scenario A: Nominal Baseline (GO FOR TAKEOFF)',
       badge: 'AIRWORTHY [GO]',
       badgeClass: 'badge-pass',
+      componentName: 'Entire Airframe Baseline',
       desc: 'Quantum 3-layer multimodal analysis predicts airframe will safely sustain all flight pattern loads up to 2.50G with peak strain under 420 &mu;&epsilon;. Zero aeroelastic flutter divergence predicted.',
       formula: '⟨ψ(θ)|Z₀|ψ(θ)⟩ = +0.952 → P(fail) = 0.024 < 0.10 • Takeoff Clearance: APPROVED',
       targetShort: 'Nominal Baseline (Zero Divergence under 2.2G turn)',
@@ -2871,168 +3333,505 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       l2: { g2: '1.96 (Quantum)', scatter: '100% (Dense Fog/Snow)', snr: '+5.8 dB (Sub-Shot-Noise)', clarity: 'Continuous alloy lattice', badge: 'PENETRATED' },
       l3: { path: '7 Waypoints (99.1% Opt)', vqcClass: 'NOMINAL_STRUCTURE', prob: '0.024 (2.4%)', entropy: '1.42 e-bits', badge: 'CLASSIFIED' },
       failPred: false,
+      failTime: 999.0,
+      impactTime: 999.0,
+      impactDesc: 'Normal Traffic Circuit • Safe Touchdown Runway 09L',
       triggerG: 2.05
     },
-    microcrack: {
-      id: 'microcrack',
-      name: 'Scenario B: Left Wing Spar Microcrack (PREDICT FAIL AT >2.0G)',
-      badge: 'CRITICAL RISK [FAIL PREDICTED]',
+    wing_dent: {
+      id: 'wing_dent',
+      name: 'Scenario 1: Wing Slat & Spar Dent (CRASH AT 2.2G TURN)',
+      badge: 'CRITICAL RISK [CRASH PREDICTED]',
       badgeClass: 'badge-crit',
-      desc: 'PRE-FLIGHT QUANTUM PREDICTION: Under dynamic crosswind banking turn (t ≈ 28s, G > 2.05G, Q > 175 psf), stress intensity at Left Wing Rib 4 will exceed K_IC = 34 MPa√m, triggering violent aeroelastic flutter and structural divergence. TAKEOFF SAFETY HAZARD PREDICTED.',
-      formula: '⟨ψ(θ)|Z₀|ψ(θ)⟩ = -0.882 → P(fail) = 0.941 > 0.85 • DIVERGENCE PREDICTED AT G > 2.05G',
-      targetShort: 'Left Wing Spar Divergence at G > 2.05G (Crosswind Turn)',
+      componentName: 'Left Wing Spar & Slat (Rib 4)',
+      desc: 'PRE-FLIGHT QUANTUM PREDICTION: Under dynamic crosswind banking turn (t = 28s, G = 2.18G, Q = 175 psf), stress intensity at Left Wing Rib 4 will exceed K_IC = 34 MPa√m, triggering violent wing spar shear, loss of lift, and an unrecoverable spiral dive into the river waterfront.',
+      formula: '⟨ψ(θ)|Z₀|ψ(θ)⟩ = -0.882 → P(fail) = 0.941 > 0.85 • SPAR SHEAR PREDICTED AT G > 2.05G',
+      targetShort: 'Left Wing Spar Shear at 2.18G -> River Waterfront Crash',
       l1: { flux: '842.6 pT/√Hz (CRITICAL SPIKE)', depth: '1.8 mm subsurface (Rib 4)', stress: '412 MPa (Singularity)', odmr: '2.842 GHz (Zeeman Split)', badge: 'FLAW DETECTED' },
       l2: { g2: '1.88 (Quantum)', scatter: '0-lux darkness holographic slice', snr: '+6.1 dB (Sub-Shot-Noise)', clarity: '14.2mm fatigue crack in Rib 4', badge: 'CRACK DETECTED' },
-      l3: { path: '7 Waypoints (Port Wing High-Res)', vqcClass: 'WING_SPAR_FATIGUE_CRACK', prob: '0.941 (94.1%)', entropy: '1.86 e-bits', badge: 'HAZARD CONFIRMED' },
+      l3: { path: 'Port Wing High-Res QAOA', vqcClass: 'CRITICAL_WING_SPAR_DENT', prob: '0.941 (94.1%)', entropy: '1.86 e-bits', badge: 'HAZARD CONFIRMED' },
       failPred: true,
+      failTime: 28.0,
+      impactTime: 34.5,
+      crashType: 'spiral_dive',
+      impactCoord: { x: 490.0, y: 0.6, z: -216.5 },
+      impactDesc: 'Left Wing Spar Shear • Violent Asymmetric Spiral Dive into River Waterfront',
       triggerG: 2.05
     },
-    fastener: {
-      id: 'fastener',
-      name: 'Scenario C: Fastener Shear & Corrosion (PREDICT VIBRATION SPIKE)',
-      badge: 'WARNING [MAINTENANCE REQ]',
-      badgeClass: 'badge-warn',
-      desc: 'PRE-FLIGHT QUANTUM PREDICTION: Fastener preload loss and hidden galvanic corrosion will cause port engine mount vibration to exceed 18 mm/s RMS during full-power takeoff spool (t ≈ 8s), generating yaw asymmetry.',
-      formula: '⟨ψ(θ)|Z₀|ψ(θ)⟩ = -0.774 → P(fail) = 0.887 > 0.70 • VIBRATION SPIKE PREDICTED AT FULL SPOOL',
-      targetShort: 'Port Engine Mount Vibration Spike at Full Spool (t ≈ 8s)',
-      l1: { flux: '386.2 pT/√Hz (HYSTERESIS SHIFT)', depth: 'Fastener shank shear', stress: '295 MPa (Fatigue)', odmr: '2.858 GHz', badge: 'SHEAR DETECTED' },
-      l2: { g2: '1.92 (Quantum)', scatter: 'Titanium collar penetration', snr: '+5.4 dB (Sub-Shot-Noise)', clarity: '320 &mu;m electrolytic pitting', badge: 'PITTING DETECTED' },
-      l3: { path: '7 Waypoints (Pylon Dwell Extended)', vqcClass: 'FASTENER_SHEAR_CORROSION', prob: '0.887 (88.7%)', entropy: '1.55 e-bits', badge: 'ALERT CONFIRMED' },
-      failPred: false,
+    fuselage_dent: {
+      id: 'fuselage_dent',
+      name: 'Scenario 2: Fuselage Crown Dent (CRASH AT ROTATION)',
+      badge: 'CRITICAL RISK [CRASH PREDICTED]',
+      badgeClass: 'badge-crit',
+      componentName: 'Fuselage Crown (Bay 14)',
+      desc: 'PRE-FLIGHT QUANTUM PREDICTION: High rotation bending moment at Vr (t = 18.5s) will cause composite skin delamination around the Bay 14 crown dent, severing elevator control cables. Uncommanded elevator pitch-down will force a lawn dart impact past Runway 09L.',
+      formula: '⟨ψ(θ)|Z₀|ψ(θ)⟩ = -0.836 → P(fail) = 0.918 > 0.85 • ELEVATOR SEVERANCE PREDICTED AT ROTATION',
+      targetShort: 'Crown Delamination & Elevator Loss at Vr -> Overrun Crash',
+      l1: { flux: '620.4 pT/√Hz (HOOP STRESS SPIKE)', depth: '0.9 mm skin delamination', stress: '365 MPa (Bending Yield)', odmr: '2.835 GHz (Dipole Shift)', badge: 'BUCKLE DETECTED' },
+      l2: { g2: '1.91 (Quantum)', scatter: 'Carbon-epoxy acoustic scan', snr: '+5.7 dB (Sub-Shot-Noise)', clarity: '350μm delamination void (Bay 14)', badge: 'VOID DETECTED' },
+      l3: { path: 'Upper Crown Station QAOA', vqcClass: 'FUSELAGE_CROWN_BUCKLE', prob: '0.918 (91.8%)', entropy: '1.74 e-bits', badge: 'ALERT CONFIRMED' },
+      failPred: true,
+      failTime: 18.5,
+      impactTime: 22.0,
+      crashType: 'lawn_dart',
+      impactCoord: { x: 340.0, y: 0.6, z: -520.0 },
+      impactDesc: 'Crown Delamination • Elevator Severance & Lawn Dart Overrun Crash',
       triggerG: 1.15
+    },
+    engine_dent: {
+      id: 'engine_dent',
+      name: 'Scenario 3: Port Engine Nacelle Dent (CRASH AT CLIMB SPOOL)',
+      badge: 'CRITICAL RISK [CRASH PREDICTED]',
+      badgeClass: 'badge-crit',
+      componentName: 'Port Engine #1 Nacelle',
+      desc: 'PRE-FLIGHT QUANTUM PREDICTION: Thermal growth at full climb thrust (t = 24.0s, 96.5% N1) will cause high-energy fan blade rub against the dented titanium shroud. Uncontained turbine disc burst will sever fuel lines, initiating an unrecoverable flat spin into the bay.',
+      formula: '⟨ψ(θ)|Z₀|ψ(θ)⟩ = -0.924 → P(fail) = 0.962 > 0.85 • UNCONTAINED EXPLOSION PREDICTED AT CLIMB SPOOL',
+      targetShort: 'Turbine Shroud Rub & Fire at Spool -> Flat Spin Bay Crash',
+      l1: { flux: '495.0 pT/√Hz (EDDY PERTURBATION)', depth: 'Fan casing ovalization 0.85mm', stress: '390 MPa (Dynamic Rub)', odmr: '2.858 GHz (Hysteresis)', badge: 'OVAL DETECTED' },
+      l2: { g2: '1.93 (Quantum)', scatter: 'Titanium intake lip slice', snr: '+5.5 dB (Sub-Shot-Noise)', clarity: '0.85mm blade clearance breach', badge: 'RUB DETECTED' },
+      l3: { path: 'Port Nacelle Perimeter QAOA', vqcClass: 'TURBINE_SHROUD_OVALIZATION', prob: '0.962 (96.2%)', entropy: '1.81 e-bits', badge: 'HAZARD CONFIRMED' },
+      failPred: true,
+      failTime: 24.0,
+      impactTime: 31.0,
+      crashType: 'flat_spin',
+      impactCoord: { x: 420.0, y: 0.6, z: -384.8 },
+      impactDesc: 'Uncontained Turbine Explosion • Wing Fuel Fire & Flat Spin into Bay',
+      triggerG: 1.25
     }
   };
+  // Backward compatibility aliases
+  quantumScenarios.microcrack = quantumScenarios.wing_dent;
+  quantumScenarios.fastener = quantumScenarios.engine_dent;
 
-  // 1. Procedural Autonomous 3D Inspection Drone with Quantum Scanning Cone
+  // 1. Spinning drone sensor completely removed per user request
   var droneGroup = new THREE.Group();
   var droneRotors = [];
   var droneScanCone = null;
   var droneScanRing = null;
   var droneWaypointsVisual = new THREE.Group();
-  var qaoaSplineCurve = null;
-
-  var qaoaNodesLocal = [
-    new THREE.Vector3(15, 3.8, 0),       // Node 1: Radome
-    new THREE.Vector3(6.5, 5.0, -6.5),   // Node 2: Port Propeller & Nacelle
-    new THREE.Vector3(0.5, 4.8, -9.2),   // Node 3: Left Wing Spar (Rib 4)
-    new THREE.Vector3(-14, 9.5, 0),      // Node 4: Vertical Stabilizer
-    new THREE.Vector3(0.5, 4.8, 9.2),    // Node 5: Starboard Wing Spar
-    new THREE.Vector3(6.5, 5.0, 6.5),    // Node 6: Starboard Engine Nacelle
-    new THREE.Vector3(11, 2.4, 0)        // Node 7: Nose Landing Gear & Trunnion
-  ];
-
   function initAutonomousInspectionDrone() {
-    // Carbon-fiber quadcopter central frame
-    var carbonMat = new THREE.MeshStandardMaterial({color: 0x0f172a, roughness: 0.35, metalness: 0.85});
-    var cyanGlowMat = new THREE.MeshBasicMaterial({color: 0x38bdf8});
-    var purpleGlowMat = new THREE.MeshBasicMaterial({color: 0xc084fc});
-
-    var bodyMesh = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.22, 0.85), carbonMat);
-    droneGroup.add(bodyMesh);
-
-    var topDome = new THREE.Mesh(new THREE.SphereGeometry(0.28, 16, 8), purpleGlowMat);
-    topDome.position.y = 0.14;
-    droneGroup.add(topDome);
-
-    // 4 Quadcopter Arms & Rotors
-    droneRotors = [];
-    var rotorMat = new THREE.MeshStandardMaterial({color: 0x334155, roughness: 0.3, metalness: 0.6});
-    [
-      {x: 0.65, z: 0.65},
-      {x: -0.65, z: 0.65},
-      {x: -0.65, z: -0.65},
-      {x: 0.65, z: -0.65}
-    ].forEach(function(armPos) {
-      var arm = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.95), carbonMat);
-      arm.rotation.z = Math.PI / 2;
-      arm.rotation.y = Math.atan2(armPos.z, armPos.x);
-      arm.position.set(armPos.x * 0.5, 0, armPos.z * 0.5);
-      droneGroup.add(arm);
-
-      var motor = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.16, 12), carbonMat);
-      motor.position.set(armPos.x, 0.06, armPos.z);
-      droneGroup.add(motor);
-
-      var prop = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.72), rotorMat);
-      prop.position.set(armPos.x, 0.16, armPos.z);
-      droneGroup.add(prop);
-      droneRotors.push(prop);
-    });
-
-    // Underslung Quantum Sensor Pod & Gimbal
-    var sensorPod = new THREE.Mesh(new THREE.SphereGeometry(0.18, 12, 8), new THREE.MeshStandardMaterial({color: 0x1e293b, metalness: 0.9}));
-    sensorPod.position.y = -0.16;
-    droneGroup.add(sensorPod);
-
-    // Holographic Quantum Scanning Beam Cone
-    var coneGeo = new THREE.ConeGeometry(2.8, 7.5, 24, 1, true);
-    coneGeo.translate(0, -3.75, 0);
-    var coneMat = new THREE.MeshBasicMaterial({
-      color: 0x8b5cf6,
-      transparent: true,
-      opacity: 0.30,
-      side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-    droneScanCone = new THREE.Mesh(coneGeo, coneMat);
-    droneScanCone.position.set(0, -0.2, 0);
-    droneGroup.add(droneScanCone);
-
-    // Animated Scan Ring
-    var ringGeo = new THREE.RingGeometry(0.2, 2.6, 24).rotateX(-Math.PI / 2);
-    droneScanRing = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
-      transparent: true,
-      opacity: 0.65,
-      side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    }));
-    droneScanRing.position.set(0, -3.5, 0);
-    droneGroup.add(droneScanRing);
-
-    // Initial position parked near runway
-    droneGroup.position.set(-450 + 15, 0.6 + 3.8, -520);
-    scene.add(droneGroup);
-
-    // Build QAOA 3D Trajectory Tube and 7 Waypoint Markers around aircraft
-    var runwayOrigin = new THREE.Vector3(-450, 0.6, -520);
-    var worldPts = qaoaNodesLocal.map(function(pt) {
-      return pt.clone().add(runwayOrigin);
-    });
-
-    qaoaSplineCurve = new THREE.CatmullRomCurve3(worldPts, true, 'centripetal');
-    var tubeGeo = new THREE.TubeGeometry(qaoaSplineCurve, 100, 0.06, 8, true);
-    var tubeMat = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
-      transparent: true,
-      opacity: 0.55,
-      blending: THREE.AdditiveBlending
-    });
-    var splineMesh = new THREE.Mesh(tubeGeo, tubeMat);
-    droneWaypointsVisual.add(splineMesh);
-
-    // Add 7 Glowing Orbital Nodes
-    worldPts.forEach(function(wpt, idx) {
-      var nodeOrb = new THREE.Mesh(
-        new THREE.SphereGeometry(0.3, 12, 12),
-        new THREE.MeshBasicMaterial({color: (idx === 2 ? 0xef4444 : 0x38bdf8)})
-      );
-      nodeOrb.position.copy(wpt);
-      
-      var halo = new THREE.Mesh(
-        new THREE.RingGeometry(0.35, 0.65, 16).rotateX(-Math.PI / 2),
-        new THREE.MeshBasicMaterial({color: (idx === 2 ? 0xef4444 : 0x38bdf8), side: THREE.DoubleSide, transparent: true, opacity: 0.45})
-      );
-      halo.position.copy(wpt);
-      droneWaypointsVisual.add(nodeOrb, halo);
-    });
-
-    scene.add(droneWaypointsVisual);
+    // Disabled / not added to scene to eliminate spinning drone
   }
 
-  // 2. 3D Aircraft Quantum Overlays: Layer 1 NV Hotspot & Layer 2 Subsurface Spar Ribs
+  // 2. 3D Aircraft Specified Component Highlighting
+  var componentHighlightGroup = new THREE.Group();
+  var compWingBox = null, compFuselageBox = null, compEngineBox = null;
+  var compWingDecal = null, compFuselageDecal = null, compEngineDecal = null;
+  var compWingBadge = null, compFuselageBadge = null, compEngineBadge = null;
+
+  function createComponentBadgeSprite(titleText, subtitleText, colorHex) {
+    var canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 76;
+    var ctx = canvas.getContext('2d');
+    
+    // Background Card
+    ctx.fillStyle = 'rgba(10, 15, 30, 0.92)';
+    ctx.strokeStyle = colorHex;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    if (ctx.roundRect) {
+      ctx.roundRect(4, 4, 248, 68, 8);
+    } else {
+      ctx.rect(4, 4, 248, 68);
+    }
+    ctx.fill();
+    ctx.stroke();
+
+    // Top header bar
+    ctx.fillStyle = colorHex;
+    ctx.fillRect(4, 4, 248, 18);
+    ctx.fillStyle = '#0f172a';
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText('AIRCRAFT COMPONENT IDENTIFIER', 12, 17);
+
+    // Title
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 13px sans-serif';
+    ctx.fillText(titleText, 12, 42);
+
+    // Subtitle
+    ctx.fillStyle = colorHex;
+    ctx.font = 'bold 10px monospace';
+    ctx.fillText(subtitleText, 12, 60);
+
+    var texture = new THREE.CanvasTexture(canvas);
+    var spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false });
+    var sprite = new THREE.Sprite(spriteMat);
+    sprite.scale.set(6.4, 1.9, 1.0);
+    return sprite;
+  }
+
+  function initAircraftComponentHighlights() {
+    componentHighlightGroup = new THREE.Group();
+
+    // 1. Left Wing Spar (Rib 4) & Slat at (0.5, 3.65, -7.5)
+    var gWing = new THREE.Group();
+    gWing.position.set(0.5, 3.65, -7.5);
+    var boxGeo1 = new THREE.BoxGeometry(3.6, 1.4, 4.8);
+    compWingBox = new THREE.Mesh(boxGeo1, new THREE.MeshBasicMaterial({color: 0xef4444, wireframe: true, transparent: true, opacity: 0.85}));
+    gWing.add(compWingBox);
+
+    // Concentric stress dent rings on wing surface
+    var dentR1 = new THREE.Mesh(new THREE.RingGeometry(0.25, 0.70, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.9}));
+    dentR1.position.y = 0.72;
+    var dentR2 = new THREE.Mesh(new THREE.RingGeometry(0.80, 1.40, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({color: 0xf97316, side: THREE.DoubleSide, transparent: true, opacity: 0.6}));
+    dentR2.position.y = 0.72;
+    compWingDecal = new THREE.Group();
+    compWingDecal.add(dentR1, dentR2);
+    gWing.add(compWingDecal);
+
+    compWingBadge = createComponentBadgeSprite('LEFT WING SPAR - RIB 4', 'DENT & 1.8mm MICROCRACK', '#ef4444');
+    compWingBadge.position.set(0, 3.2, 0);
+    gWing.add(compWingBadge);
+    componentHighlightGroup.add(gWing);
+
+    // 2. Fuselage Crown Bay 14 at (8.0, 4.85, 0.0)
+    var gFuse = new THREE.Group();
+    gFuse.position.set(8.0, 4.85, 0.0);
+    var boxGeo2 = new THREE.BoxGeometry(4.2, 1.6, 3.6);
+    compFuselageBox = new THREE.Mesh(boxGeo2, new THREE.MeshBasicMaterial({color: 0xf97316, wireframe: true, transparent: true, opacity: 0.85}));
+    gFuse.add(compFuselageBox);
+
+    var fR1 = new THREE.Mesh(new THREE.RingGeometry(0.25, 0.75, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({color: 0xf97316, side: THREE.DoubleSide, transparent: true, opacity: 0.9}));
+    fR1.position.y = 0.82;
+    var fR2 = new THREE.Mesh(new THREE.RingGeometry(0.85, 1.45, 24).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({color: 0xfacc15, side: THREE.DoubleSide, transparent: true, opacity: 0.6}));
+    fR2.position.y = 0.82;
+    compFuselageDecal = new THREE.Group();
+    compFuselageDecal.add(fR1, fR2);
+    gFuse.add(compFuselageDecal);
+
+    compFuselageBadge = createComponentBadgeSprite('FUSELAGE CROWN - BAY 14', 'HAIL DENT & DELAMINATION', '#f97316');
+    compFuselageBadge.position.set(0, 3.2, 0);
+    gFuse.add(compFuselageBadge);
+    componentHighlightGroup.add(gFuse);
+
+    // 3. Port Engine #1 Nacelle at (6.06, 3.65, -6.28)
+    var gEng = new THREE.Group();
+    gEng.position.set(6.06, 3.65, -6.28);
+    var boxGeo3 = new THREE.BoxGeometry(3.8, 2.8, 2.8);
+    compEngineBox = new THREE.Mesh(boxGeo3, new THREE.MeshBasicMaterial({color: 0xf59e0b, wireframe: true, transparent: true, opacity: 0.85}));
+    gEng.add(compEngineBox);
+
+    var eR1 = new THREE.Mesh(new THREE.RingGeometry(0.3, 0.8, 24).rotateY(Math.PI / 2), new THREE.MeshBasicMaterial({color: 0xf59e0b, side: THREE.DoubleSide, transparent: true, opacity: 0.9}));
+    eR1.position.x = 1.95;
+    var eR2 = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.5, 24).rotateY(Math.PI / 2), new THREE.MeshBasicMaterial({color: 0xfacc15, side: THREE.DoubleSide, transparent: true, opacity: 0.6}));
+    eR2.position.x = 1.95;
+    compEngineDecal = new THREE.Group();
+    compEngineDecal.add(eR1, eR2);
+    gEng.add(compEngineDecal);
+
+    compEngineBadge = createComponentBadgeSprite('PORT ENGINE #1 NACELLE', 'INTAKE DENT & SHROUD RUB', '#f59e0b');
+    compEngineBadge.position.set(0, 3.2, 0);
+    gEng.add(compEngineBadge);
+    componentHighlightGroup.add(gEng);
+
+    planeVisual.add(componentHighlightGroup);
+    updateComponentHighlights(activeQuantumScenario);
+  }
+
+  function updateComponentHighlights(scId) {
+    if (scId === 'microcrack') scId = 'wing_dent';
+    if (scId === 'fastener') scId = 'engine_dent';
+    if (!compWingBox) return;
+
+    if (scId === 'wing_dent') {
+      compWingBox.parent.visible = true;
+      compFuselageBox.parent.visible = false;
+      compEngineBox.parent.visible = false;
+      compWingBox.material.color.setHex(0xef4444);
+    } else if (scId === 'fuselage_dent') {
+      compWingBox.parent.visible = false;
+      compFuselageBox.parent.visible = true;
+      compEngineBox.parent.visible = false;
+      compFuselageBox.material.color.setHex(0xf97316);
+    } else if (scId === 'engine_dent') {
+      compWingBox.parent.visible = false;
+      compFuselageBox.parent.visible = false;
+      compEngineBox.parent.visible = true;
+      compEngineBox.material.color.setHex(0xf59e0b);
+    } else {
+      // Nominal: gently display all 3 as inspected/airworthy green
+      compWingBox.parent.visible = true;
+      compFuselageBox.parent.visible = true;
+      compEngineBox.parent.visible = true;
+      compWingBox.material.color.setHex(0x10b981);
+      compFuselageBox.material.color.setHex(0x10b981);
+      compEngineBox.material.color.setHex(0x10b981);
+    }
+  }
+
+  // 3. Differentiated 3D Flight Trajectories in the Sky (Nominal vs Crash)
+  var trajectoryGroup = new THREE.Group();
+  var nominalRibbonMesh = null;
+  var nominalLine = null;
+  var crashRibbonMesh = null;
+  var crashLine = null;
+  var crashImpactMarker = null;
+  var areTrajectoriesVisible = true;
+
+  function init3DFlightTrajectories() {
+    trajectoryGroup = new THREE.Group();
+
+    // 1. Nominal 8-Phase Closed Circuit in Emerald / Cyan
+    var nomPts = [];
+    for (var t = 0; t <= 95.0; t += 0.5) {
+      var p = evaluateNominalFlightPattern(t);
+      nomPts.push(new THREE.Vector3(p.x, Math.max(0.6, p.y), p.z));
+    }
+    var nomCurve = new THREE.CatmullRomCurve3(nomPts, false);
+    var nomTubeGeo = new THREE.TubeGeometry(nomCurve, 200, 0.45, 8, false);
+    var nomMat = new THREE.MeshBasicMaterial({
+      color: 0x10b981,
+      transparent: true,
+      opacity: 0.55,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    nominalRibbonMesh = new THREE.Mesh(nomTubeGeo, nomMat);
+    trajectoryGroup.add(nominalRibbonMesh);
+
+    var nomLineGeo = new THREE.BufferGeometry().setFromPoints(nomPts);
+    nominalLine = new THREE.Line(nomLineGeo, new THREE.LineBasicMaterial({color: 0x34d399, transparent: true, opacity: 0.85}));
+    trajectoryGroup.add(nominalLine);
+
+    // Milestone Beacons along nominal path
+    var milestones = [
+      new THREE.Vector3(-450, 1.8, -520),
+      new THREE.Vector3(30, 2.0, -520),
+      new THREE.Vector3(380, 120.6, -520),
+      new THREE.Vector3(380, 400.6, -120),
+      new THREE.Vector3(-580, 160.6, -520),
+      new THREE.Vector3(-250, 1.8, -520)
+    ];
+    milestones.forEach(function(pos) {
+      var orb = new THREE.Mesh(new THREE.SphereGeometry(1.2, 12, 12), new THREE.MeshBasicMaterial({color: 0x10b981}));
+      orb.position.copy(pos);
+      var ring = new THREE.Mesh(new THREE.RingGeometry(1.4, 2.4, 16).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({color: 0x34d399, side: THREE.DoubleSide, transparent: true, opacity: 0.6}));
+      ring.position.copy(pos);
+      trajectoryGroup.add(orb, ring);
+    });
+
+    scene.add(trajectoryGroup);
+    update3DCrashTrajectory(activeQuantumScenario);
+  }
+
+  function update3DCrashTrajectory(scId) {
+    if (scId === 'microcrack') scId = 'wing_dent';
+    if (scId === 'fastener') scId = 'engine_dent';
+
+    if (crashRibbonMesh) { trajectoryGroup.remove(crashRibbonMesh); crashRibbonMesh.geometry.dispose(); crashRibbonMesh = null; }
+    if (crashLine) { trajectoryGroup.remove(crashLine); crashLine.geometry.dispose(); crashLine = null; }
+    if (crashImpactMarker) { trajectoryGroup.remove(crashImpactMarker); crashImpactMarker = null; }
+
+    var sc = quantumScenarios[scId];
+    if (!sc || !sc.failPred) return;
+
+    var tf = sc.failTime, ti = sc.impactTime;
+    var crashPts = [];
+    for (var t = tf; t <= ti; t += 0.25) {
+      var cp = evaluateCrashTrajectory(scId, t, tf, ti);
+      crashPts.push(new THREE.Vector3(cp.x, Math.max(0.6, cp.y), cp.z));
+    }
+
+    var crashCurve = new THREE.CatmullRomCurve3(crashPts, false);
+    var crashTubeGeo = new THREE.TubeGeometry(crashCurve, 60, 0.70, 8, false);
+    var crashMat = new THREE.MeshBasicMaterial({
+      color: 0xef4444,
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    crashRibbonMesh = new THREE.Mesh(crashTubeGeo, crashMat);
+    trajectoryGroup.add(crashRibbonMesh);
+
+    var crashLineGeo = new THREE.BufferGeometry().setFromPoints(crashPts);
+    crashLine = new THREE.Line(crashLineGeo, new THREE.LineBasicMaterial({color: 0xff3b30, transparent: true, opacity: 0.95}));
+    trajectoryGroup.add(crashLine);
+
+    // Divergence Marker
+    var divPt = crashPts[0];
+    var divOrb = new THREE.Mesh(new THREE.SphereGeometry(1.6, 12, 12), new THREE.MeshBasicMaterial({color: 0xfacc15}));
+    divOrb.position.copy(divPt);
+    trajectoryGroup.add(divOrb);
+
+    // Impact Ground Marker
+    var impPt = crashPts[crashPts.length - 1];
+    crashImpactMarker = new THREE.Group();
+    crashImpactMarker.position.copy(impPt);
+
+    var iRing1 = new THREE.Mesh(new THREE.RingGeometry(2.0, 5.0, 32).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.85}));
+    var iRing2 = new THREE.Mesh(new THREE.RingGeometry(6.0, 11.0, 32).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({color: 0xf97316, side: THREE.DoubleSide, transparent: true, opacity: 0.55}));
+    var iBeacon = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 18.0), new THREE.MeshBasicMaterial({color: 0xef4444, transparent: true, opacity: 0.75}));
+    iBeacon.position.y = 9.0;
+    crashImpactMarker.add(iRing1, iRing2, iBeacon);
+    trajectoryGroup.add(crashImpactMarker);
+  }
+
+  window.toggleTrajectoryVisuals = function() {
+    areTrajectoriesVisible = !areTrajectoriesVisible;
+    if (trajectoryGroup) trajectoryGroup.visible = areTrajectoriesVisible;
+    var tag = document.getElementById('pathToggleStatus');
+    if (tag) {
+      tag.innerText = areTrajectoriesVisible ? 'VISIBLE' : 'HIDDEN';
+      tag.style.color = areTrajectoriesVisible ? '#10b981' : '#94a3b8';
+    }
+  };
+
+  // 4. Dynamic In-Flight Trailing Smoke & Fire Particles
+  var smokeParticles = [];
+  var smokeGroup = new THREE.Group();
+  scene.add(smokeGroup);
+
+  function emitTrailingSmoke(originPos, count) {
+    for (var i = 0; i < count; i++) {
+      var pMesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.8 + Math.random() * 1.2, 8, 8),
+        new THREE.MeshBasicMaterial({
+          color: (Math.random() < 0.35 ? 0xff4500 : 0x1f2937),
+          transparent: true,
+          opacity: 0.85,
+          depthWrite: false
+        })
+      );
+      pMesh.position.copy(originPos);
+      pMesh.position.x += (Math.random() - 0.5) * 1.5;
+      pMesh.position.y += (Math.random() - 0.5) * 1.5;
+      pMesh.position.z += (Math.random() - 0.5) * 1.5;
+
+      smokeGroup.add(pMesh);
+      smokeParticles.push({
+        mesh: pMesh,
+        vx: (Math.random() - 0.5) * 4.0,
+        vy: 1.5 + Math.random() * 4.0,
+        vz: (Math.random() - 0.5) * 4.0,
+        age: 0.0,
+        life: 1.4 + Math.random() * 1.2,
+        scaleSpeed: 2.2 + Math.random() * 2.5
+      });
+    }
+  }
+
+  function updateTrailingSmoke(dt) {
+    for (var i = smokeParticles.length - 1; i >= 0; i--) {
+      var sp = smokeParticles[i];
+      sp.age += dt;
+      if (sp.age >= sp.life) {
+        smokeGroup.remove(sp.mesh);
+        sp.mesh.geometry.dispose();
+        sp.mesh.material.dispose();
+        smokeParticles.splice(i, 1);
+        continue;
+      }
+      var prog = sp.age / sp.life;
+      sp.mesh.position.x += sp.vx * dt;
+      sp.mesh.position.y += sp.vy * dt;
+      sp.mesh.position.z += sp.vz * dt;
+      var s = 1.0 + prog * sp.scaleSpeed;
+      sp.mesh.scale.set(s, s, s);
+      sp.mesh.material.opacity = (1.0 - prog) * 0.75;
+    }
+  }
+
+  // 5. Impact Explosion FX & Camera Screenshake
+  var explosionGroup = new THREE.Group();
+  scene.add(explosionGroup);
+  var explosionActive = false;
+  var explosionTimer = 0.0;
+  var explosionPos = new THREE.Vector3();
+  var cameraShakeTime = 0.0;
+
+  function triggerImpactExplosion(pos, scId) {
+    if (impactExplosionTriggered) return;
+    impactExplosionTriggered = true;
+    explosionActive = true;
+    explosionTimer = 0.0;
+    explosionPos.copy(pos);
+    cameraShakeTime = 1.4; // Trigger screen rumble
+
+    while (explosionGroup.children.length > 0) {
+      explosionGroup.remove(explosionGroup.children[0]);
+    }
+
+    // 1. Fireball Sphere
+    var fGeo = new THREE.SphereGeometry(2.5, 16, 16);
+    var fMat = new THREE.MeshBasicMaterial({color: 0xff3b00, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending});
+    var fireball = new THREE.Mesh(fGeo, fMat);
+    fireball.position.copy(pos);
+    fireball.position.y += 4.0;
+    fireball.name = 'fireball';
+    explosionGroup.add(fireball);
+
+    // 2. Shockwave Ring
+    var sGeo = new THREE.RingGeometry(1.0, 3.5, 32).rotateX(-Math.PI / 2);
+    var sMat = new THREE.MeshBasicMaterial({color: 0xf97316, side: THREE.DoubleSide, transparent: true, opacity: 0.85});
+    var shockwave = new THREE.Mesh(sGeo, sMat);
+    shockwave.position.copy(pos);
+    shockwave.position.y += 0.3;
+    shockwave.name = 'shockwave';
+    explosionGroup.add(shockwave);
+
+    // 3. Ground Fire Light
+    var expLight = new THREE.PointLight(0xff4500, 5.0, 150);
+    expLight.position.copy(pos).add(new THREE.Vector3(0, 5, 0));
+    expLight.name = 'expLight';
+    explosionGroup.add(expLight);
+
+    // 4. Update HUD Alert Banner
+    var alertBox = document.getElementById('qHudAlertBox');
+    if (alertBox) alertBox.className = 'q-verification-alert q-alert-divergence';
+    var icon = document.getElementById('qHudAlertIcon');
+    if (icon) icon.innerHTML = '&#128165;';
+    var title = document.getElementById('qHudAlertTitle');
+    if (title) title.innerText = 'CATASTROPHIC IMPACT: FLIGHT TERMINATED';
+    var desc = document.getElementById('qHudAlertDesc');
+    if (desc) desc.innerText = 'Impact recorded at predicted site! Pre-flight quantum structural prediction verified 100% ACCURATE.';
+    var badge = document.getElementById('qHudStatusBadge');
+    if (badge) {
+      badge.innerText = 'IMPACT [PREDICTION VERIFIED]';
+      badge.className = 'q-hud-status-badge badge-crit';
+    }
+
+    // Schedule auto-opening of Forensic Debrief Modal
+    setTimeout(function() {
+      stopFlightPlan("CATASTROPHIC IMPACT: FLIGHT TERMINATED (PREDICTION VERIFIED)");
+    }, 1400);
+  }
+
+  function updateExplosionFX(dt) {
+    if (!explosionActive) return;
+    explosionTimer += dt;
+
+    var fb = explosionGroup.getObjectByName('fireball');
+    if (fb) {
+      var prog = Math.min(1.0, explosionTimer / 1.2);
+      var sc = 1.0 + prog * 11.0;
+      fb.scale.set(sc, sc * 0.8, sc);
+      fb.material.opacity = Math.max(0.0, 1.0 - prog);
+      if (prog > 0.4) fb.material.color.setHex(0x374151);
+    }
+
+    var sw = explosionGroup.getObjectByName('shockwave');
+    if (sw) {
+      var sProg = Math.min(1.0, explosionTimer / 1.5);
+      var sc2 = 1.0 + sProg * 22.0;
+      sw.scale.set(sc2, sc2, 1);
+      sw.material.opacity = Math.max(0.0, 1.0 - sProg);
+    }
+
+    var lt = explosionGroup.getObjectByName('expLight');
+    if (lt) {
+      lt.intensity = Math.max(0.0, (1.0 - explosionTimer / 2.0) * 5.0);
+    }
+
+    // Emit rising wreckage smoke column
+    if (explosionTimer < 5.0 && Math.random() < 0.6) {
+      emitTrailingSmoke(explosionPos.clone().add(new THREE.Vector3(0, 1.5, 0)), 2);
+    }
+  }
+
+  // 6. 3D Aircraft Quantum Overlays: Layer 1 NV Hotspot & Layer 2 Subsurface Spar Ribs
   var quantumOverlayGroup = new THREE.Group();
   var nvHotspotRings = [];
   var nvHotspotMesh = null;
@@ -3041,8 +3840,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   function initQuantumAircraftOverlays() {
     quantumOverlayGroup = new THREE.Group();
 
-    // Layer 1: NV Magnetometer Flux Anomaly Dipole Ring (Left Wing Spar Rib 4)
-    // In planeVisual coordinates: Rib 4 is at x ≈ 0.5, y ≈ 3.55, z ≈ -7.5
+    // Layer 1: NV Magnetometer Flux Anomaly Dipole Ring
     var ring1 = new THREE.Mesh(
       new THREE.RingGeometry(0.3, 0.65, 24).rotateX(-Math.PI / 2),
       new THREE.MeshBasicMaterial({color: 0xef4444, transparent: true, opacity: 0.85, side: THREE.DoubleSide})
@@ -3061,7 +3859,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     nvHotspotRings = [ring1, ring2, ring3];
     quantumOverlayGroup.add(nvHotspotMesh);
 
-    // Layer 2: Holographic Subsurface Spar Rib Wireframe (visible internal skeleton)
+    // Layer 2: Holographic Subsurface Spar Rib Wireframe
     var sparBoxGeo = new THREE.BoxGeometry(4.2, 1.1, 22.0);
     var wireMat = new THREE.MeshBasicMaterial({
       color: 0x38bdf8,
@@ -3078,23 +3876,27 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   }
 
   function updateQuantumOverlayMaterials() {
-    var sc = quantumScenarios[activeQuantumScenario];
+    var sc = quantumScenarios[activeQuantumScenario] || quantumScenarios.wing_dent;
     if (!nvHotspotRings.length) return;
 
-    if (activeQuantumScenario === 'microcrack') {
+    if (sc.id === 'wing_dent' || sc.id === 'microcrack') {
       nvHotspotMesh.visible = true;
-      nvHotspotMesh.position.set(0.5, 3.65, -7.5); // Left wing spar
+      nvHotspotMesh.position.set(0.5, 3.65, -7.5); // Left wing spar Rib 4
       nvHotspotRings[0].material.color.setHex(0xef4444);
       nvHotspotRings[1].material.color.setHex(0xf97316);
       nvHotspotRings[2].material.color.setHex(0xfacc15);
-      if (droneScanCone) droneScanCone.material.color.setHex(0xef4444);
-    } else if (activeQuantumScenario === 'fastener') {
+    } else if (sc.id === 'fuselage_dent') {
       nvHotspotMesh.visible = true;
-      nvHotspotMesh.position.set(6.06, 3.65, -6.28); // Port engine mount
+      nvHotspotMesh.position.set(8.0, 4.85, 0.0); // Fuselage crown Bay 14
+      nvHotspotRings[0].material.color.setHex(0xf97316);
+      nvHotspotRings[1].material.color.setHex(0xfacc15);
+      nvHotspotRings[2].material.color.setHex(0xfef08a);
+    } else if (sc.id === 'engine_dent' || sc.id === 'fastener') {
+      nvHotspotMesh.visible = true;
+      nvHotspotMesh.position.set(6.06, 3.65, -6.28); // Port engine nacelle
       nvHotspotRings[0].material.color.setHex(0xf59e0b);
       nvHotspotRings[1].material.color.setHex(0xfbbf24);
       nvHotspotRings[2].material.color.setHex(0xfef08a);
-      if (droneScanCone) droneScanCone.material.color.setHex(0xf59e0b);
     } else {
       // Nominal
       nvHotspotMesh.visible = true;
@@ -3102,13 +3904,12 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       nvHotspotRings[0].material.color.setHex(0x10b981);
       nvHotspotRings[1].material.color.setHex(0x34d399);
       nvHotspotRings[2].material.color.setHex(0x6ee7b7);
-      if (droneScanCone) droneScanCone.material.color.setHex(0x10b981);
     }
   }
 
   // 3. 2D Canvases Visualization (Layer 1 NV Spectrum, Layer 2 Ghost Imaging, Layer 3 VQC)
   function drawQuantumCanvases() {
-    var sc = quantumScenarios[activeQuantumScenario];
+    var sc = quantumScenarios[activeQuantumScenario] || quantumScenarios.wing_dent;
 
     // Canvas 1: ODMR Spectrum Frequency Sweep
     var cv1 = document.getElementById('canvasLayer1NV');
@@ -3126,7 +3927,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 
       // ODMR Dip Curve
       ctx1.beginPath();
-      ctx1.strokeStyle = (sc.id === 'microcrack' ? '#ef4444' : (sc.id === 'fastener' ? '#f59e0b' : '#10b981'));
+      var curveCol = (sc.id === 'nominal') ? '#10b981' : ((sc.id === 'wing_dent' || sc.id === 'microcrack') ? '#ef4444' : (sc.id === 'fuselage_dent' ? '#f97316' : '#f59e0b'));
+      ctx1.strokeStyle = curveCol;
       ctx1.lineWidth = 2.5;
 
       for (var px = 0; px < w1; px++) {
@@ -3136,13 +3938,18 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
           // Single zero-field dip at 2.870 GHz
           var d = freq - 2.870;
           pl -= 0.52 * Math.exp(-(d * d) / 0.00012);
-        } else if (sc.id === 'microcrack') {
-          // Zeeman dipole splitting: 2 dips at 2.842 and 2.898 GHz
+        } else if (sc.id === 'wing_dent' || sc.id === 'microcrack') {
+          // Zeeman dipole splitting: 2 dips at 2.842 and 2.898 GHz (Δν = 56 MHz)
           var d1 = freq - 2.842;
           var d2 = freq - 2.898;
           pl -= 0.48 * Math.exp(-(d1 * d1) / 0.00010) + 0.46 * Math.exp(-(d2 * d2) / 0.00010);
+        } else if (sc.id === 'fuselage_dent') {
+          // Hoop stress dipole splitting: 2 dips at 2.835 and 2.905 GHz (Δν = 70 MHz)
+          var d1 = freq - 2.835;
+          var d2 = freq - 2.905;
+          pl -= 0.45 * Math.exp(-(d1 * d1) / 0.00012) + 0.43 * Math.exp(-(d2 * d2) / 0.00012);
         } else {
-          // Fastener torque hysteresis dip
+          // Casing hysteresis dip: 2 dips at 2.858 and 2.882 GHz (Δν = 24 MHz)
           var d1 = freq - 2.858;
           var d2 = freq - 2.882;
           pl -= 0.38 * Math.exp(-(d1 * d1) / 0.00014) + 0.35 * Math.exp(-(d2 * d2) / 0.00014);
@@ -3159,10 +3966,18 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       ctx1.fillText('2.87 GHz (D_gs)', w1 / 2 - 38, h1 - 6);
       ctx1.fillText('2.94 GHz', w1 - 50, h1 - 6);
 
-      if (sc.id === 'microcrack') {
+      if (sc.id === 'wing_dent' || sc.id === 'microcrack') {
         ctx1.fillStyle = '#ef4444';
         ctx1.font = 'bold 9px monospace';
-        ctx1.fillText('ZEEMAN SPLIT: Δν = 56 MHz (CRACK TIP)', 12, 18);
+        ctx1.fillText('ZEEMAN SPLIT: Δν = 56 MHz (RIB 4 CRACK TIP)', 12, 18);
+      } else if (sc.id === 'fuselage_dent') {
+        ctx1.fillStyle = '#f97316';
+        ctx1.font = 'bold 9px monospace';
+        ctx1.fillText('HOOP STRESS DIPOLE: Δν = 70 MHz (BAY 14)', 12, 18);
+      } else if (sc.id === 'engine_dent' || sc.id === 'fastener') {
+        ctx1.fillStyle = '#f59e0b';
+        ctx1.font = 'bold 9px monospace';
+        ctx1.fillText('CASING HYSTERESIS: Δν = 24 MHz (SHROUD RUB)', 12, 18);
       } else {
         ctx1.fillStyle = '#10b981';
         ctx1.font = 'bold 9px monospace';
@@ -3178,12 +3993,12 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       ctx2.fillStyle = '#030712';
       ctx2.fillRect(0, 0, w2, h2);
 
-      // Subsurface Spar Flange & Ribs
+      // Subsurface Structure Frame
       ctx2.strokeStyle = 'rgba(56, 189, 248, 0.4)';
       ctx2.lineWidth = 1.5;
       ctx2.strokeRect(20, 25, w2 - 40, h2 - 50);
 
-      // Rib dividers
+      // Frame ribs
       for (var rx = 55; rx < w2 - 40; rx += 45) {
         ctx2.beginPath();
         ctx2.moveTo(rx, 25);
@@ -3191,8 +4006,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
         ctx2.stroke();
       }
 
-      // If Microcrack: Draw subsurface fatigue crack line across Rib 4
-      if (sc.id === 'microcrack') {
+      if (sc.id === 'wing_dent' || sc.id === 'microcrack') {
+        // Microcrack across Rib 4
         ctx2.strokeStyle = '#ef4444';
         ctx2.lineWidth = 3;
         ctx2.beginPath();
@@ -3202,7 +4017,6 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
         ctx2.lineTo(164, 82);
         ctx2.stroke();
 
-        // Pulsing flaw circle
         ctx2.fillStyle = 'rgba(239, 68, 68, 0.35)';
         ctx2.beginPath();
         ctx2.arc(155, 60, 14, 0, Math.PI * 2);
@@ -3210,15 +4024,29 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 
         ctx2.fillStyle = '#ef4444';
         ctx2.font = 'bold 9px monospace';
-        ctx2.fillText('CRACK: 14.2mm x 1.8mm depth', 105, 16);
-      } else if (sc.id === 'fastener') {
+        ctx2.fillText('CRACK: 14.2mm x 1.8mm depth (Rib 4)', 95, 16);
+      } else if (sc.id === 'fuselage_dent') {
+        // Delamination void in Bay 14
+        ctx2.fillStyle = 'rgba(249, 115, 22, 0.35)';
+        ctx2.beginPath();
+        ctx2.ellipse(155, 60, 32, 16, 0, 0, Math.PI * 2);
+        ctx2.fill();
+        ctx2.strokeStyle = '#f97316';
+        ctx2.lineWidth = 2;
+        ctx2.stroke();
+
+        ctx2.fillStyle = '#fb923c';
+        ctx2.font = 'bold 9px monospace';
+        ctx2.fillText('VOID: 350μm DELAMINATION (BAY 14)', 85, 16);
+      } else if (sc.id === 'engine_dent' || sc.id === 'fastener') {
+        // Shroud rub & fastener pitting
         ctx2.fillStyle = '#f59e0b';
         for (var bx = 65; bx < 240; bx += 35) {
           ctx2.beginPath();
           ctx2.arc(bx, 60, 4, 0, Math.PI * 2);
           ctx2.fill();
         }
-        ctx2.fillText('FASTENER ROW: CORROSION PITTING 320μm', 35, 16);
+        ctx2.fillText('SHROUD OVALIZATION & 320μm PITTING', 45, 16);
       } else {
         ctx2.fillStyle = '#10b981';
         ctx2.font = 'bold 9px monospace';
@@ -3289,7 +4117,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       ctx3.beginPath(); ctx3.arc(165, qY[3], 5, 0, Math.PI * 2); ctx3.stroke();
 
       // Output classification badge
-      ctx3.fillStyle = (sc.id === 'microcrack' ? '#ef4444' : (sc.id === 'fastener' ? '#f59e0b' : '#10b981'));
+      ctx3.fillStyle = (sc.id === 'nominal') ? '#10b981' : ((sc.id === 'wing_dent' || sc.id === 'microcrack') ? '#ef4444' : (sc.id === 'fuselage_dent' ? '#f97316' : '#f59e0b'));
       ctx3.font = 'bold 9px monospace';
       ctx3.fillText('VQC RISK: ' + sc.l3.prob, 190, 20);
     }
@@ -3309,17 +4137,46 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   };
 
   window.selectQuantumScenario = function(scId) {
+    if (scId === 'microcrack') scId = 'wing_dent';
+    if (scId === 'fastener') scId = 'engine_dent';
     activeQuantumScenario = scId;
-    var sc = quantumScenarios[scId];
+    impactExplosionTriggered = false;
+    explosionActive = false;
+    while (explosionGroup.children.length > 0) {
+      explosionGroup.remove(explosionGroup.children[0]);
+    }
 
-    // Update scenario button styling
-    ['scBtnNominal', 'scBtnMicrocrack', 'scBtnFastener'].forEach(function(bId) {
+    var sc = quantumScenarios[scId] || quantumScenarios.wing_dent;
+
+    // Update scenario button styling in modal
+    ['scBtnNominal', 'scBtnWing', 'scBtnFuselage', 'scBtnEngine', 'scBtnMicrocrack', 'scBtnFastener'].forEach(function(bId) {
       var btn = document.getElementById(bId);
       if (btn) btn.classList.remove('active');
     });
-    if (scId === 'nominal') document.getElementById('scBtnNominal').classList.add('active');
-    if (scId === 'microcrack') document.getElementById('scBtnMicrocrack').classList.add('active');
-    if (scId === 'fastener') document.getElementById('scBtnFastener').classList.add('active');
+    if (scId === 'nominal') {
+      var b = document.getElementById('scBtnNominal'); if (b) b.classList.add('active');
+    } else if (scId === 'wing_dent') {
+      var b = document.getElementById('scBtnWing') || document.getElementById('scBtnMicrocrack'); if (b) b.classList.add('active');
+    } else if (scId === 'fuselage_dent') {
+      var b = document.getElementById('scBtnFuselage'); if (b) b.classList.add('active');
+    } else if (scId === 'engine_dent') {
+      var b = document.getElementById('scBtnEngine') || document.getElementById('scBtnFastener'); if (b) b.classList.add('active');
+    }
+
+    // Update on-screen quick switcher dock buttons
+    ['dockScBtnNominal', 'dockScBtnWing', 'dockScBtnFuselage', 'dockScBtnEngine'].forEach(function(bId) {
+      var btn = document.getElementById(bId);
+      if (btn) btn.classList.remove('active');
+    });
+    if (scId === 'nominal') {
+      var b = document.getElementById('dockScBtnNominal'); if (b) b.classList.add('active');
+    } else if (scId === 'wing_dent') {
+      var b = document.getElementById('dockScBtnWing'); if (b) b.classList.add('active');
+    } else if (scId === 'fuselage_dent') {
+      var b = document.getElementById('dockScBtnFuselage'); if (b) b.classList.add('active');
+    } else if (scId === 'engine_dent') {
+      var b = document.getElementById('dockScBtnEngine'); if (b) b.classList.add('active');
+    }
 
     // Update Header Badges
     var modalBadge = document.getElementById('qModalAirframeStatusBadge');
@@ -3359,6 +4216,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     var hudTarget = document.getElementById('qHudTargetText');
     if (hudTarget) hudTarget.innerText = sc.targetShort;
 
+    updateComponentHighlights(scId);
+    update3DCrashTrajectory(scId);
     updateQuantumOverlayMaterials();
     drawQuantumCanvases();
   };
@@ -3367,6 +4226,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     closeQuantumInspector();
     verificationFlightActive = true;
     qVerificationTriggered = false;
+    impactExplosionTriggered = false;
+    explosionActive = false;
 
     // Arm HUD
     var hudStatus = document.getElementById('qHudStatusBadge');
@@ -3379,7 +4240,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       alertBox.className = 'q-verification-alert q-alert-nominal';
       document.getElementById('qHudAlertIcon').innerHTML = '&#9883;';
       document.getElementById('qHudAlertTitle').innerText = 'IN-FLIGHT PREDICTION MONITORING';
-      document.getElementById('qHudAlertDesc').innerText = 'Monitoring dynamic wing strain & G-load against pre-flight quantum prediction.';
+      document.getElementById('qHudAlertDesc').innerText = 'Monitoring dynamic wing strain, pitch rate & spool against pre-flight quantum prediction.';
     }
 
     // Launch flight plan
@@ -3393,13 +4254,21 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   };
   window.__setCircuitTimer = function(t) { circuitTimer = t; isFlightPlanRunning = true; };
 
-  // Initialize Drone and Aircraft Overlays
+  // Initialize Aircraft Highlights, Trajectories and Overlays
   initAutonomousInspectionDrone();
   initQuantumAircraftOverlays();
+  init3DFlightTrajectories();
+  initAircraftComponentHighlights();
 
   // Handle URL Parameters for direct inspection / verification testing & deep-linking
   (function handleUrlParams() {
     var params = new URLSearchParams(window.location.search);
+    if (params.get('mode') === 'crash') {
+      switchSimulationMode('crash');
+    }
+    if (params.get('speed')) {
+      setSimSpeed(parseInt(params.get('speed')));
+    }
     if (params.get('scenario')) {
       var sc = params.get('scenario');
       if (quantumScenarios[sc]) selectQuantumScenario(sc);
@@ -3425,7 +4294,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 
   function animate(now) {
     requestAnimationFrame(animate);
-    var dt = Math.min(0.1, (now - lastTime) / 1000);
+    var dt = Math.min(0.1, (now - lastTime) / 1000) * (window.simSpeed || 1.0);
     lastTime = now;
 
     // Advance Day Clock
@@ -3447,11 +4316,21 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       }
       state = evaluateFlightPattern(circuitTimer);
     } else {
-      // CRASH HISTORY MODE (N722BD)
-      crashTimeIdx = (crashTimeIdx + dt * 0.45) % (crashTrajData.length - 1);
-      var i0 = Math.floor(crashTimeIdx);
+      // CRASH HISTORY MODE (N722BD) - Smooth, continuous high speed (never slows down)
+      var currentSpeedMps = 240.0; // Steady fast jet velocity (~466 kts) so it never crawls
+      crashDistance = (crashDistance + currentSpeedMps * dt) % crashTotalDist;
+
+      // Locate active segment along cumulative distance path
+      var i0 = 0;
+      for (var s = 0; s < crashCumDists.length - 1; s++) {
+        if (crashDistance >= crashCumDists[s] && crashDistance <= crashCumDists[s + 1]) {
+          i0 = s;
+          break;
+        }
+      }
       var i1 = Math.min(crashTrajData.length - 1, i0 + 1);
-      var alpha = crashTimeIdx - i0;
+      var segLen = Math.max(0.001, crashCumDists[i1] - crashCumDists[i0]);
+      var alpha = (crashDistance - crashCumDists[i0]) / segLen;
       var cp0 = crashTrajData[i0];
       var cp1 = crashTrajData[i1];
 
@@ -3471,8 +4350,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
         pitch: cPitch,
         roll: cBank,
         yaw: THREE.MathUtils.degToRad(-cHdg + 90),
-        speed: cp0.spd,
-        gear: (cp0.alt < 10000 ? 0.0 : 0.0),
+        speed: Math.max(430, cp0.spd), // Consistent fast jet speed (never slows down)
+        gear: 0.0,
         phase: cPhase
       };
     }
@@ -3501,36 +4380,38 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       p.rotation.x += propSpeed;
     });
 
-    // 3D Autonomous Inspection Drone and Quantum Scanning Dynamics
-    if (droneRotors.length > 0) {
-      droneRotors.forEach(function(r) { r.rotation.y += dt * 48.0; });
-    }
-    if (droneScanRing) {
-      // Oscillate scan ring down the conical beam
-      var scanProg = (now * 0.002) % 1.0;
-      droneScanRing.position.y = -0.5 - scanProg * 6.5;
-      droneScanRing.scale.set(0.2 + scanProg * 0.8, 1, 0.2 + scanProg * 0.8);
+    // Trailing Fire & Smoke Particle Simulation & Crash Explosion FX
+    updateTrailingSmoke(dt);
+    updateExplosionFX(dt);
+
+    // In-Flight Failure Divergence Emitter & Crash Trigger
+    var scActive = quantumScenarios[activeQuantumScenario] || quantumScenarios.wing_dent;
+    if (isFlightPlanRunning && scActive.failPred) {
+      if (circuitTimer >= scActive.failTime && circuitTimer < scActive.impactTime) {
+        // Dynamic Smoke & Fire trailing from failed component
+        var compPos = new THREE.Vector3();
+        if ((scActive.id === 'wing_dent' || scActive.id === 'microcrack') && compWingBox) {
+          compWingBox.getWorldPosition(compPos);
+        } else if (scActive.id === 'fuselage_dent' && compFuselageBox) {
+          compFuselageBox.getWorldPosition(compPos);
+        } else if ((scActive.id === 'engine_dent' || scActive.id === 'fastener') && compEngineBox) {
+          compEngineBox.getWorldPosition(compPos);
+        } else {
+          planeRoot.getWorldPosition(compPos);
+        }
+        emitTrailingSmoke(compPos, 3);
+      } else if (circuitTimer >= scActive.impactTime) {
+        if (!impactExplosionTriggered) {
+          triggerImpactExplosion(new THREE.Vector3(scActive.impactCoord.x, 0.6, scActive.impactCoord.z), scActive.id);
+        }
+      }
     }
 
-    // Drone Navigation State
-    if (!isFlightPlanRunning) {
-      // Pre-Flight Inspection Mode: Drone traverses QAOA 3D spline loop around aircraft parked on runway
-      if (qaoaSplineCurve) {
-        var splineProg = (now * 0.00008) % 1.0;
-        var dronePos = qaoaSplineCurve.getPointAt(splineProg);
-        droneGroup.position.copy(dronePos);
-        var droneLook = qaoaSplineCurve.getPointAt((splineProg + 0.03) % 1.0);
-        droneGroup.lookAt(droneLook);
-      }
-      droneGroup.visible = true;
-      droneWaypointsVisual.visible = true;
-    } else {
-      // Flight Plan Active: Drone hovers at designated safety observation perimeter beside Runway 09L
-      droneWaypointsVisual.visible = false;
-      var droneHoldPos = new THREE.Vector3(-390, 16.0 + Math.sin(now * 0.002) * 0.8, -470);
-      droneGroup.position.lerp(droneHoldPos, 0.05);
-      droneGroup.lookAt(planeRoot.position.x, planeRoot.position.y + 3.0, planeRoot.position.z);
-    }
+    // Animate Pulsing Dent Decal Rings on Highlighted Aircraft Components
+    var dentPulse = 1.0 + Math.sin(now * 0.008) * 0.18;
+    if (compWingDecal && compWingDecal.parent && compWingDecal.parent.visible) compWingDecal.scale.set(dentPulse, dentPulse, dentPulse);
+    if (compFuselageDecal && compFuselageDecal.parent && compFuselageDecal.parent.visible) compFuselageDecal.scale.set(dentPulse, dentPulse, dentPulse);
+    if (compEngineDecal && compEngineDecal.parent && compEngineDecal.parent.visible) compEngineDecal.scale.set(dentPulse, dentPulse, dentPulse);
 
     // Animate 3D NV Magnetometer Flux Dipole Rings
     if (nvHotspotRings.length > 0) {
@@ -3542,7 +4423,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 
     // Dynamic Aeroelastic Wing Flexing & Quantum Verification In-Flight Flutter
     var isFluttering = false;
-    if (activeQuantumScenario === 'microcrack' && isFlightPlanRunning && gLoad > 2.05) {
+    if ((activeQuantumScenario === 'wing_dent' || activeQuantumScenario === 'microcrack') && isFlightPlanRunning && gLoad > 2.05) {
       isFluttering = true;
       var flutterIntensity = (gLoad - 2.0) / 0.18;
       var flutterOsc = Math.sin(now * 0.05) * 0.045 * flutterIntensity;
@@ -3629,24 +4510,106 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     var dynStrain = baseMicrostrain;
     var sc = quantumScenarios[activeQuantumScenario];
 
-    if (activeQuantumScenario === 'microcrack') {
-      if (gLoad > 2.05 && circuitTimer >= 22.0 && circuitTimer <= 38.0) {
-        // Microcrack Stress Singularity & Divergence triggered!
-        dynStrain = Math.min(1840, Math.round(baseMicrostrain + 720.0 + Math.pow(Math.min(1.0, (gLoad - 2.05) / 0.13), 1.2) * 440.0)); // Reaches predicted 1,840 με failure threshold
-        
-        // Update Live Verification HUD to ALARM / VERIFIED
-        var alertBox = document.getElementById('qHudAlertBox');
-        if (alertBox) alertBox.className = 'q-verification-alert q-alert-divergence';
-        var icon = document.getElementById('qHudAlertIcon');
-        if (icon) icon.innerHTML = '&#128680;';
-        var title = document.getElementById('qHudAlertTitle');
-        if (title) title.innerText = 'PREDICTION VERIFIED: WING SPAR DIVERGENCE!';
-        var desc = document.getElementById('qHudAlertDesc');
-        if (desc) desc.innerText = 'At ' + gLoad.toFixed(2) + 'G aero load, microcrack propagated! Flutter vibration confirmed. Pre-flight VQC prediction was 100% ACCURATE.';
-        var badge = document.getElementById('qHudStatusBadge');
-        if (badge) {
-          badge.innerText = 'VERIFIED [FLAW CONFIRMED]';
-          badge.className = 'q-hud-status-badge badge-crit';
+    if (activeQuantumScenario === 'wing_dent' || activeQuantumScenario === 'microcrack') {
+      if (circuitTimer >= 22.0 && circuitTimer <= 38.0) {
+        if (circuitTimer >= 28.0) {
+          dynStrain = 1840; // Predicted fracture strain
+          var alertBox = document.getElementById('qHudAlertBox');
+          if (alertBox) alertBox.className = 'q-verification-alert q-alert-divergence';
+          var icon = document.getElementById('qHudAlertIcon');
+          if (icon) icon.innerHTML = '&#128680;';
+          var title = document.getElementById('qHudAlertTitle');
+          if (title) title.innerText = 'PREDICTION VERIFIED: LEFT WING SPAR SHEARED!';
+          var desc = document.getElementById('qHudAlertDesc');
+          if (desc) desc.innerText = 'Rib 4 spar fractured at 2.18G load! Asymmetric roll stall triggered spiral dive into river. Pre-flight VQC prediction was 100% ACCURATE.';
+          var badge = document.getElementById('qHudStatusBadge');
+          if (badge) {
+            badge.innerText = 'VERIFIED [SPAR SHEARED]';
+            badge.className = 'q-hud-status-badge badge-crit';
+          }
+        } else if (gLoad > 1.8) {
+          dynStrain = Math.min(1760, Math.round(baseMicrostrain + 720.0 + Math.pow(Math.min(1.0, (gLoad - 1.8) / 0.38), 1.2) * 440.0));
+          var alertBox = document.getElementById('qHudAlertBox');
+          if (alertBox) alertBox.className = 'q-verification-alert q-alert-divergence';
+          var icon = document.getElementById('qHudAlertIcon');
+          if (icon) icon.innerHTML = '&#9888;';
+          var title = document.getElementById('qHudAlertTitle');
+          if (title) title.innerText = 'WARNING: WING MICROCRACK EXPANDING!';
+          var desc = document.getElementById('qHudAlertDesc');
+          if (desc) desc.innerText = 'Aeroelastic strain spiking rapidly under 2.18G crosswind turn. Structural limits approaching.';
+          var badge = document.getElementById('qHudStatusBadge');
+          if (badge) {
+            badge.innerText = 'CRITICAL STRAIN SPIKE';
+            badge.className = 'q-hud-status-badge badge-warn';
+          }
+        }
+      }
+    } else if (activeQuantumScenario === 'fuselage_dent') {
+      if (circuitTimer >= 16.0 && circuitTimer <= 23.0) {
+        if (circuitTimer >= 18.5) {
+          dynStrain = 1650;
+          var alertBox = document.getElementById('qHudAlertBox');
+          if (alertBox) alertBox.className = 'q-verification-alert q-alert-divergence';
+          var icon = document.getElementById('qHudAlertIcon');
+          if (icon) icon.innerHTML = '&#128680;';
+          var title = document.getElementById('qHudAlertTitle');
+          if (title) title.innerText = 'PREDICTION VERIFIED: FUSELAGE CROWN DELAMINATION!';
+          var desc = document.getElementById('qHudAlertDesc');
+          if (desc) desc.innerText = 'Bay 14 crown skin buckled under rotation moment! Elevator cables severed -> Lawn dart dive. Pre-flight prediction 100% ACCURATE.';
+          var badge = document.getElementById('qHudStatusBadge');
+          if (badge) {
+            badge.innerText = 'VERIFIED [ELEVATOR SEVERED]';
+            badge.className = 'q-hud-status-badge badge-crit';
+          }
+        } else {
+          dynStrain = Math.min(1450, Math.round(baseMicrostrain + 450.0 + ((circuitTimer - 16.0) / 2.5) * 500.0));
+          var alertBox = document.getElementById('qHudAlertBox');
+          if (alertBox) alertBox.className = 'q-verification-alert q-alert-divergence';
+          var icon = document.getElementById('qHudAlertIcon');
+          if (icon) icon.innerHTML = '&#9888;';
+          var title = document.getElementById('qHudAlertTitle');
+          if (title) title.innerText = 'WARNING: CROWN HOOP STRESS SURGE!';
+          var desc = document.getElementById('qHudAlertDesc');
+          if (desc) desc.innerText = 'Crown skin delamination void expanding under rotation pitch moment.';
+          var badge = document.getElementById('qHudStatusBadge');
+          if (badge) {
+            badge.innerText = 'CROWN STRAIN SPIKE';
+            badge.className = 'q-hud-status-badge badge-warn';
+          }
+        }
+      }
+    } else if (activeQuantumScenario === 'engine_dent' || activeQuantumScenario === 'fastener') {
+      if (circuitTimer >= 18.0 && circuitTimer <= 32.0) {
+        if (circuitTimer >= 24.0) {
+          dynStrain = 1920;
+          var alertBox = document.getElementById('qHudAlertBox');
+          if (alertBox) alertBox.className = 'q-verification-alert q-alert-divergence';
+          var icon = document.getElementById('qHudAlertIcon');
+          if (icon) icon.innerHTML = '&#128680;';
+          var title = document.getElementById('qHudAlertTitle');
+          if (title) title.innerText = 'PREDICTION VERIFIED: TURBINE SHROUD RUB & EXPLOSION!';
+          var desc = document.getElementById('qHudAlertDesc');
+          if (desc) desc.innerText = 'Port Engine #1 turbine disc burst at 96.5% N1 climb spool! Fuel line ignited -> Flat spin dive into bay. Pre-flight prediction 100% ACCURATE.';
+          var badge = document.getElementById('qHudStatusBadge');
+          if (badge) {
+            badge.innerText = 'VERIFIED [ENGINE BURST]';
+            badge.className = 'q-hud-status-badge badge-crit';
+          }
+        } else {
+          dynStrain = Math.min(1500, Math.round(baseMicrostrain + 500.0 + ((circuitTimer - 18.0) / 6.0) * 450.0));
+          var alertBox = document.getElementById('qHudAlertBox');
+          if (alertBox) alertBox.className = 'q-verification-alert q-alert-divergence';
+          var icon = document.getElementById('qHudAlertIcon');
+          if (icon) icon.innerHTML = '&#9888;';
+          var title = document.getElementById('qHudAlertTitle');
+          if (title) title.innerText = 'WARNING: PORT NACELLE OVALIZATION RUB!';
+          var desc = document.getElementById('qHudAlertDesc');
+          if (desc) desc.innerText = 'Turbine blade clearance collapsing under full spool. Severe thermal expansion.';
+          var badge = document.getElementById('qHudStatusBadge');
+          if (badge) {
+            badge.innerText = 'SHROUD RUB WARNING';
+            badge.className = 'q-hud-status-badge badge-warn';
+          }
         }
       }
     } else if (activeQuantumScenario === 'nominal') {
@@ -3663,20 +4626,6 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
         if (badge) {
           badge.innerText = 'VERIFIED [GO CONFIRMED]';
           badge.className = 'q-hud-status-badge badge-pass';
-        }
-      }
-    } else if (activeQuantumScenario === 'fastener') {
-      if (circuitTimer >= 6.0 && circuitTimer <= 16.0) {
-        var alertBox = document.getElementById('qHudAlertBox');
-        if (alertBox) alertBox.className = 'q-verification-alert q-alert-divergence';
-        var title = document.getElementById('qHudAlertTitle');
-        if (title) title.innerText = 'PREDICTION VERIFIED: MOUNT VIBRATION EXCEEDED!';
-        var desc = document.getElementById('qHudAlertDesc');
-        if (desc) desc.innerText = 'Port engine mount vibration breached 21.4 mm/s RMS under full spool! Pre-flight prediction 100% ACCURATE.';
-        var badge = document.getElementById('qHudStatusBadge');
-        if (badge) {
-          badge.innerText = 'VERIFIED [VIB CONFIRMED]';
-          badge.className = 'q-hud-status-badge badge-warn';
         }
       }
     }
@@ -3779,6 +4728,15 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
         Math.cos(orbitAzimuth) * Math.cos(orbitElevation) * orbitDistance - 180
       );
       camera.lookAt(0, 40, -180);
+    }
+
+    // Dynamic Camera Screenshake upon impact explosion
+    if (cameraShakeTime > 0) {
+      cameraShakeTime -= dt;
+      var shakeMag = (cameraShakeTime / 1.4) * 3.2;
+      camera.position.x += (Math.random() - 0.5) * shakeMag;
+      camera.position.y += (Math.random() - 0.5) * shakeMag;
+      camera.position.z += (Math.random() - 0.5) * shakeMag;
     }
 
     // Dynamic sky & sunlight tracking
