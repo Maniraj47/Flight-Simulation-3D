@@ -16,20 +16,20 @@ window.onerror = function(msg, url, line, col, error) {
 </script>
 <style>
 :root {
-  --ink: #f8fafc;
-  --panel: rgba(13, 21, 38, 0.88);
-  --panel-border: rgba(56, 189, 248, 0.28);
+  --ink: #0f172a;
+  --ink-muted: #64748b;
+  --panel: rgba(255, 255, 255, 0.94);
+  --panel-border: rgba(203, 213, 225, 0.88);
   --accent: #0284c7;
-  --accent-cyan: #38bdf8;
-  --accent-orange: #f97316;
-  --accent-emerald: #10b981;
-  --accent-purple: #c084fc;
+  --accent-cyan: #0369a1;
+  --accent-orange: #ea580c;
+  --accent-emerald: #059669;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
 html, body {
   height: 100%;
   margin: 0;
-  background: #070b14;
+  background: #f1f5f9;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--ink);
   overflow: hidden;
@@ -45,7 +45,7 @@ html, body {
   border: 1px solid var(--panel-border);
   border-radius: 12px;
   backdrop-filter: blur(16px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.12), 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 .brand-badge {
   display: flex;
@@ -54,7 +54,7 @@ html, body {
   padding: 8px 16px;
 }
 .logo-pill {
-  background: linear-gradient(135deg, #0284c7, #2563eb);
+  background: linear-gradient(135deg, #0284c7, #0369a1);
   color: #fff;
   font-weight: 800;
   font-size: 13px;
@@ -62,8 +62,8 @@ html, body {
   border-radius: 6px;
   letter-spacing: 0.5px;
 }
-.brand-text h1 { font-size: 16px; font-weight: 700; color: #fff; }
-.brand-text p { font-size: 11px; color: #94a3b8; }
+.brand-text h1 { font-size: 16px; font-weight: 700; color: #0f172a; }
+.brand-text p { font-size: 11px; color: #64748b; }
 
 .control-groups {
   display: flex;
@@ -73,8 +73,8 @@ html, body {
 }
 .btn-group {
   display: flex;
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(241, 245, 249, 0.95);
+  border: 1px solid rgba(203, 213, 225, 0.9);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -85,23 +85,25 @@ button {
   padding: 7px 12px;
   border: 0;
   background: none;
-  color: #cbd5e1;
+  color: #334155;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 5px;
 }
-button:hover { background: rgba(56, 189, 248, 0.15); color: #fff; }
+button:hover { background: rgba(2, 132, 199, 0.12); color: #0284c7; }
 button.active { background: var(--accent); color: #fff; font-weight: 700; }
 .slider-group {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 6px 12px;
+  background: rgba(241, 245, 249, 0.95);
+  border: 1px solid rgba(203, 213, 225, 0.9);
 }
-.slider-group label { font-size: 13px; font-weight: 700; color: var(--accent-cyan); font-family: monospace; min-width: 44px; }
-.slider-group input { width: 110px; cursor: pointer; }
+.slider-group label { font-size: 13px; font-weight: 700; color: #0284c7; font-family: monospace; min-width: 44px; }
+.slider-group input { width: 110px; cursor: pointer; accent-color: #0284c7; }
 
 /* Flight Telemetry HUD Overlay (Top-Left) */
 
@@ -116,7 +118,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   font-weight: 800;
   padding: 3px 8px;
   border-radius: 4px;
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(5, 150, 105, 0.12);
   border: 1px solid var(--accent-emerald);
   color: var(--accent-emerald);
   text-transform: uppercase;
@@ -127,14 +129,14 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   gap: 8px;
 }
 .telem-item {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(248, 250, 252, 0.95);
+  border: 1px solid rgba(203, 213, 225, 0.85);
   border-radius: 6px;
   padding: 6px 10px;
 }
-.telem-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
-.telem-val { font-size: 16px; font-weight: 700; font-family: monospace; color: #fff; }
-.telem-unit { font-size: 10px; color: #94a3b8; margin-left: 2px; }
+.telem-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+.telem-val { font-size: 16px; font-weight: 700; font-family: monospace; color: #0f172a; }
+.telem-unit { font-size: 10px; color: #64748b; margin-left: 2px; }
 
 /* Cockpit POV Reticle Overlay */
 #cockpit-hud {
@@ -158,9 +160,9 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   padding: 14px 18px;
   z-index: 20;
 }
-.info-box h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: #fff; }
-.info-box p { font-size: 12px; line-height: 1.45; color: #cbd5e1; margin: 2px 0; }
-.note { font-size: 11px; color: #94a3b8; margin-top: 6px; font-style: italic; }
+.info-box h2 { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: #0f172a; }
+.info-box p { font-size: 12px; line-height: 1.45; color: #334155; margin: 2px 0; }
+.note { font-size: 11px; color: #64748b; margin-top: 6px; font-style: italic; }
 
 /* Test Flight Mission Button */
 .test-flight-btn {
@@ -169,14 +171,14 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   font-weight: 700 !important;
   padding: 8px 16px !important;
   border: 1px solid #fdba74 !important;
-  box-shadow: 0 0 16px rgba(249, 115, 22, 0.45) !important;
+  box-shadow: 0 2px 10px rgba(249, 115, 22, 0.35) !important;
   cursor: pointer;
   border-radius: 8px;
   animation: pulseBtn 2.2s infinite;
 }
 @keyframes pulseBtn {
-  0%, 100% { box-shadow: 0 0 12px rgba(249, 115, 22, 0.35); }
-  50% { box-shadow: 0 0 24px rgba(249, 115, 22, 0.75); }
+  0%, 100% { box-shadow: 0 0 8px rgba(249, 115, 22, 0.25); }
+  50% { box-shadow: 0 0 18px rgba(249, 115, 22, 0.55); }
 }
 
 /* Extended Component Telemetry HUD */
@@ -195,12 +197,12 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   align-items: center;
   font-size: 11px;
   font-weight: 700;
-  color: var(--accent-cyan);
+  color: #0284c7;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 8px;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+  border-bottom: 1px solid rgba(2, 132, 199, 0.2);
 }
 .comp-grid {
   display: grid;
@@ -209,21 +211,21 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   font-size: 11px;
 }
 .comp-row {
-  background: rgba(15, 23, 42, 0.55);
+  background: rgba(248, 250, 252, 0.9);
   padding: 4px 6px;
   border-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(203, 213, 225, 0.8);
   display: flex;
   justify-content: space-between;
 }
-.comp-k { color: #94a3b8; }
-.comp-v { color: #38bdf8; font-family: monospace; font-weight: 600; }
+.comp-k { color: #64748b; }
+.comp-v { color: #0284c7; font-family: monospace; font-weight: 600; }
 
 /* Test Flight Diagnostics Modal */
 #testModal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(4, 8, 18, 0.82);
+  background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(12px);
   z-index: 100;
   display: none;
@@ -233,24 +235,25 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 .modal-card {
   width: 580px;
   max-width: 90vw;
-  background: #0d1526;
-  border: 1px solid rgba(56, 189, 248, 0.4);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   border-radius: 16px;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.7), 0 0 32px rgba(2, 132, 199, 0.25);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
   padding: 24px;
-  color: #f8fafc;
+  color: #0f172a;
 }
 .modal-hdr {
   display: flex;
   align-items: center;
   gap: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 14px;
   margin-bottom: 16px;
 }
 .modal-icon {
   font-size: 28px;
-  background: linear-gradient(135deg, #0284c7, #38bdf8);
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  color: #fff;
   padding: 8px 12px;
   border-radius: 10px;
 }
@@ -264,14 +267,15 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(15, 23, 42, 0.7);
+  background: #f8fafc;
   padding: 10px 14px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid #e2e8f0;
   font-size: 13px;
+  color: #0f172a;
 }
 .chk-status {
-  color: #10b981;
+  color: #059669;
   font-weight: 700;
   font-family: monospace;
 }
@@ -282,22 +286,27 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   margin-top: 20px;
 }
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #f8fafc;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
   padding: 10px 18px;
   border-radius: 8px;
   cursor: pointer;
+  font-weight: 600;
+}
+.btn-secondary:hover {
+  background: #e2e8f0;
+  color: #0f172a;
 }
 .btn-primary-action {
-  background: linear-gradient(135deg, #10b981, #059669);
-  border: 1px solid #34d399;
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  border: 1px solid #0284c7;
   color: #fff;
   font-weight: 700;
   padding: 10px 22px;
   border-radius: 8px;
   cursor: pointer;
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 2px 10px rgba(2, 132, 199, 0.3);
 }
 
 /* Post-Flight Certification Report Card */
@@ -308,14 +317,15 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   transform: translateX(-50%);
   width: 520px;
   max-width: 92vw;
-  background: rgba(13, 21, 38, 0.95);
-  border: 2px solid #10b981;
+  background: rgba(255, 255, 255, 0.96);
+  border: 2px solid #059669;
   border-radius: 14px;
   padding: 18px 22px;
   z-index: 90;
-  box-shadow: 0 16px 48px rgba(0,0,0,0.7), 0 0 32px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 16px 48px rgba(15, 23, 42, 0.15);
   display: none;
   backdrop-filter: blur(16px);
+  color: #0f172a;
 }
 .report-grid {
   display: grid;
@@ -325,15 +335,18 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   font-size: 12px;
 }
 .report-row {
-  background: rgba(15, 23, 42, 0.7);
+  background: #f8fafc;
   padding: 6px 10px;
   border-radius: 6px;
+  border: 1px solid #e2e8f0;
   display: flex;
   justify-content: space-between;
+  color: #0f172a;
 }
 .badge-pass {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
+  background: rgba(5, 150, 105, 0.12);
+  color: #047857;
+  border: 1px solid rgba(5, 150, 105, 0.3);
   font-size: 10px;
   padding: 2px 6px;
   border-radius: 4px;
@@ -366,13 +379,13 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 .brand-text h1 {
   font-size: 13px;
   font-weight: 700;
-  color: #fff;
+  color: #0f172a;
   letter-spacing: -0.01em;
   margin: 0;
 }
 .brand-text p {
   font-size: 10px;
-  color: #94a3b8;
+  color: #64748b;
   margin: 0;
 }
 .control-groups {
@@ -424,22 +437,22 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 .btn-flight-action.start {
   background: linear-gradient(135deg, #0284c7, #0369a1) !important;
   color: #fff !important;
-  border: 1px solid #38bdf8 !important;
-  box-shadow: 0 0 14px rgba(56, 189, 248, 0.4) !important;
+  border: 1px solid #0284c7 !important;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3) !important;
 }
 .btn-flight-action.stop {
-  background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
   color: #fff !important;
-  border: 1px solid #fca5a5 !important;
-  box-shadow: 0 0 18px rgba(239, 68, 68, 0.6) !important;
+  border: 1px solid #ef4444 !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
   animation: pulseStop 1.8s infinite;
 }
 @keyframes pulseStop {
-  0%, 100% { box-shadow: 0 0 12px rgba(239, 68, 68, 0.5); transform: scale(1); }
-  50% { box-shadow: 0 0 22px rgba(239, 68, 68, 0.9); transform: scale(1.02); }
+  0%, 100% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); transform: scale(1); }
+  50% { box-shadow: 0 0 16px rgba(239, 68, 68, 0.7); transform: scale(1.02); }
 }
 
-/* Simulation Playback Speed Multiplier Controls (1x, 2x, 3x) */
+/* Simulation Playback Speed Multiplier Controls (1x, 2x, 3x, 5x) */
 .sim-speed-group {
   display: flex !important;
   align-items: center !important;
@@ -449,15 +462,15 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 .speed-label {
   font-size: 10px;
   font-weight: 700;
-  color: #94a3b8;
+  color: #64748b;
   padding: 0 4px;
   font-family: monospace;
   letter-spacing: 0.05em;
 }
 .btn-speed {
-  background: rgba(15, 23, 42, 0.7) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: #94a3b8 !important;
+  background: rgba(241, 245, 249, 0.95) !important;
+  border: 1px solid rgba(203, 213, 225, 0.9) !important;
+  color: #475569 !important;
   font-family: monospace !important;
   font-size: 11px !important;
   font-weight: 700 !important;
@@ -471,15 +484,15 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   min-width: 28px !important;
 }
 .btn-speed:hover {
-  color: #fff !important;
-  border-color: #38bdf8 !important;
-  background: rgba(56, 189, 248, 0.2) !important;
+  color: #0284c7 !important;
+  border-color: #0284c7 !important;
+  background: rgba(2, 132, 199, 0.1) !important;
 }
 .btn-speed.active {
   background: linear-gradient(135deg, #0284c7, #0369a1) !important;
-  border-color: #38bdf8 !important;
+  border-color: #0284c7 !important;
   color: #fff !important;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35) !important;
 }
 
 /* Telemetry HUD - Positioned Cleanly on Left, Never Overlapping */
@@ -501,9 +514,9 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   padding: 8px 12px;
 }
 .telem-min-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #94a3b8;
+  background: rgba(241, 245, 249, 0.9);
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  color: #64748b;
   font-size: 10px;
   padding: 2px 6px;
   border-radius: 4px;
@@ -511,8 +524,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   margin-left: 6px;
 }
 .telem-min-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  background: rgba(2, 132, 199, 0.1);
+  color: #0284c7;
 }
 .telem-grid {
   grid-template-columns: repeat(2, 1fr);
@@ -534,7 +547,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 #debriefModal {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(4, 9, 20, 0.88);
+  background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(14px);
   z-index: 150;
   display: none;
@@ -546,19 +559,19 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   width: 760px;
   max-width: 95vw;
   max-height: 90vh;
-  background: #0d1526;
-  border: 2px solid #38bdf8;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 35px rgba(56, 189, 248, 0.35);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  color: #f8fafc;
+  color: #0f172a;
 }
 .debrief-header {
   padding: 16px 22px;
-  background: linear-gradient(90deg, rgba(2, 132, 199, 0.25), rgba(15, 23, 42, 0.8));
-  border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -576,16 +589,16 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   gap: 10px;
 }
 .debrief-stat {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   padding: 10px 12px;
   border-radius: 8px;
 }
-.debrief-stat-k { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-.debrief-stat-v { font-size: 16px; font-weight: 700; color: #38bdf8; font-family: monospace; }
+.debrief-stat-k { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.debrief-stat-v { font-size: 16px; font-weight: 700; color: #0284c7; font-family: monospace; }
 .debrief-log {
-  background: rgba(9, 14, 28, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   padding: 12px 14px;
   font-family: monospace;
@@ -593,20 +606,21 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   line-height: 1.6;
   max-height: 240px;
   overflow-y: auto;
+  color: #1e293b;
 }
 .log-row {
   display: flex;
   gap: 12px;
   padding: 4px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid #e2e8f0;
 }
-.log-t { color: #f97316; font-weight: 700; min-width: 52px; }
-.log-e { color: #e2e8f0; }
-.log-tag { color: #10b981; font-weight: 700; }
+.log-t { color: #0284c7; font-weight: 700; min-width: 52px; }
+.log-e { color: #334155; }
+.log-tag { color: #059669; font-weight: 700; }
 .debrief-footer {
   padding: 12px 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(15, 23, 42, 0.6);
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
@@ -625,27 +639,28 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(13, 21, 38, 0.75);
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(203, 213, 225, 0.9);
   padding: 5px 14px;
   border-radius: 20px;
   font-size: 11px;
-  color: #94a3b8;
+  color: #475569;
   backdrop-filter: blur(10px);
   pointer-events: none;
   z-index: 20;
   display: flex;
   align-items: center;
   gap: 8px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
 }
 .hud-mouse-hint span {
-  color: #38bdf8;
+  color: #0284c7;
   font-weight: 600;
 }
 .btn-reset-cam {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #94a3b8;
+  background: rgba(241, 245, 249, 0.9);
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  color: #475569;
   font-size: 10px;
   padding: 4px 8px;
   border-radius: 6px;
@@ -653,8 +668,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   margin-left: 4px;
 }
 .btn-reset-cam:hover {
-  background: rgba(255, 255, 255, 0.18);
-  color: #fff;
+  background: rgba(2, 132, 199, 0.1);
+  color: #0284c7;
 }
 
 
@@ -676,11 +691,11 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   align-items: center;
   font-size: 11px;
   font-weight: 700;
-  color: #38bdf8;
+  color: #0284c7;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(56, 189, 248, 0.25);
+  border-bottom: 1px solid rgba(2, 132, 199, 0.2);
 }
 .mode-opt-btn {
   display: flex;
@@ -688,29 +703,29 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   gap: 10px;
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(15, 23, 42, 0.7);
-  color: #94a3b8;
+  border: 1px solid rgba(203, 213, 225, 0.85);
+  background: rgba(248, 250, 252, 0.95);
+  color: #334155;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
 }
 .mode-opt-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(2, 132, 199, 0.08);
+  color: #0f172a;
+  border-color: #0284c7;
 }
 .mode-opt-btn.active {
-  background: linear-gradient(135deg, rgba(2, 132, 199, 0.35), rgba(15, 23, 42, 0.9));
-  border: 1px solid #38bdf8;
-  color: #fff;
-  box-shadow: 0 0 16px rgba(56, 189, 248, 0.3);
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.12), rgba(248, 250, 252, 0.95));
+  border: 2px solid #0284c7;
+  color: #0f172a;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
 }
 .mode-opt-btn.active.crash {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(15, 23, 42, 0.9));
-  border: 1px solid #ef4444;
-  color: #fff;
-  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(248, 250, 252, 0.95));
+  border: 2px solid #ef4444;
+  color: #7f1d1d;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.15);
 }
 .mode-btn-icon {
   font-size: 18px;
@@ -720,10 +735,11 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   font-size: 12px;
   font-weight: 700;
   margin: 0;
+  color: #0f172a;
 }
 .mode-btn-text p {
   font-size: 10px;
-  color: #94a3b8;
+  color: #64748b;
   margin: 2px 0 0 0;
   line-height: 1.3;
 }
@@ -739,10 +755,10 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 
 /* --- QUANTUM PRE-FLIGHT INSPECTION & VERIFICATION STYLES --- */
 .btn-quantum-scan {
-  background: linear-gradient(135deg, rgba(147, 51, 234, 0.4), rgba(56, 189, 248, 0.45));
-  border: 1px solid #c084fc;
-  color: #f8fafc;
-  box-shadow: 0 0 16px rgba(192, 132, 252, 0.35);
+  background: #0284c7;
+  border: 1px solid #0369a1;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.28);
   display: flex;
   align-items: center;
   gap: 7px;
@@ -751,28 +767,19 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   padding: 7px 14px;
   font-size: 12px;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s ease;
 }
 .btn-quantum-scan:hover {
-  background: linear-gradient(135deg, rgba(147, 51, 234, 0.7), rgba(56, 189, 248, 0.7));
-  box-shadow: 0 0 25px rgba(192, 132, 252, 0.65);
+  background: #0369a1;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.38);
   transform: translateY(-1px);
-}
-.btn-quantum-scan .q-atom {
-  font-size: 16px;
-  animation: spinSlow 8s linear infinite;
-  display: inline-block;
-}
-@keyframes spinSlow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 /* Quantum Inspector Modal */
 #quantumInspectorModal {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(4, 8, 18, 0.88);
+  background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(14px);
   z-index: 100;
   display: none;
@@ -784,19 +791,19 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   width: 1080px;
   max-width: 96vw;
   max-height: 94vh;
-  background: #090e1a;
-  border: 2px solid #8b5cf6;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   border-radius: 16px;
-  box-shadow: 0 25px 70px rgba(0,0,0,0.9), 0 0 40px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 25px 70px rgba(15, 23, 42, 0.22);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  color: #f8fafc;
+  color: #0f172a;
 }
 .q-modal-header {
   padding: 14px 22px;
-  background: linear-gradient(90deg, rgba(139, 92, 246, 0.3), rgba(15, 23, 42, 0.85));
-  border-bottom: 1px solid rgba(139, 92, 246, 0.4);
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -809,8 +816,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   gap: 14px;
 }
 .q-scenario-selector {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
   padding: 12px 14px;
   display: flex;
@@ -826,10 +833,10 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   flex: 1;
   min-width: 260px;
   padding: 10px 14px;
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
-  color: #cbd5e1;
+  color: #334155;
   cursor: pointer;
   text-align: left;
   display: flex;
@@ -838,34 +845,34 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   transition: all 0.2s ease;
 }
 .q-scenario-btn:hover {
-  background: rgba(51, 65, 85, 0.8);
-  border-color: #38bdf8;
+  background: rgba(2, 132, 199, 0.08);
+  border-color: #0284c7;
 }
 .q-scenario-btn.active.sc-nominal {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(15, 23, 42, 0.9));
-  border: 1px solid #10b981;
-  color: #fff;
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.1);
+  border: 2px solid #10b981;
+  color: #065f46;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
 }
 .q-scenario-btn.active.sc-wing,
 .q-scenario-btn.active.sc-microcrack {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(15, 23, 42, 0.9));
-  border: 1px solid #ef4444;
-  color: #fff;
-  box-shadow: 0 0 18px rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid #ef4444;
+  color: #991b1b;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
 }
 .q-scenario-btn.active.sc-fuselage {
-  background: linear-gradient(135deg, rgba(249, 115, 22, 0.35), rgba(15, 23, 42, 0.9));
-  border: 1px solid #f97316;
-  color: #fff;
-  box-shadow: 0 0 18px rgba(249, 115, 22, 0.4);
+  background: rgba(249, 115, 22, 0.1);
+  border: 2px solid #f97316;
+  color: #9a3412;
+  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.2);
 }
 .q-scenario-btn.active.sc-engine,
 .q-scenario-btn.active.sc-fastener {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(15, 23, 42, 0.9));
-  border: 1px solid #f59e0b;
-  color: #fff;
-  box-shadow: 0 0 18px rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.1);
+  border: 2px solid #f59e0b;
+  color: #92400e;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2);
 }
 
 /* On-screen Fast Scenario Switcher Buttons */
@@ -876,21 +883,21 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   width: 100%;
   padding: 6px 8px;
   margin-top: 4px;
-  background: rgba(15, 23, 42, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(248, 250, 252, 0.95);
+  border: 1px solid rgba(203, 213, 225, 0.85);
   border-radius: 6px;
   cursor: pointer;
   text-align: left;
   transition: all 0.2s ease;
 }
 .sc-quick-btn:hover {
-  background: rgba(30, 41, 59, 0.85);
-  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(2, 132, 199, 0.08);
+  border-color: #0284c7;
 }
 .sc-quick-btn.active {
-  background: rgba(30, 41, 59, 0.95);
-  border-color: #38bdf8;
-  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3);
+  background: #ffffff;
+  border: 2px solid #0284c7;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15);
 }
 .sc-q-indicator {
   width: 8px;
@@ -912,7 +919,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 }
 .sc-q-desc {
   font-size: 9px;
-  color: #94a3b8;
+  color: #64748b;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -924,10 +931,11 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   font-size: 9px;
   font-weight: 600;
   padding: 4px 6px;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 4px;
   margin-top: 4px;
+  color: #334155;
 }
 
 /* 3 Layer Inspection Cards Grid */
@@ -937,8 +945,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   gap: 12px;
 }
 .q-layer-card {
-  background: rgba(13, 21, 38, 0.85);
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
   padding: 12px;
   display: flex;
@@ -949,13 +957,13 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 6px;
 }
 .q-layer-title {
   font-size: 11px;
   font-weight: 700;
-  color: #38bdf8;
+  color: #0284c7;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   display: flex;
@@ -965,8 +973,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 .q-canvas-box {
   width: 100%;
   height: 120px;
-  background: #040812;
-  border: 1px solid rgba(56, 189, 248, 0.3);
+  background: #0f172a;
+  border: 1px solid #cbd5e1;
   border-radius: 6px;
   position: relative;
   overflow: hidden;
@@ -986,14 +994,14 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   display: flex;
   justify-content: space-between;
   padding: 3px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid #e2e8f0;
 }
-.q-m-label { color: #94a3b8; }
-.q-m-val { font-weight: 700; font-family: monospace; color: #f1f5f9; }
+.q-m-label { color: #64748b; }
+.q-m-val { font-weight: 700; font-family: monospace; color: #0f172a; }
 .q-sensor-reduction-tag {
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  color: #10b981;
+  background: rgba(2, 132, 199, 0.08);
+  border: 1px solid rgba(2, 132, 199, 0.3);
+  color: #0369a1;
   border-radius: 4px;
   padding: 5px 8px;
   font-size: 10px;
@@ -1002,14 +1010,15 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 
 /* Prediction Certificate Banner */
 .q-prediction-card {
-  background: linear-gradient(135deg, rgba(88, 28, 135, 0.45), rgba(15, 23, 42, 0.95));
-  border: 2px solid #a855f7;
+  background: rgba(2, 132, 199, 0.06);
+  border: 2px solid #0284c7;
   border-radius: 12px;
   padding: 14px 18px;
-  box-shadow: 0 0 22px rgba(168, 85, 247, 0.3);
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.12);
   display: flex;
   flex-direction: column;
   gap: 8px;
+  color: #0f172a;
 }
 .q-pred-header {
   display: flex;
@@ -1025,21 +1034,21 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 .q-pred-desc {
   font-size: 12px;
   line-height: 1.5;
-  color: #e2e8f0;
+  color: #334155;
 }
 .q-pred-formula {
-  background: rgba(4, 8, 18, 0.65);
-  border-left: 3px solid #c084fc;
+  background: #f1f5f9;
+  border-left: 3px solid #0284c7;
   padding: 6px 12px;
   font-family: monospace;
   font-size: 11px;
-  color: #38bdf8;
+  color: #0369a1;
   border-radius: 0 4px 4px 0;
 }
 .q-modal-footer {
   padding: 12px 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(15, 23, 42, 0.6);
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
   display: flex;
   justify-content: flex-end;
   gap: 12px;
@@ -1052,16 +1061,16 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   left: 290px;
   width: 330px;
   padding: 12px 14px;
-  background: rgba(9, 14, 28, 0.94);
-  border: 1px solid #8b5cf6;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #0284c7;
   border-radius: 12px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.75), 0 0 20px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.15);
   backdrop-filter: blur(14px);
   z-index: 26;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  color: #f8fafc;
+  color: #0f172a;
   pointer-events: auto;
   transition: all 0.3s ease;
 }
@@ -1069,13 +1078,13 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+  border-bottom: 1px solid rgba(2, 132, 199, 0.2);
   padding-bottom: 4px;
 }
 .q-hud-title {
   font-size: 11px;
   font-weight: 700;
-  color: #c084fc;
+  color: #0284c7;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   display: flex;
@@ -1091,7 +1100,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 .q-gauge-track {
   width: 100%;
   height: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  background: #e2e8f0;
   border-radius: 4px;
   overflow: hidden;
   position: relative;
@@ -1146,16 +1155,16 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   <div class="control-groups interactive">
     <!-- Climate Selector -->
     <div class="panel btn-group" role="group">
-      <button id="btnCold" class="active" onclick="setClimate('cold')">&#10052; Cold</button>
-      <button id="btnHot" onclick="setClimate('hot')">&#9728; Hot</button>
-      <button id="btnSpring" onclick="setClimate('spring')">&#127793; Normal</button>
-      <button id="btnRain" onclick="setClimate('rain')">&#127783; Storm</button>
+      <button id="btnSpring" class="active" onclick="setClimate('spring')">&#9728; Daylight</button>
+      <button id="btnHot" onclick="setClimate('hot')">&#9728; Desert</button>
+      <button id="btnCold" onclick="setClimate('cold')">&#10052; Snow</button>
+      <button id="btnRain" onclick="setClimate('rain')">&#127783; Rain</button>
     </div>
 
     <!-- Time of Day -->
     <div class="panel slider-group">
-      <label id="lblTime">10:00</label>
-      <input id="rngTime" type="range" min="0" max="24" step="0.05" value="10">
+      <label id="lblTime">12:00</label>
+      <input id="rngTime" type="range" min="0" max="24" step="0.05" value="12">
       <button id="btnClock" onclick="toggleClock()">&#9654; Auto</button>
     </div>
 
@@ -1170,10 +1179,10 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     </div>
 
     <!-- Flight Plan Action Button: "START FLIGHT PLAN" / "Stop in the task" -->
-        <!-- Quantum Pre-Flight Scan & Prediction Button -->
+    <!-- Quantum Pre-Flight Scan & Prediction Button -->
     <div class="panel" style="padding: 2px;">
       <button id="btnQuantumScan" class="btn-quantum-scan" onclick="openQuantumInspector()" title="Run 3-Layer Quantum NDT Inspection & Defect Prediction">
-        <span class="q-atom">&#9883;</span> QUANTUM PRE-FLIGHT SCAN
+        <span style="font-size:14px;">🔬</span> QUANTUM AIRFRAME INSPECTION
       </button>
     </div>
 
@@ -1181,12 +1190,13 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       <button id="btnFlightAction" class="btn-flight-action start" onclick="toggleFlightPlanAction()">&#9992; START FLIGHT PLAN</button>
     </div>
 
-    <!-- Simulation Playback Speed: 1x, 2x, 3x -->
-    <div class="panel sim-speed-group" title="Simulation Speed Multiplier (Press 1, 2, or 3 on keyboard)">
+    <!-- Simulation Playback Speed: 1x, 2x, 3x, 5x -->
+    <div class="panel sim-speed-group" title="Simulation Speed Multiplier (Press 1, 2, 3, or 5 on keyboard)">
       <span class="speed-label">&#9889; SPEED</span>
-      <button id="btnSpeed1x" class="btn-speed active" onclick="setSimSpeed(1)">1x</button>
-      <button id="btnSpeed2x" class="btn-speed" onclick="setSimSpeed(2)">2x</button>
+      <button id="btnSpeed1x" class="btn-speed" onclick="setSimSpeed(1)">1x</button>
+      <button id="btnSpeed2x" class="btn-speed active" onclick="setSimSpeed(2)">2x</button>
       <button id="btnSpeed3x" class="btn-speed" onclick="setSimSpeed(3)">3x</button>
+      <button id="btnSpeed5x" class="btn-speed" onclick="setSimSpeed(5)">5x</button>
     </div>
   </div>
 </div>
@@ -1212,97 +1222,97 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   <button id="btnModeCrash" class="mode-opt-btn" onclick="switchSimulationMode('crash')">
     <div class="mode-btn-icon">&#128165;</div>
     <div class="mode-btn-text">
-      <h3 style="color:#f87171;">Crash History: N722BD</h3>
+      <h3 style="color:#ef4444;">Crash History: N722BD</h3>
       <p>FL350 Severe Icing &bull; -58k fpm Spiral Dive Forensics</p>
     </div>
   </button>
 
   <!-- Differentiated 3D Flight Trajectories Toggle -->
-  <button id="btnTogglePaths" class="mode-opt-btn" onclick="toggleTrajectoryVisuals()" style="padding: 7px 10px; margin-top: 4px; border: 1px solid rgba(56, 189, 248, 0.4); background: rgba(15, 23, 42, 0.6);" title="Toggle 3D Flight Trajectory Ribbons">
-    <div class="mode-btn-icon" style="color: #38bdf8;">&#128506;&#65039;</div>
+  <button id="btnTogglePaths" class="mode-opt-btn" onclick="toggleTrajectoryVisuals()" style="padding: 7px 10px; margin-top: 4px;" title="Toggle 3D Flight Trajectory Ribbons">
+    <div class="mode-btn-icon" style="color: #0284c7;">&#128506;&#65039;</div>
     <div class="mode-btn-text">
-      <h3 style="font-size: 11px; color: #38bdf8;">3D Trajectories: <span id="pathToggleStatus" style="color:#10b981;">VISIBLE</span></h3>
+      <h3 style="font-size: 11px; color: #0284c7;">3D Trajectories: <span id="pathToggleStatus" style="color:#059669;">VISIBLE</span></h3>
       <p style="font-size: 9px; margin-top: 1px;">
-        <span style="color:#10b981;">&#9679; Nominal</span> &bull; <span style="color:#ef4444;">&#9679; Crash Divergence</span>
+        <span style="color:#059669;">&#9679; Nominal</span> &bull; <span style="color:#ef4444;">&#9679; Crash Divergence</span>
       </p>
     </div>
   </button>
 
   <!-- Quantum NDT Button -->
-  <button class="mode-opt-btn" onclick="openQuantumInspector()" style="padding: 7px 10px; margin-top: 4px; border: 1px solid rgba(168, 85, 247, 0.4); background: rgba(88, 28, 135, 0.25);" title="Open 3-Layer Quantum Airframe Inspector">
-    <div class="mode-btn-icon" style="color: #c084fc;">&#9883;</div>
+  <button class="mode-opt-btn" onclick="openQuantumInspector()" style="padding: 7px 10px; margin-top: 4px; border: 1px solid rgba(2, 132, 199, 0.4); background: rgba(2, 132, 199, 0.08);" title="Open 3-Layer Quantum Airframe Inspector">
+    <div class="mode-btn-icon" style="color: #0284c7;">🔬</div>
     <div class="mode-btn-text">
-      <h3 style="font-size: 11px; color: #c084fc;">Quantum Airframe NDT</h3>
+      <h3 style="font-size: 11px; color: #0284c7;">Quantum Airframe NDT</h3>
       <p style="font-size: 9px;">3 Layers &bull; Flaw Prediction &bull; Sensor Reduction</p>
     </div>
   </button>
 
   <!-- Quantum Airframe Dent Scenarios -->
-  <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.12);">
-    <div style="font-size: 10px; font-weight: 700; color: #f87171; text-transform: uppercase; letter-spacing: 0.05em; display:flex; justify-content:space-between; align-items:center;">
+  <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(203,213,225,0.8);">
+    <div style="font-size: 10px; font-weight: 700; color: #dc2626; text-transform: uppercase; letter-spacing: 0.05em; display:flex; justify-content:space-between; align-items:center;">
       <span>Quantum Dent Scenarios:</span>
-      <span style="font-size:8px; color:#94a3b8;">1-Click</span>
+      <span style="font-size:8px; color:#64748b;">1-Click</span>
     </div>
 
     <!-- Option 1: Left Wing Slat / Spar Dent -->
     <button id="dockScBtnWing" class="sc-quick-btn active" onclick="selectQuantumScenario('wing_dent')">
       <div class="sc-q-indicator" style="background:#ef4444; color:#ef4444;"></div>
       <div class="sc-q-info">
-        <div class="sc-q-title" style="color:#f87171;">Dent 1: Left Wing Slat (Crash)</div>
+        <div class="sc-q-title" style="color:#dc2626;">Dent 1: Left Wing Slat (Crash)</div>
         <div class="sc-q-desc">Rib 4 Spar Shear at 2.2G &bull; Spiral Dive to River</div>
       </div>
     </button>
 
     <!-- Option 2: Fuselage Crown Dent -->
     <button id="dockScBtnFuselage" class="sc-quick-btn" onclick="selectQuantumScenario('fuselage_dent')">
-      <div class="sc-q-indicator" style="background:#f97316; color:#f97316;"></div>
+      <div class="sc-q-indicator" style="background:#ea580c; color:#ea580c;"></div>
       <div class="sc-q-info">
-        <div class="sc-q-title" style="color:#fb923c;">Dent 2: Fuselage Crown (Crash)</div>
+        <div class="sc-q-title" style="color:#ea580c;">Dent 2: Fuselage Crown (Crash)</div>
         <div class="sc-q-desc">Skin Delamination at Vr &bull; Lawn Dart Overrun</div>
       </div>
     </button>
 
     <!-- Option 3: Port Engine Nacelle Dent -->
     <button id="dockScBtnEngine" class="sc-quick-btn" onclick="selectQuantumScenario('engine_dent')">
-      <div class="sc-q-indicator" style="background:#f59e0b; color:#f59e0b;"></div>
+      <div class="sc-q-indicator" style="background:#d97706; color:#d97706;"></div>
       <div class="sc-q-info">
-        <div class="sc-q-title" style="color:#fbbf24;">Dent 3: Engine Nacelle (Crash)</div>
+        <div class="sc-q-title" style="color:#d97706;">Dent 3: Engine Nacelle (Crash)</div>
         <div class="sc-q-desc">Turbine Shroud Rub &bull; Fuel Fire Flat Spin into Bay</div>
       </div>
     </button>
 
     <!-- Option 4: Nominal Airframe -->
     <button id="dockScBtnNominal" class="sc-quick-btn" onclick="selectQuantumScenario('nominal')">
-      <div class="sc-q-indicator" style="background:#10b981; color:#10b981;"></div>
+      <div class="sc-q-indicator" style="background:#059669; color:#059669;"></div>
       <div class="sc-q-info">
-        <div class="sc-q-title" style="color:#34d399;">Nominal Airframe (Safe Flight)</div>
+        <div class="sc-q-title" style="color:#059669;">Nominal Airframe (Safe Flight)</div>
         <div class="sc-q-desc">Airworthy Baseline &bull; Pattern &bull; Safe Touchdown</div>
       </div>
     </button>
   </div>
 
   <!-- Flight Fleet & Scenario Switcher -->
-  <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.12); font-size: 10px; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em;">
+  <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(203,213,225,0.8); font-size: 10px; font-weight: 700; color: #0284c7; text-transform: uppercase; letter-spacing: 0.05em;">
     Switch Aircraft & Flight:
   </div>
   <button class="mode-opt-btn" onclick="window.location.href='f16_3d_simulation.html'" style="padding: 6px 10px; margin-top: 4px;" title="Launch Supersonic F-16 Flight Simulation">
     <div class="mode-btn-icon">&#9889;</div>
     <div class="mode-btn-text">
-      <h3 style="font-size: 12px; color: #38bdf8;">F-16 Fighting Falcon</h3>
+      <h3 style="font-size: 12px; color: #0284c7;">F-16 Fighting Falcon</h3>
       <p style="font-size: 10px;">Mach 1.34 Supersonic &bull; Edwards AFB</p>
     </div>
   </button>
   <button class="mode-opt-btn" onclick="window.location.href='f4n_3d_simulation.html'" style="padding: 6px 10px; margin-top: 4px;" title="Launch Carrier F-4N Phantom Simulation">
     <div class="mode-btn-icon">&#9992;</div>
     <div class="mode-btn-text">
-      <h3 style="font-size: 12px; color: #f97316;">F-4N Phantom II</h3>
+      <h3 style="font-size: 12px; color: #ea580c;">F-4N Phantom II</h3>
       <p style="font-size: 10px;">Carrier Fighter Transonic Dynamics</p>
     </div>
   </button>
   <button class="mode-opt-btn" onclick="window.location.href='flight_3d_simulation.html'" style="padding: 6px 10px; margin-top: 4px;" title="Launch RocketPy Calisto Simulation">
     <div class="mode-btn-icon">&#128640;</div>
     <div class="mode-btn-text">
-      <h3 style="font-size: 12px; color: #c084fc;">RocketPy Calisto Rocket</h3>
+      <h3 style="font-size: 12px; color: #0284c7;">RocketPy Calisto Rocket</h3>
       <p style="font-size: 10px;">6-DOF Launch Rail Trajectory</p>
     </div>
   </button>
@@ -1313,7 +1323,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   <div class="telem-header">
     <div style="font-size: 11px; font-weight: 700; color: var(--accent-cyan); display:flex; align-items:center; gap: 4px;">
       AIRLINER CAP-101
-      <span id="telemSimSpeed" style="font-size: 10px; font-family: monospace; color: #38bdf8; background: rgba(56,189,248,0.15); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(56,189,248,0.3);">1x SPEED</span>
+      <span id="telemSimSpeed" style="font-size: 10px; font-family: monospace; color: #d97706; background: rgba(217,119,6,0.1); padding: 1px 5px; border-radius: 4px; border: 1px solid rgba(217,119,6,0.3);">2x SPEED</span>
       <button class="telem-min-btn" onclick="toggleTelemMinimize()" title="Minimize/Expand Telemetry">&#9724; Min</button>
     </div>
     <div id="telemPhase" class="flight-phase-badge">RUNWAY HOLD</div>
@@ -1405,12 +1415,12 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   <div class="q-modal-card">
     <div class="q-modal-header">
       <div style="display:flex; align-items:center; gap:10px;">
-        <span style="font-size:22px; color:#c084fc;">&#9883;</span>
+        <span style="font-size:22px; color:#0284c7;">🔬</span>
         <div>
-          <h2 style="font-size:16px; margin:0; color:#fff; display:flex; align-items:center; gap:8px;">
-            THREE-LAYER QUANTUM AIRFRAME INSPECTION & PREDICTIVE NDT
+          <h2 style="font-size:16px; margin:0; color:#0f172a; display:flex; align-items:center; gap:8px;">
+            THREE-LAYER QUANTUM AIRFRAME INSPECTION &amp; PREDICTIVE NDT
           </h2>
-          <p style="font-size:11px; color:#94a3b8; margin:2px 0 0 0;">
+          <p style="font-size:11px; color:#64748b; margin:2px 0 0 0;">
             Quantum NV Magnetometer &bull; Ghost Imaging / Quantum Illumination &bull; QAOA Autonomous Route &amp; VQC Defect Classification
           </p>
         </div>
@@ -1421,41 +1431,41 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     <div class="q-modal-body">
       <!-- Scenario Selector Bar -->
       <div class="q-scenario-selector">
-        <div style="font-size:11px; font-weight:700; color:#38bdf8; text-transform:uppercase; letter-spacing:0.05em; display:flex; justify-content:space-between;">
+        <div style="font-size:11px; font-weight:700; color:#0284c7; text-transform:uppercase; letter-spacing:0.05em; display:flex; justify-content:space-between;">
           <span>Select Structural Scenario to Predict &amp; In-Flight Verify:</span>
-          <span style="color:#94a3b8; font-weight:normal;">3 Layers Analyze Subsurface Stresses &bull; Gives Explicit Pre-Flight Prediction</span>
+          <span style="color:#64748b; font-weight:normal;">3 Layers Analyze Subsurface Stresses &bull; Gives Explicit Pre-Flight Prediction</span>
         </div>
         <div class="q-scenario-pills">
           <button id="scBtnNominal" class="q-scenario-btn active sc-nominal" onclick="selectQuantumScenario('nominal')">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong style="font-size:12px; color:#10b981;">&#9679; Scenario A: Nominal Baseline</strong>
-              <span style="font-size:9px; background:rgba(16,185,129,0.25); color:#10b981; padding:2px 5px; border-radius:4px; font-weight:700;">GO</span>
+              <strong style="font-size:12px; color:#059669;">&#9679; Scenario A: Nominal Baseline</strong>
+              <span style="font-size:9px; background:rgba(5,150,105,0.15); color:#047857; padding:2px 5px; border-radius:4px; font-weight:700;">GO</span>
             </div>
-            <span style="font-size:10px; color:#94a3b8;">Zero microcracks. Safe under all flight loads up to 2.50G.</span>
+            <span style="font-size:10px; color:#64748b;">Zero microcracks. Safe under all flight loads up to 2.50G.</span>
           </button>
           
           <button id="scBtnWing" class="q-scenario-btn sc-wing sc-microcrack" onclick="selectQuantumScenario('wing_dent')">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong style="font-size:12px; color:#f87171;">&#9888; Dent 1: Wing Slat &amp; Spar</strong>
-              <span style="font-size:9px; background:rgba(239,68,68,0.25); color:#f87171; padding:2px 5px; border-radius:4px; font-weight:700;">CRASH PREDICTED</span>
+              <strong style="font-size:12px; color:#dc2626;">&#9888; Dent 1: Wing Slat &amp; Spar</strong>
+              <span style="font-size:9px; background:rgba(239,68,68,0.15); color:#b91c1c; padding:2px 5px; border-radius:4px; font-weight:700;">CRASH PREDICTED</span>
             </div>
-            <span style="font-size:10px; color:#94a3b8;">Rib 4 fatigue crack under slat dent. Wing spar shears under 2.2G turn &rarr; River Crash.</span>
+            <span style="font-size:10px; color:#64748b;">Rib 4 fatigue crack under slat dent. Wing spar shears under 2.2G turn &rarr; River Crash.</span>
           </button>
 
           <button id="scBtnFuselage" class="q-scenario-btn sc-fuselage" onclick="selectQuantumScenario('fuselage_dent')">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong style="font-size:12px; color:#fb923c;">&#9888; Dent 2: Fuselage Crown (Bay 14)</strong>
-              <span style="font-size:9px; background:rgba(249,115,22,0.25); color:#fb923c; padding:2px 5px; border-radius:4px; font-weight:700;">CRASH PREDICTED</span>
+              <strong style="font-size:12px; color:#ea580c;">&#9888; Dent 2: Fuselage Crown (Bay 14)</strong>
+              <span style="font-size:9px; background:rgba(249,115,22,0.15); color:#c2410c; padding:2px 5px; border-radius:4px; font-weight:700;">CRASH PREDICTED</span>
             </div>
-            <span style="font-size:10px; color:#94a3b8;">Hail dent delaminates at rotation. Elevator cables severed &rarr; Lawn Dart Overrun Crash.</span>
+            <span style="font-size:10px; color:#64748b;">Hail dent delaminates at rotation. Elevator cables severed &rarr; Lawn Dart Overrun Crash.</span>
           </button>
 
           <button id="scBtnEngine" class="q-scenario-btn sc-engine sc-fastener" onclick="selectQuantumScenario('engine_dent')">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong style="font-size:12px; color:#f59e0b;">&#9888; Dent 3: Port Engine Nacelle</strong>
-              <span style="font-size:9px; background:rgba(245,158,11,0.25); color:#f59e0b; padding:2px 5px; border-radius:4px; font-weight:700;">CRASH PREDICTED</span>
+              <strong style="font-size:12px; color:#d97706;">&#9888; Dent 3: Port Engine Nacelle</strong>
+              <span style="font-size:9px; background:rgba(245,158,11,0.15); color:#b45309; padding:2px 5px; border-radius:4px; font-weight:700;">CRASH PREDICTED</span>
             </div>
-            <span style="font-size:10px; color:#94a3b8;">Shroud rub ovalization at climb thrust. Uncontained turbine explosion &rarr; Bay Flat Spin Crash.</span>
+            <span style="font-size:10px; color:#64748b;">Shroud rub ovalization at climb thrust. Uncontained turbine explosion &rarr; Bay Flat Spin Crash.</span>
           </button>
         </div>
       </div>
@@ -1466,12 +1476,12 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
         <div class="q-layer-card">
           <div class="q-layer-hdr">
             <div class="q-layer-title">
-              <span style="color:#c084fc;">&#9670; Layer 1</span>
+              <span style="color:#0284c7;">&#9670; Layer 1</span>
               <span>NV Magnetometer</span>
             </div>
             <span id="l1StatusBadge" class="chk-status" style="font-size:9px;">NOMINAL</span>
           </div>
-          <div style="font-size:10px; color:#94a3b8; line-height:1.3;">
+          <div style="font-size:10px; color:#64748b; line-height:1.3;">
             Nitrogen-Vacancy Diamond Probes &bull; Subsurface Stress Tensor &amp; Microcrack Dipole
           </div>
           <div class="q-canvas-box">
@@ -1571,8 +1581,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
               <span class="q-m-val" id="mVqcEntropy">1.42 e-bits</span>
             </div>
           </div>
-          <div class="q-sensor-reduction-tag" style="border-color:rgba(192,132,252,0.35); background:rgba(192,132,252,0.12); color:#c084fc;">
-            <strong>&#9883; SENSOR REDUCTION:</strong> Autonomous 3D drone flies collision-free QAOA path in 45s vs 4hr manual scaffolding NDT. VQC compresses multimodal tensor into 4 qubits.
+          <div class="q-sensor-reduction-tag" style="border-color:rgba(2,132,199,0.35); background:rgba(2,132,199,0.08); color:#0369a1;">
+            <strong>🔬 SENSOR REDUCTION:</strong> Autonomous 3D drone flies collision-free QAOA path in 45s vs 4hr manual scaffolding NDT. VQC compresses multimodal tensor into 4 qubits.
           </div>
         </div>
       </div>
@@ -1581,8 +1591,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       <div class="q-prediction-card">
         <div class="q-pred-header">
           <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:18px; color:#c084fc;">&#128220;</span>
-            <span style="font-size:12px; font-weight:700; color:#c084fc; text-transform:uppercase; letter-spacing:0.06em;">
+            <span style="font-size:18px; color:#0284c7;">📋</span>
+            <span style="font-size:12px; font-weight:700; color:#0284c7; text-transform:uppercase; letter-spacing:0.06em;">
               Pre-Flight Quantum Prediction &amp; Airframe Certification
             </span>
           </div>
@@ -1596,7 +1606,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
         </div>
 
         <div class="q-pred-formula">
-          <span style="color:#94a3b8;">Quantum Decision Circuit:</span> 
+          <span style="color:#64748b;">Quantum Decision Circuit:</span> 
           <span id="qPredFormulaText">&lang;&psi;(&theta;) | Z&#8320; | &psi;(&theta;)&rang; = +0.952 &rarr; P(fail) = 0.024 &lt; 0.10 &bull; Takeoff Clearance: APPROVED</span>
         </div>
       </div>
@@ -1604,8 +1614,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
 
     <div class="q-modal-footer">
       <button class="btn-secondary" onclick="closeQuantumInspector()">&#10005; Close Inspector</button>
-      <button class="btn-primary-action" onclick="executeVerificationFlight()" style="background:linear-gradient(135deg, #7c3aed, #0284c7); border:1px solid #c084fc; box-shadow:0 0 15px rgba(192,132,252,0.4);">
-        &#128640; EXECUTE VERIFICATION FLIGHT
+      <button class="btn-primary-action" onclick="executeVerificationFlight()" style="background:linear-gradient(135deg, #0284c7, #0369a1); border:1px solid #0284c7; box-shadow:0 2px 10px rgba(2,132,199,0.3);">
+        🚀 EXECUTE VERIFICATION FLIGHT
       </button>
     </div>
   </div>
@@ -1616,10 +1626,10 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   <div class="debrief-card">
     <div class="debrief-header">
       <div>
-        <h2 id="debriefModalTitle" style="font-size:16px;margin:0;color:#fff;display:flex;align-items:center;gap:8px;">
-          <span style="color:#10b981;">&#10004;</span> FLIGHT PLAN TRIP DEBRIEFING & ANALYSIS
+        <h2 id="debriefModalTitle" style="font-size:16px;margin:0;color:#0f172a;display:flex;align-items:center;gap:8px;">
+          <span style="color:#059669;">✔</span> FLIGHT PLAN TRIP DEBRIEFING &amp; ANALYSIS
         </h2>
-        <p style="font-size:11px;color:#94a3b8;margin:2px 0 0 0;">Capital City International (KCAP) Runway 09L Pattern Trip Log</p>
+        <p style="font-size:11px;color:#64748b;margin:2px 0 0 0;">Capital City International (KCAP) Runway 09L Pattern Trip Log</p>
       </div>
       <span class="badge-pass" id="debriefStatusBadge">TRIP LOG COMPLETE</span>
     </div>
@@ -1661,29 +1671,29 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
         </div>
       </div>
 
-            <!-- Quantum Predictive Verification Debriefing Card -->
-      <div style="background:rgba(88,28,135,0.25); border:1px solid #8b5cf6; border-radius:8px; padding:12px 14px;">
+      <!-- Quantum Predictive Verification Debriefing Card -->
+      <div style="background:rgba(2,132,199,0.06); border:1px solid #0284c7; border-radius:8px; padding:12px 14px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <div style="font-size:12px; font-weight:700; color:#c084fc; display:flex; align-items:center; gap:6px;">
-            <span>&#9883;</span> QUANTUM PREDICTIVE VERIFICATION CERTIFICATION
+          <div style="font-size:12px; font-weight:700; color:#0284c7; display:flex; align-items:center; gap:6px;">
+            <span>🔬</span> QUANTUM PREDICTIVE VERIFICATION CERTIFICATION
           </div>
           <span id="dbQuantumVerdictBadge" class="badge-pass">100% PREDICTION ACCURACY</span>
         </div>
-        <div id="dbQuantumSummaryText" style="font-size:11px; color:#cbd5e1; line-height:1.5;">
+        <div id="dbQuantumSummaryText" style="font-size:11px; color:#334155; line-height:1.5;">
           Pre-flight quantum prediction accurately forecasted aircraft aerodynamic behavior under flight loads.
         </div>
         <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:8px; font-size:10px;">
-          <div style="background:rgba(15,23,42,0.7); padding:6px; border-radius:6px;">
-            <div style="color:#94a3b8;">PREDICTED BEHAVIOR</div>
-            <div id="dbPredTarget" style="font-weight:700; color:#38bdf8; font-family:monospace; margin-top:2px;">Safe Baseline (&lt;450 &mu;&epsilon;)</div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:6px; border-radius:6px;">
+            <div style="color:#64748b;">PREDICTED BEHAVIOR</div>
+            <div id="dbPredTarget" style="font-weight:700; color:#0284c7; font-family:monospace; margin-top:2px;">Safe Baseline (&lt;450 &mu;&epsilon;)</div>
           </div>
-          <div style="background:rgba(15,23,42,0.7); padding:6px; border-radius:6px;">
-            <div style="color:#94a3b8;">ACTUAL IN-FLIGHT LOAD</div>
-            <div id="dbActualLoad" style="font-weight:700; color:#f8fafc; font-family:monospace; margin-top:2px;">Peak 2.18G &bull; 418 &mu;&epsilon;</div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:6px; border-radius:6px;">
+            <div style="color:#64748b;">ACTUAL IN-FLIGHT LOAD</div>
+            <div id="dbActualLoad" style="font-weight:700; color:#0f172a; font-family:monospace; margin-top:2px;">Peak 2.18G &bull; 418 &mu;&epsilon;</div>
           </div>
-          <div style="background:rgba(15,23,42,0.7); padding:6px; border-radius:6px;">
-            <div style="color:#94a3b8;">SENSOR REDUCTION SAVINGS</div>
-            <div style="font-weight:700; color:#10b981; font-family:monospace; margin-top:2px;">-94.2% Sensor Mass &bull; -92% Photons</div>
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:6px; border-radius:6px;">
+            <div style="color:#64748b;">SENSOR REDUCTION SAVINGS</div>
+            <div style="font-weight:700; color:#059669; font-family:monospace; margin-top:2px;">-94.2% Sensor Mass &bull; -92% Photons</div>
           </div>
         </div>
       </div>
@@ -2563,8 +2573,8 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     }
   };
 
-  var curClimate = 'cold';
-  var timeOfDay = 10.0;
+  var curClimate = 'spring';
+  var timeOfDay = 12.0;
   var isAutoClock = false;
   var cameraMode = 'chase';
 
@@ -3000,11 +3010,11 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     document.getElementById('btnClock').classList.toggle('active', isAutoClock);
   };
 
-  // Simulation Speed Multiplier Controls (1x, 2x, 3x)
-  window.simSpeed = 1.0;
+  // Simulation Speed Multiplier Controls (1x, 2x, 3x, 5x)
+  window.simSpeed = 2.0;
   window.setSimSpeed = function(spd) {
-    window.simSpeed = Math.max(1, Math.min(3, parseFloat(spd) || 1));
-    ['btnSpeed1x', 'btnSpeed2x', 'btnSpeed3x'].forEach(function(bId) {
+    window.simSpeed = Math.max(1, Math.min(5, parseFloat(spd) || 2));
+    ['btnSpeed1x', 'btnSpeed2x', 'btnSpeed3x', 'btnSpeed5x'].forEach(function(bId) {
       var btn = document.getElementById(bId);
       if (btn) btn.classList.remove('active');
     });
@@ -3014,8 +3024,9 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     var hudSpeed = document.getElementById('telemSimSpeed');
     if (hudSpeed) {
       hudSpeed.innerText = window.simSpeed + 'x SPEED';
-      hudSpeed.style.color = window.simSpeed === 3 ? '#ef4444' : (window.simSpeed === 2 ? '#f59e0b' : '#38bdf8');
-      hudSpeed.style.borderColor = window.simSpeed === 3 ? 'rgba(239,68,68,0.4)' : (window.simSpeed === 2 ? 'rgba(245,158,11,0.4)' : 'rgba(56,189,248,0.3)');
+      hudSpeed.style.color = window.simSpeed >= 3 ? '#dc2626' : (window.simSpeed === 2 ? '#d97706' : '#0284c7');
+      hudSpeed.style.borderColor = window.simSpeed >= 3 ? 'rgba(220,38,38,0.4)' : (window.simSpeed === 2 ? 'rgba(217,119,6,0.4)' : 'rgba(2,132,199,0.3)');
+      hudSpeed.style.background = window.simSpeed >= 3 ? 'rgba(220,38,38,0.08)' : (window.simSpeed === 2 ? 'rgba(217,119,6,0.08)' : 'rgba(2,132,199,0.08)');
     }
   };
 
@@ -3024,6 +3035,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     if (e.key === '1') setSimSpeed(1);
     else if (e.key === '2') setSimSpeed(2);
     else if (e.key === '3') setSimSpeed(3);
+    else if (e.key === '4' || e.key === '5') setSimSpeed(5);
   });
 
   window.setCamera = function(mode) {
@@ -4064,11 +4076,11 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
     if (cv3 && cv3.getContext) {
       var ctx3 = cv3.getContext('2d');
       var w3 = cv3.width, h3 = cv3.height;
-      ctx3.fillStyle = '#040814';
+      ctx3.fillStyle = '#0f172a';
       ctx3.fillRect(0, 0, w3, h3);
 
       var qY = [22, 48, 74, 100];
-      ctx3.strokeStyle = 'rgba(192, 132, 252, 0.3)';
+      ctx3.strokeStyle = 'rgba(56, 189, 248, 0.35)';
       ctx3.lineWidth = 1;
 
       // Draw 4 quantum wire rails
@@ -4077,13 +4089,13 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
         ctx3.moveTo(35, qY[q]);
         ctx3.lineTo(w3 - 25, qY[q]);
         ctx3.stroke();
-        ctx3.fillStyle = '#c084fc';
+        ctx3.fillStyle = '#38bdf8';
         ctx3.font = 'bold 9px monospace';
         ctx3.fillText('q' + q, 12, qY[q] + 3);
 
         // Ry(theta) gate box
-        ctx3.fillStyle = '#1e1b4b';
-        ctx3.strokeStyle = '#8b5cf6';
+        ctx3.fillStyle = '#1e293b';
+        ctx3.strokeStyle = '#0284c7';
         ctx3.lineWidth = 1;
         ctx3.fillRect(45, qY[q] - 8, 36, 16);
         ctx3.strokeRect(45, qY[q] - 8, 36, 16);
@@ -4092,19 +4104,19 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
         ctx3.fillText('Ry(θ)', 50, qY[q] + 4);
 
         // Measurement meter at end
-        ctx3.fillStyle = '#0f172a';
+        ctx3.fillStyle = '#0284c7';
         ctx3.strokeStyle = '#38bdf8';
         ctx3.fillRect(w3 - 24, qY[q] - 8, 16, 16);
         ctx3.strokeRect(w3 - 24, qY[q] - 8, 16, 16);
-        ctx3.fillStyle = '#38bdf8';
+        ctx3.fillStyle = '#ffffff';
         ctx3.fillText('M', w3 - 19, qY[q] + 4);
       }
 
       // CNOT Entangling ladder
-      ctx3.strokeStyle = '#c084fc';
+      ctx3.strokeStyle = '#0284c7';
       ctx3.lineWidth = 1.5;
       // CNOT 0 -> 1
-      ctx3.beginPath(); ctx3.arc(105, qY[0], 3, 0, Math.PI * 2); ctx3.fillStyle = '#c084fc'; ctx3.fill();
+      ctx3.beginPath(); ctx3.arc(105, qY[0], 3, 0, Math.PI * 2); ctx3.fillStyle = '#0284c7'; ctx3.fill();
       ctx3.beginPath(); ctx3.moveTo(105, qY[0]); ctx3.lineTo(105, qY[1]); ctx3.stroke();
       ctx3.beginPath(); ctx3.arc(105, qY[1], 5, 0, Math.PI * 2); ctx3.stroke();
       // CNOT 1 -> 2
@@ -4317,7 +4329,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
       state = evaluateFlightPattern(circuitTimer);
     } else {
       // CRASH HISTORY MODE (N722BD) - Smooth, continuous high speed (never slows down)
-      var currentSpeedMps = 240.0; // Steady fast jet velocity (~466 kts) so it never crawls
+      var currentSpeedMps = 380.0; // High transonic dive speed (~738 kts) so it moves fast and dynamically
       crashDistance = (crashDistance + currentSpeedMps * dt) % crashTotalDist;
 
       // Locate active segment along cumulative distance path
@@ -4748,7 +4760,7 @@ button.active { background: var(--accent); color: #fff; font-weight: 700; }
   }
 
   // Initialize
-  applyClimate('cold');
+  applyClimate('spring');
   requestAnimationFrame(animate);
 })();
 </script>
